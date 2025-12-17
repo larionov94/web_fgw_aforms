@@ -56,3 +56,22 @@ CREATE NONCLUSTERED INDEX IX_svTB_Production_Status_Archive
 CREATE NONCLUSTERED INDEX IX_svTB_Production_VP_ML
     ON dbo.svTB_Production (PrVP, PrML)
     INCLUDE (PrArticle, PrStatus, PrArchive);
+
+CREATE PROCEDURE dbo.svAFormsProductionAll -- ХП выводит список продукции.
+    AS
+BEGIN
+    SET NOCOUNT ON;
+
+SELECT PrArticle,
+       PrPackName,
+       PrShortName,
+       PrColor,
+       PrRows,
+       PrCount,
+       PrHWD,
+       idProduction,
+       PrEditDate
+FROM dbo.svTB_Production;
+
+END
+GO;
