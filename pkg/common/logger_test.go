@@ -1,8 +1,8 @@
 package common
 
 import (
-	"FGW_WEB/pkg/convert"
 	"errors"
+	"fgw_web_aforms/pkg/convert"
 	"log"
 	"os"
 	"reflect"
@@ -11,7 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const pathFile = "test_log.json"
+const (
+	SkipNumOfStackFrame = 5
+	pathFile            = "test_log.json"
+)
 
 func openFile(path string) (*os.File, error) {
 	return os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
@@ -256,7 +259,7 @@ func TestLogger_createDetails(t *testing.T) {
 				infoPC:   tt.fields.infoPC,
 				filePath: tt.fields.filePath,
 			}
-			if got := l.createDetails(); !reflect.DeepEqual(got, tt.want) {
+			if got := l.createDetails(SkipNumOfStackFrame); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("createDetails() = %v, want %v", got, tt.want)
 			}
 			l.file.Close()
