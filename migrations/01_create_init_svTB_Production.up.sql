@@ -43,33 +43,38 @@ CREATE TABLE dbo.svTB_Production
 
 );
 -- 1. Кластерный индекс (сейчас используется NONCLUSTERED на PK).
-CREATE CLUSTERED INDEX IX_svTB_Production_Created_at
+CREATE
+CLUSTERED INDEX IX_svTB_Production_Created_at
     ON dbo.svTB_Production (Created_at DESC)
     WITH (DROP_EXISTING = OFF);
 
 -- 2. Индекс для часто используемых фильтров.
-CREATE NONCLUSTERED INDEX IX_svTB_Production_Status_Archive
+CREATE
+NONCLUSTERED INDEX IX_svTB_Production_Status_Archive
     ON dbo.svTB_Production (PrStatus, PrArchive)
     INCLUDE (PrArticle, PrName, PrShortName);
 
 -- 3. Индекс для фильтрации по VP и ML (используется в процедуре генерации артикула).
-CREATE NONCLUSTERED INDEX IX_svTB_Production_VP_ML
+CREATE
+NONCLUSTERED INDEX IX_svTB_Production_VP_ML
     ON dbo.svTB_Production (PrVP, PrML)
     INCLUDE (PrArticle, PrStatus, PrArchive);
+
 
 CREATE PROCEDURE dbo.svAFormsProductionAll -- ХП выводит список продукции.
     AS
 BEGIN
-    SET NOCOUNT ON;
+    SET
+NOCOUNT ON;
 
-SELECT PrArticle,
-       PrPackName,
+SELECT idProduction,
        PrShortName,
+       PrPackName,
+       PrArticle,
        PrColor,
-       PrRows,
        PrCount,
+       PrRows,
        PrHWD,
-       idProduction,
        PrEditDate
 FROM dbo.svTB_Production;
 

@@ -11,3 +11,8 @@ const (
 const (
 	FGWsvRoleFindByIdQuery = "exec dbo.svRoleFindById ?;" // ХП ищет роль.
 )
+
+// ПРОДУКЦИЯ
+const (
+	FGWsvAFormsProductionAllQuery = "exec dbo.svAFormsProductionAll ?;" //ХП выводит список продукции.
+)
