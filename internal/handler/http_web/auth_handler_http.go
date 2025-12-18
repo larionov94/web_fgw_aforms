@@ -4,11 +4,11 @@ import (
 	"fgw_web_aforms/internal/config"
 	"fgw_web_aforms/internal/handler"
 	"fgw_web_aforms/internal/handler/http_err"
+	"fgw_web_aforms/internal/handler/page"
 	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
 	"fgw_web_aforms/pkg/convert"
-	"html/template"
 	"net/http"
 	"net/url"
 	"time"
@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	tmplRedirectHTML = "redirect.html"
-	tmplAuthHTML     = "auth.html"
+	tmplRedirectHTML   = "redirect.html"
+	tmplAuthHTML       = "auth.html"
+	tmplProductionHTML = "productions.html"
 
 	urlAForms             = "/aforms"
 	urlAuth               = "/auth"
@@ -27,11 +28,6 @@ const (
 	urlTempRedirect       = "/temp-redirect"
 	pathToDefault         = "/"
 	tmplStartPageHTML     = "index.html"
-	tmplErrorHTML         = "error.html"
-
-	// /fgw
-	prefixDefaultTmpl = "web/html/"
-	prefixAFormsTmpl  = "web/html/aforms/"
 )
 
 const (
@@ -57,7 +53,7 @@ type RedirectData struct {
 	Delay           int
 	FallbackDelay   int
 	ClearHistory    bool
-	AddTempState    bool // Флаг для сложного управления историей
+	AddTempState    bool
 }
 
 type DataPage struct {
@@ -104,7 +100,7 @@ func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
 
 	data := NewDataPage("Панель форма комплектов", "dashboard", performerFIO, performerId, roleName)
 
-	a.renderPages(w, tmplStartPageHTML, data, r)
+	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML)
 }
 
 func (a *AuthHandlerHTML) ShowAuthForm(w http.ResponseWriter, r *http.Request) {
@@ -120,7 +116,7 @@ func (a *AuthHandlerHTML) ShowAuthForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *AuthHandlerHTML) LoginPage(w http.ResponseWriter, r *http.Request) {
-	a.setSecureHTMLHeaders(w)
+	page.SetSecureHTMLHeaders(w)
 
 	if r.Method != http.MethodGet {
 		http_err.SendErrorHTTP(w, http.StatusMethodNotAllowed, "", a.logg, r)
@@ -135,7 +131,7 @@ func (a *AuthHandlerHTML) LoginPage(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage: errorMsg,
 	}
 
-	a.renderPage(w, tmplAuthHTML, data, r)
+	page.RenderPage(w, tmplAuthHTML, data, r)
 }
 
 func (a *AuthHandlerHTML) Logout(w http.ResponseWriter, r *http.Request) {
@@ -184,7 +180,7 @@ func (a *AuthHandlerHTML) AuthPerformerHTML(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := r.ParseForm(); err != nil {
-		a.renderErrorPage(w, http.StatusBadRequest, msg.H7007, r)
+		page.RenderErrorPage(w, http.StatusBadRequest, msg.H7007, r)
 		return
 	}
 
@@ -192,7 +188,7 @@ func (a *AuthHandlerHTML) AuthPerformerHTML(w http.ResponseWriter, r *http.Reque
 	performerPass := r.FormValue("performerPassword")
 
 	if performerIdStr == "" || performerPass == "" {
-		a.renderErrorPage(w, http.StatusUnauthorized, msg.E3211, r)
+		page.RenderErrorPage(w, http.StatusUnauthorized, msg.E3211, r)
 		return
 	}
 
@@ -211,7 +207,7 @@ func (a *AuthHandlerHTML) AuthPerformerHTML(w http.ResponseWriter, r *http.Reque
 	if authResult.Success {
 		err := a.createSecureSession(w, r, performerId, authResult.Performer.IdRoleAForms)
 		if err != nil {
-			a.renderErrorPage(w, http.StatusInternalServerError, "Ошибка создания сессии", r)
+			page.RenderErrorPage(w, http.StatusInternalServerError, "Ошибка создания сессии", r)
 			return
 		}
 
@@ -261,8 +257,8 @@ func (a *AuthHandlerHTML) renderRedirectPage(w http.ResponseWriter, r *http.Requ
 		data.FallbackDelay = FallbackDelayDefault
 	}
 
-	a.setSecureHTMLHeaders(w)
-	a.renderPage(w, tmplRedirectHTML, data, r)
+	page.SetSecureHTMLHeaders(w)
+	page.RenderPage(w, tmplRedirectHTML, data, r)
 }
 
 // Обновленный sendLoginSuccessPage
@@ -307,15 +303,6 @@ func (a *AuthHandlerHTML) redirectToLoginWithHistoryClear(w http.ResponseWriter,
 	a.sendLogoutPageWithHistoryClear(w, r)
 }
 
-func (a *AuthHandlerHTML) setSecureHTMLHeaders(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private, max-age=0")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.Header().Set("X-Frame-Options", "DENY")
-}
-
 func (a *AuthHandlerHTML) createSecureSession(w http.ResponseWriter, r *http.Request, performerId, roleId int) error {
 	session, _ := config.Store.Get(r, config.GetSessionName())
 
@@ -336,76 +323,7 @@ func (a *AuthHandlerHTML) createSecureSession(w http.ResponseWriter, r *http.Req
 		SameSite: http.SameSiteStrictMode,
 	}
 
-	a.setSecureHTMLHeaders(w)
+	page.SetSecureHTMLHeaders(w)
 
 	return session.Save(r, w)
-}
-
-func (a *AuthHandlerHTML) renderErrorPage(w http.ResponseWriter, statusCode int, msgCode string, r *http.Request) {
-	a.setSecureHTMLHeaders(w)
-
-	data := struct {
-		Title      string
-		MsgCode    string
-		StatusCode int
-		Method     string
-		Path       string
-	}{
-		Title:      "Ошибка",
-		MsgCode:    msgCode,
-		StatusCode: statusCode,
-		Method:     r.Method,
-		Path:       r.URL.Path,
-	}
-
-	w.WriteHeader(statusCode)
-	a.logg.LogHttpErr(msgCode, statusCode, r.Method, r.URL.Path)
-	a.renderPage(w, tmplErrorHTML, data, r)
-}
-
-func (a *AuthHandlerHTML) renderPage(w http.ResponseWriter, tmpl string, data interface{}, r *http.Request) {
-	templatePath := prefixDefaultTmpl + tmpl
-
-	parseTmpl, err := template.New(tmpl).Funcs(
-		template.FuncMap{
-			"formatDateTime": convert.FormatDateTime,
-		}).ParseFiles(templatePath)
-
-	if err != nil {
-		a.renderErrorPage(w, http.StatusInternalServerError, msg.H7002+err.Error(), r)
-
-		return
-	}
-
-	if err = parseTmpl.ExecuteTemplate(w, tmpl, data); err != nil {
-		a.renderErrorPage(w, http.StatusInternalServerError, msg.H7003+err.Error(), r)
-
-		return
-	}
-}
-
-func (a *AuthHandlerHTML) renderPages(
-	w http.ResponseWriter, tmpl string, data interface{}, r *http.Request, additionalTemplates ...string) {
-	templatePaths := []string{prefixDefaultTmpl + tmpl}
-
-	for _, additionalTmpl := range additionalTemplates {
-		templatePaths = append(templatePaths, prefixAFormsTmpl+additionalTmpl)
-	}
-
-	parseTmpl, err := template.New(tmpl).Funcs(
-		template.FuncMap{
-			"formatDateTime": convert.FormatDateTime,
-		}).ParseFiles(templatePaths...)
-
-	if err != nil {
-		a.renderErrorPage(w, http.StatusInternalServerError, msg.H7002+err.Error(), r)
-
-		return
-	}
-
-	if err = parseTmpl.ExecuteTemplate(w, tmpl, data); err != nil {
-		a.renderErrorPage(w, http.StatusInternalServerError, msg.H7003+err.Error(), r)
-
-		return
-	}
 }

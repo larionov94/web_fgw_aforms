@@ -70,12 +70,12 @@
                         <span class="ms-0">Главная</span>
                     </a>
                 </li>
-<!--                <li class="nav-item ms-2">-->
-<!--                    <a class="nav-link {{ if eq .CurrentPage `performers` }}active{{ end }}" href="/aforms/performers">-->
-<!--                        <span>👥</span>-->
-<!--                        <span class="ms-0">Сотрудники</span>-->
-<!--                    </a>-->
-<!--                </li>-->
+                <li class="nav-item ms-2">
+                    <a class="nav-link {{ if eq .CurrentPage `productions` }}active{{ end }}" href="/aforms/productions">
+                        <span>👥</span>
+                        <span class="ms-0">Варианты упаковки продукции</span>
+                    </a>
+                </li>
 <!--                <li class="nav-item ms-2">-->
 <!--                    <a class="nav-link {{ if eq .CurrentPage `roles` }}active{{ end }}" href="/aforms/roles">-->
 <!--                        <span>🛡️</span>-->
@@ -109,6 +109,9 @@
         <p class="lead">Вы вошли в систему как <strong>{{ .PerformerRole }}</strong></p>
     </div>
 
+
+    {{ else if eq .CurrentPage `productions` }}
+    {{ template "productions_content" . }}
 
     {{ else }}
     <!-- Страница по умолчанию или 404 -->

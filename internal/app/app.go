@@ -6,6 +6,7 @@ import (
 	"fgw_web_aforms/internal/config/db"
 	"fgw_web_aforms/internal/handler"
 	"fgw_web_aforms/internal/handler/http_web"
+	"fgw_web_aforms/internal/handler/http_web/aforms"
 	"fgw_web_aforms/internal/repository"
 	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
@@ -52,11 +53,16 @@ func StartApp() {
 	repoPerformer := repository.NewPerformerRepo(mssqlDB, logger)
 	servicePerformer := service.NewPerformerService(repoPerformer, logger)
 
+	repoAFormsProduction := repository.NewProductionRepo(mssqlDB, logger)
+	serviceAFormsProduction := service.NewProductionService(repoAFormsProduction, logger)
+
 	handlerAuthHTML := http_web.NewAuthHandlerHTML(servicePerformer, serviceRole, logger, authMiddleware)
+	handlerAFormsProductionHTML := aforms.NewProductionHandlerHTML(serviceAFormsProduction, servicePerformer, serviceRole, logger, authMiddleware)
 
 	mux := http.NewServeMux()
 
 	handlerAuthHTML.ServerHTTPRouter(mux)
+	handlerAFormsProductionHTML.ServeHTTPHTMLRouter(mux)
 
 	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web/"))))
 
