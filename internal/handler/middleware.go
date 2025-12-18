@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"errors"
 	"fgw_web_aforms/internal/config"
 	"fgw_web_aforms/internal/handler/http_err"
+	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
 	"fmt"
 	"html/template"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -18,6 +21,7 @@ const (
 	prefixTmplPerformers = "web/html/"
 	tmplForceLogoutHTML  = "force_logout.html"
 	maxLifeSession       = 4 * time.Hour
+	expiresCache         = 60 * time.Minute
 )
 
 type AuthMiddleware struct {
@@ -26,6 +30,14 @@ type AuthMiddleware struct {
 	performerKey string
 	roleKey      string
 	logg         *common.Logger
+	userCache    map[int]*UserSession
+	cacheMu      sync.RWMutex
+}
+
+type UserSession struct {
+	PerformerFIO string
+	RoleName     string
+	Expires      time.Time
 }
 
 func NewAuthMiddleware(store *sessions.CookieStore, logg *common.Logger) *AuthMiddleware {
@@ -36,6 +48,62 @@ func NewAuthMiddleware(store *sessions.CookieStore, logg *common.Logger) *AuthMi
 		roleKey:      config.SessionRoleKey,
 		logg:         logg,
 	}
+}
+
+// GetUserData получаем данные пользователя.
+func (m *AuthMiddleware) GetUserData(r *http.Request, performerService service.PerformerUseCase, roleService service.RoleUseCase) (string, int, string, error) {
+	performerId, ok1 := m.GetPerformerId(r)
+	roleId, ok2 := m.GetRoleId(r)
+	if !ok1 || !ok2 {
+		m.logg.LogE(msg.E3103, nil)
+
+		return "", 0, "", errors.New("пользователь не авторизован")
+	}
+
+	var performerFIO string
+	var roleName string
+
+	// 1. Проверяем кеш.
+	m.cacheMu.RLock()
+	if cached, exists := m.userCache[performerId]; exists && time.Now().Before(cached.Expires) {
+		performerFIO = cached.PerformerFIO
+		roleName = cached.RoleName
+		m.cacheMu.RUnlock()
+
+		return performerFIO, performerId, roleName, nil
+	}
+	m.cacheMu.RUnlock()
+
+	// 2. Загружаем данные.
+	ctx := r.Context()
+
+	performer, err := performerService.FindByIdPerformer(ctx, performerId)
+	if err != nil {
+		m.logg.LogE(msg.E3206, err)
+
+		return "", performerId, "", err
+	}
+
+	role, err := roleService.FindRoleById(ctx, roleId)
+	if err != nil {
+		m.logg.LogE(msg.E3206, err)
+
+		return performerFIO, performerId, "", err
+	}
+
+	// 3. Сохраняем в кеш.
+	m.cacheMu.Lock()
+	if m.userCache == nil {
+		m.userCache = make(map[int]*UserSession)
+	}
+	m.userCache[performerId] = &UserSession{
+		PerformerFIO: performer.FIO,
+		RoleName:     role.Name,
+		Expires:      time.Now().Add(expiresCache),
+	}
+	m.cacheMu.Unlock()
+
+	return performer.FIO, performerId, role.Name, nil
 }
 
 // RequireAuth - основной middleware для проверки аутентификации.

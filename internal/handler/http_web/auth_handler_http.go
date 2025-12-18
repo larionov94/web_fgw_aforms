@@ -9,7 +9,6 @@ import (
 	"fgw_web_aforms/pkg/common/msg"
 	"fgw_web_aforms/pkg/convert"
 	"html/template"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -61,6 +60,18 @@ type RedirectData struct {
 	AddTempState    bool // Флаг для сложного управления историей
 }
 
+type DataPage struct {
+	Title         string
+	CurrentPage   string
+	PerformerFIO  string
+	PerformerId   int
+	PerformerRole string
+}
+
+func NewDataPage(title string, currentPage string, performerFIO string, performerId int, performerRole string) *DataPage {
+	return &DataPage{title, currentPage, performerFIO, performerId, performerRole}
+}
+
 func NewAuthHandlerHTML(
 	performerService service.PerformerUseCase,
 	roleService service.RoleUseCase,
@@ -84,39 +95,14 @@ func (a *AuthHandlerHTML) ServerHTTPRouter(mux *http.ServeMux) {
 }
 
 func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
-	performerId, ok1 := a.authMiddleware.GetPerformerId(r)
-	performerRole, ok2 := a.authMiddleware.GetRoleId(r)
-
-	if !ok1 || !ok2 {
+	performerFIO, performerId, roleName, err := a.authMiddleware.GetUserData(r, a.performerService, a.roleService)
+	if err != nil {
 		a.redirectToLoginWithHistoryClear(w, r)
+
 		return
 	}
 
-	a.setSecureHTMLHeaders(w)
-
-	performer, err := a.performerService.FindByIdPerformer(r.Context(), performerId)
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	role, err := a.roleService.FindRoleById(r.Context(), performerRole)
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	data := struct {
-		Title         string
-		CurrentPage   string
-		PerformerFIO  string
-		PerformerId   int
-		PerformerRole string
-	}{
-		Title:         "Панель форма комплектов",
-		CurrentPage:   "dashboard",
-		PerformerFIO:  performer.FIO,
-		PerformerId:   performerId,
-		PerformerRole: role.Name,
-	}
+	data := NewDataPage("Панель форма комплектов", "dashboard", performerFIO, performerId, roleName)
 
 	a.renderPages(w, tmplStartPageHTML, data, r)
 }
