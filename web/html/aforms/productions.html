@@ -1,4 +1,6 @@
 {{ define "productions_content" }}
+{{ $sortField := .SortProducts.SortField }}
+{{ $sortOrder := .SortProducts.SortOrder }}
 
 <div class="d-flex justify-content-between align-items-center">
     <h1 class="h2 mb-3">{{ .Title }}</h1>
@@ -15,7 +17,7 @@
                 <table class="table table-hover mb-0" style="min-width: 1200px;" id="productionsTable">
 
                     <colgroup>
-                        <col style="width: 60px">
+                        <col style="width: 68px">
                         <col style="width: 550px">
                         <col style="width: 500px">
                         <col style="width: 120px">
@@ -26,28 +28,108 @@
                         <col style="width: 110px">
                     </colgroup>
 
-                    <thead class="table-light" style="position: sticky; top: 0; z-index: 10; background-color: #f8f9fa;">
+                    <thead class="table-light"
+                           style="position: sticky; top: 0; z-index: 10; background-color: #f8f9fa;">
                     <tr>
-                        <th class="text-nowrap sortable-header" style="position: relative;">
-                            <a href="?sort=PrArticle&order={{ if eq .SortProducts.SortField `PrArticle` }}{{ if eq .SortProducts.SortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+
+                        <th class="text-nowrap sortable-header" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrArticle&order={{ if eq $sortField `PrArticle` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Артикул
-                                {{ if eq .SortProducts.SortField "PrArticle" }}
-                                <span class="sort-indicator position-absolute" style="right: 5px;">
-                                    {{ if eq .SortProducts.SortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                {{ if eq $sortField "PrArticle" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
                                 </span>
                                 {{ end }}
                             </a>
+                        </th>
 
-                            </th>
-                        <th class="text-nowrap">Наименование продукции для упаковщика</th>
-                        <th class="text-nowrap">Наименование продукции для этикетки</th>
-                        <th class="text-nowrap text-center">Цвет</th>
-                        <th class="text-nowrap text-center">Кол-во <br> рядов</th>
-                        <th class="text-nowrap text-center">Кол-во <br> в ряду</th>
-                        <th class="text-nowrap text-center">Габариты <br> упаковки</th>
-                        <th class="text-nowrap text-center">Код <br> продукции</th>
-                        <th class="text-nowrap text-center">Дата и время <br> изменение записи</th>
+                        <th class="text-nowrap sortable-header" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrPackName&order={{ if eq $sortField `PrPackName` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Наименование продукции для упаковщика
+                                {{ if eq $sortField "PrPackName" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrShortName&order={{ if eq $sortField `PrShortName` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Наименование продукции для этикетки
+                                {{ if eq $sortField "PrShortName" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrColor&order={{ if eq $sortField `PrColor` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Цвет
+                                {{ if eq $sortField "PrColor" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=PrRows&order={{ if eq $sortField `PrRows` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Кол-во <br> рядов
+                                {{ if eq $sortField "PrRows" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=PrCount&order={{ if eq $sortField `PrCount` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Кол-во <br> в ряду
+                                {{ if eq $sortField "PrCount" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap text-center text-dark">Габариты <br> упаковки</th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=idProduction&order={{ if eq $sortField `idProduction` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Код <br> продукции
+                                {{ if eq $sortField "idProduction" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=PrEditDate&order={{ if eq $sortField `PrEditDate` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Дата и время <br> изменение записи
+                                {{ if eq $sortField "PrEditDate" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
                     </tr>
                     </thead>
                     <tbody>
