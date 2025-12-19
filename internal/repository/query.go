@@ -14,5 +14,5 @@ const (
 
 // ПРОДУКЦИЯ
 const (
-	FGWsvAFormsProductionAllQuery = "exec dbo.svAFormsProductionAll ?;" //ХП выводит список продукции.
+	FGWsvAFormsProductionAllQuery = "exec dbo.svAFormsProductionAll;" //ХП выводит список продукции.
 )

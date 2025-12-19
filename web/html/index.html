@@ -24,7 +24,7 @@
             <div class="dropdown">
                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle px-3 py-2" type="button"
                         data-bs-toggle="dropdown">
-                    👤 {{ .PerformerId }}
+                    👤 {{ .InfoPerformer.PerformerId }}
                 </button>
                 <div class="dropdown-menu dropdown-menu-end dropdown-user-info p-4" style="min-width: 320px;">
                     <!-- Заголовок меню -->
@@ -36,19 +36,19 @@
                     <div class="user-data-item">
                         <div class="d-flex">
                             <span class="fw-bold text-muted">Табельный номер:</span>
-                            <span class="user-data-value">{{ .PerformerId }}</span>
+                            <span class="user-data-value">{{ .InfoPerformer.PerformerId }}</span>
                         </div>
                     </div>
                     <div class="user-data-item">
                         <div class="d-flex">
                             <span class="fw-bold text-muted">Роль:</span>
-                            <span class="user-data-value">{{ .PerformerRole }}</span>
+                            <span class="user-data-value">{{ .InfoPerformer.PerformerRole }}</span>
                         </div>
                     </div>
                     <div class="user-data-item">
                         <div class="d-flex">
                             <span class="fw-bold text-muted">ФИО:</span>
-                            <span class="user-data-value">{{ .PerformerFIO }}</span>
+                            <span class="user-data-value">{{ .InfoPerformer.PerformerFIO }}</span>
                         </div>
                     </div>
                 </div>
@@ -105,8 +105,8 @@
     {{ if eq .CurrentPage `dashboard` }}
 
     <div class="mt-4">
-        <h1 class="mb-4">Добро пожаловать, {{ .PerformerFIO }}</h1>
-        <p class="lead">Вы вошли в систему как <strong>{{ .PerformerRole }}</strong></p>
+        <h1 class="mb-4">Добро пожаловать, {{ .InfoPerformer.PerformerFIO }}</h1>
+        <p class="lead">Вы вошли в систему как <strong>{{ .InfoPerformer.PerformerRole }}</strong></p>
     </div>
 
 

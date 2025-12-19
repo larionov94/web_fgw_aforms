@@ -5,6 +5,7 @@ import (
 	"fgw_web_aforms/internal/handler"
 	"fgw_web_aforms/internal/handler/http_err"
 	"fgw_web_aforms/internal/handler/page"
+	"fgw_web_aforms/internal/model"
 	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
@@ -56,16 +57,21 @@ type RedirectData struct {
 	AddTempState    bool
 }
 
-type DataPage struct {
-	Title         string
-	CurrentPage   string
+type InfoPerformerPage struct {
 	PerformerFIO  string
 	PerformerId   int
 	PerformerRole string
 }
 
-func NewDataPage(title string, currentPage string, performerFIO string, performerId int, performerRole string) *DataPage {
-	return &DataPage{title, currentPage, performerFIO, performerId, performerRole}
+type DataPage struct {
+	Title         string
+	CurrentPage   string
+	InfoPerformer *InfoPerformerPage
+	Productions   []*model.Production
+}
+
+func NewDataPage(title string, currentPage string, infoPerformer *InfoPerformerPage, productions []*model.Production) *DataPage {
+	return &DataPage{title, currentPage, infoPerformer, productions}
 }
 
 func NewAuthHandlerHTML(
@@ -98,7 +104,11 @@ func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := NewDataPage("Панель форма комплектов", "dashboard", performerFIO, performerId, roleName)
+	data := NewDataPage("Панель форма комплектов", "dashboard", &InfoPerformerPage{
+		PerformerFIO:  performerFIO,
+		PerformerId:   performerId,
+		PerformerRole: roleName,
+	}, nil)
 
 	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML)
 }

@@ -7,6 +7,7 @@ import (
 	"fgw_web_aforms/internal/handler/page"
 	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
+	"fgw_web_aforms/pkg/common/msg"
 	"net/http"
 )
 
@@ -37,7 +38,7 @@ func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	if r.Method != http.MethodGet {
-		http_err.SendErrorHTTP(w, http.StatusMethodNotAllowed, "", p.logg, r)
+		http_err.SendErrorHTTP(w, http.StatusMethodNotAllowed, msg.H7000, p.logg, r)
 
 		return
 	}
@@ -48,7 +49,18 @@ func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http
 		return
 	}
 
-	data := http_web.NewDataPage("Варианты упаковки продукции", "productions", performerFIO, performerId, roleName)
+	productions, err := p.productionService.AllProductions(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7008, p.logg, r)
+
+		return
+	}
+
+	data := http_web.NewDataPage("Варианты упаковки продукции", "productions", &http_web.InfoPerformerPage{
+		PerformerFIO:  performerFIO,
+		PerformerId:   performerId,
+		PerformerRole: roleName,
+	}, productions)
 
 	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML)
 }
