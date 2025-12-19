@@ -130,6 +130,8 @@
                             </a>
                         </th>
 
+                        <th class="text-nowrap text-center">Операции</th>
+
                     </tr>
                     </thead>
                     <tbody>
@@ -145,6 +147,18 @@
                         <td>{{ .PrHWD }}</td>
                         <td class="text-center">{{ .IdProduction }}</td>
                         <td>{{ formatDateTime .PrEditDate }}</td>
+
+                        <!-- Кнопки операций -->
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <!-- Кнопка редактирования -->
+                                <button class="btn btn-sm btn-outline-primary edit-btn"
+                                        title="Редактировать">
+                                    <span>✏️</span>
+                                </button>
+                            </div>
+                        </td>
+
                     </tr>
                     {{ end }}
 

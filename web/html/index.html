@@ -65,24 +65,36 @@
         <div class="collapse navbar-collapse ms-5" id="navbarContent">
             <!-- Навигационное меню -->
             <ul class="navbar-nav me-auto">
+
                 <li class="nav-item">
                     <a class="nav-link {{ if eq .CurrentPage `dashboard` }}active{{ end }}" href="/aforms">
                         <span>🏠</span>
                         <span class="ms-0">Главная</span>
                     </a>
                 </li>
+
                 <li class="nav-item ms-2">
-                    <a class="nav-link {{ if eq .CurrentPage `productions` }}active{{ end }}" href="/aforms/productions">
-                        <span>👥</span>
-                        <span class="ms-0">Варианты упаковки продукции</span>
+                    <a class="nav-link {{ if eq .CurrentPage `productions` }}active{{ end }}"
+                       href="/aforms/productions">
+
+                        <span class="me-1" style="color: #ff9800;">
+                            <svg width="16" height="20" viewBox="0 0 16 20">
+                                <path d="M8 1.5l3.5 5a5.5 5.5 0 1 1-7 0z"
+                                      fill="#FF9800"
+                                      stroke="#000000"
+                                      stroke-width="1"/>
+                            </svg>🧴📦
+                        </span>
+                        <span>Варианты упаковки продукции</span>
                     </a>
                 </li>
-<!--                <li class="nav-item ms-2">-->
-<!--                    <a class="nav-link {{ if eq .CurrentPage `roles` }}active{{ end }}" href="/aforms/roles">-->
-<!--                        <span>🛡️</span>-->
-<!--                        <span class="ms-0">Роли</span>-->
-<!--                    </a>-->
-<!--                </li>-->
+
+                <!--                <li class="nav-item ms-2">-->
+                <!--                    <a class="nav-link {{ if eq .CurrentPage `roles` }}active{{ end }}" href="/aforms/roles">-->
+                <!--                        <span>🛡️</span>-->
+                <!--                        <span class="ms-0">Роли</span>-->
+                <!--                    </a>-->
+                <!--                </li>-->
                 <!-- Добавьте другие пункты меню здесь -->
             </ul>
 
