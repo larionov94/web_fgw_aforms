@@ -63,15 +63,21 @@ type InfoPerformerPage struct {
 	PerformerRole string
 }
 
+type SortProductionsPage struct {
+	SortField string
+	SortOrder string
+}
+
 type DataPage struct {
 	Title         string
 	CurrentPage   string
 	InfoPerformer *InfoPerformerPage
 	Productions   []*model.Production
+	SortProducts  *SortProductionsPage
 }
 
-func NewDataPage(title string, currentPage string, infoPerformer *InfoPerformerPage, productions []*model.Production) *DataPage {
-	return &DataPage{title, currentPage, infoPerformer, productions}
+func NewDataPage(title string, currentPage string, infoPerformer *InfoPerformerPage, productions []*model.Production, sortProducts *SortProductionsPage) *DataPage {
+	return &DataPage{title, currentPage, infoPerformer, productions, sortProducts}
 }
 
 func NewAuthHandlerHTML(
@@ -108,7 +114,7 @@ func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
 		PerformerFIO:  performerFIO,
 		PerformerId:   performerId,
 		PerformerRole: roleName,
-	}, nil)
+	}, nil, nil)
 
 	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML)
 }

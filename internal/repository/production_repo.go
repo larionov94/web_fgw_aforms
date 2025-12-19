@@ -19,11 +19,11 @@ func NewProductionRepo(mssql *sql.DB, logg *common.Logger) *ProductionRepo {
 }
 
 type ProductionRepository interface {
-	All(ctx context.Context) ([]*model.Production, error)
+	All(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error)
 }
 
-func (p *ProductionRepo) All(ctx context.Context) ([]*model.Production, error) {
-	rows, err := p.mssql.QueryContext(ctx, FGWsvAFormsProductionAllQuery)
+func (p *ProductionRepo) All(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error) {
+	rows, err := p.mssql.QueryContext(ctx, FGWsvAFormsProductionAllQuery, sortField, sortOrder)
 	if err != nil {
 		p.logg.LogE(msg.E3203, err)
 

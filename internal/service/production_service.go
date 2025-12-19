@@ -18,11 +18,11 @@ func NewProductionService(production repository.ProductionRepository, logg *comm
 }
 
 type ProductionUserCase interface {
-	AllProductions(ctx context.Context) ([]*model.Production, error)
+	AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error)
 }
 
-func (p *ProductionService) AllProductions(ctx context.Context) ([]*model.Production, error) {
-	productions, err := p.productionRepo.All(ctx)
+func (p *ProductionService) AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error) {
+	productions, err := p.productionRepo.All(ctx, sortField, sortOrder)
 	if err != nil {
 		p.logg.LogE(msg.E3209, err)
 

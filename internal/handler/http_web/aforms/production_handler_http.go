@@ -49,7 +49,10 @@ func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http
 		return
 	}
 
-	productions, err := p.productionService.AllProductions(r.Context())
+	sortField := r.URL.Query().Get("sort")
+	sortOrder := r.URL.Query().Get("order")
+
+	productions, err := p.productionService.AllProductions(r.Context(), sortField, sortOrder)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7008, p.logg, r)
 
@@ -60,7 +63,10 @@ func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http
 		PerformerFIO:  performerFIO,
 		PerformerId:   performerId,
 		PerformerRole: roleName,
-	}, productions)
+	}, productions, &http_web.SortProductionsPage{
+		SortField: sortField,
+		SortOrder: sortOrder,
+	})
 
 	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML)
 }

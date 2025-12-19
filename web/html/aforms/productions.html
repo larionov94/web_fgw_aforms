@@ -28,7 +28,18 @@
 
                     <thead class="table-light" style="position: sticky; top: 0; z-index: 10; background-color: #f8f9fa;">
                     <tr>
-                        <th class="text-nowrap">Артикул</th>
+                        <th class="text-nowrap sortable-header" style="position: relative;">
+                            <a href="?sort=PrArticle&order={{ if eq .SortProducts.SortField `PrArticle` }}{{ if eq .SortProducts.SortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Артикул
+                                {{ if eq .SortProducts.SortField "PrArticle" }}
+                                <span class="sort-indicator position-absolute" style="right: 5px;">
+                                    {{ if eq .SortProducts.SortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+
+                            </th>
                         <th class="text-nowrap">Наименование продукции для упаковщика</th>
                         <th class="text-nowrap">Наименование продукции для этикетки</th>
                         <th class="text-nowrap text-center">Цвет</th>
