@@ -67,6 +67,56 @@ BEGIN
     SET
 NOCOUNT ON;
 
+CREATE PROCEDURE dbo.svAFormsProductionAll @SortField NVARCHAR(50) = 'idProduction', -- ХП возвращает список продукции с сортировкой.
+                                           @SortOrder NVARCHAR(4) = 'DESC'
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Валидация параметров.
+    SET @SortField = LTRIM(RTRIM(ISNULL(@SortField, 'idProduction')));
+    SET @SortOrder = UPPER(LTRIM(RTRIM(ISNULL(@SortOrder, 'DESC'))));
+
+    -- Безопасный список полей.
+    IF @SortOrder NOT IN ('ASC', 'DESC')
+        SET @SortOrder = 'DESC';
+
+    DECLARE @SQL NVARCHAR(MAX);
+
+    IF @SortField NOT IN ('idProduction', 'PrArticle', 'PrPackName', 'PrShortName',
+                          'PrColor', 'PrCount', 'PrRows', 'PrEditDate')
+        SET @SortField = 'idProduction';
+
+    -- Безопасное формирование.
+    DECLARE @OrderBy NVARCHAR(100) = QUOTENAME(@SortField) + ' ' + @SortOrder;
+
+    SET @SQL = N'
+        SELECT idProduction,
+               PrShortName,
+               PrPackName,
+               PrArticle,
+               PrColor,
+               PrCount,
+               PrRows,
+               PrHWD,
+               PrEditDate
+        FROM dbo.svTB_Production
+        ORDER BY ' + @OrderBy
+
+    EXEC sp_executesql @SQL
+
+END
+GO;
+
+CREATE PROCEDURE dbo.svAFormsProductionFilterById -- ХП ищет продукцию по артиклю и наименованию и коду продукции.
+    @ArticlePattern VARCHAR(7) = N'', -- Паттерн поиска (например, "1", "12")
+    @NamePattern NVARCHAR(100) = N'', -- Паттерн поиска по имени\названию продукции
+    @IdPattern VARCHAR(7) = N'' -- Паттерн поиска по коду продукции.
+AS
+BEGIN
+
+    SET NOCOUNT ON;
+
 SELECT idProduction,
        PrShortName,
        PrPackName,
@@ -76,7 +126,11 @@ SELECT idProduction,
        PrRows,
        PrHWD,
        PrEditDate
-FROM dbo.svTB_Production;
+FROM dbo.svTB_Production
+WHERE (@ArticlePattern = '' OR CONVERT(VARCHAR(7), PrArticle) LIKE '%' + @ArticlePattern + '%')
+  AND (@NamePattern = '' OR PrPackName LIKE '%' + @NamePattern + '%')
+  AND (@IdPattern = '' OR CONVERT(VARCHAR(7), idProduction) LIKE '%' + @IdPattern + '%')
+ORDER BY idProduction;
 
 END
 GO;
