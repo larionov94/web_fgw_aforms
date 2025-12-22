@@ -11,10 +11,12 @@
 <div class="search-container mb-3">
     <form method="GET" action="/aforms/productions" class="row g-2" id="searchForm">
         <div class="col-auto">
-            <label for="searchInput" style="position: relative; display: inline-block;">
+
+            <!--            Поиск по АРТИКУЛУ -->
+            <label for="searchArticle" style="position: relative; display: inline-block;">
                 <input type="text"
                        name="articles"
-                       id="searchInput"
+                       id="searchArticle"
                        class="form-control form-control-sm"
                        style="width: 15ch; padding-right: 15px;"
                        placeholder="Поиск по арт..."
@@ -23,12 +25,53 @@
                        maxlength="7">
 
                 {{if .SearchProducts.SearchArticle }}
-                <span id="clearSearchIcon"
+                <span id="clearSearchIconArticle"
                       style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 14px;">
         ✗
     </span>
                 {{end}}
             </label>
+
+            <!--            ПОИСК по НАИМЕНОВАНИЮ ПРОДУКЦИИ ДЛЯ УПАКОВЩИКОВ -->
+            <label for="searchName" style="position: relative; display: inline-block;">
+                <input type="text"
+                       name="name"
+                       id="searchName"
+                       class="form-control form-control-sm"
+                       style="width: 35ch; padding-right: 15px;"
+                       placeholder="Поиск по наименованию для упак..."
+                       value="{{ .SearchProducts.SearchName }}"
+                       autocomplete="off"
+                       maxlength="25">
+
+                {{if .SearchProducts.SearchName }}
+                <span id="clearSearchIconName"
+                      style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 14px;">
+        ✗
+    </span>
+                {{end}}
+            </label>
+
+            <!--            ПОИСК по КОДУ ПРОДУКЦИИ -->
+            <label for="searchIdProduction" style="position: relative; display: inline-block;">
+                <input type="text"
+                       name="idProduction"
+                       id="searchIdProduction"
+                       class="form-control form-control-sm"
+                       style="width: 30ch; padding-right: 15px;"
+                       placeholder="Поиск по коду продукции..."
+                       value="{{ .SearchProducts.SearchId }}"
+                       autocomplete="off"
+                       maxlength="25">
+
+                {{if .SearchProducts.SearchId }}
+                <span id="clearSearchIconIdProduction"
+                      style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 14px;">
+        ✗
+    </span>
+                {{end}}
+            </label>
+
         </div>
     </form>
 
@@ -107,7 +150,8 @@
                             </a>
                         </th>
 
-                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                        <th class="text-nowrap sortable-header text-center"
+                            style="position: relative; padding-bottom: 13px;">
                             <a href="?sort=PrColor&order={{ if eq $sortField `PrColor` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Цвет
