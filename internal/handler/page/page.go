@@ -33,12 +33,13 @@ type DataPage struct {
 	Productions    []*model.Production
 	SortProducts   *SortProductionsPage
 	SearchProducts *SearchProductionsPage
+	IsSearch       bool
 }
 
 func NewDataPage(title string, currentPage string, infoPerformer *handler.PerformerData, productions []*model.Production,
-	sortProducts *SortProductionsPage, searchProductions *SearchProductionsPage) *DataPage {
+	sortProducts *SortProductionsPage, searchProductions *SearchProductionsPage, isSearch bool) *DataPage {
 
-	return &DataPage{title, currentPage, infoPerformer, productions, sortProducts, searchProductions}
+	return &DataPage{title, currentPage, infoPerformer, productions, sortProducts, searchProductions, isSearch}
 }
 func SetSecureHTMLHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

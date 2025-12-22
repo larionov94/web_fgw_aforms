@@ -6,6 +6,45 @@
     <h1 class="h2 mb-3">{{ .Title }}</h1>
 </div>
 
+
+<!-- Блок поиска всегда отображается -->
+<div class="search-container mb-3">
+    <form method="GET" action="/aforms/productions" class="row g-2" id="searchForm">
+        <div class="col-auto">
+            <label for="searchInput" style="position: relative; display: inline-block;">
+                <input type="text"
+                       name="articles"
+                       id="searchInput"
+                       class="form-control form-control-sm"
+                       style="width: 15ch; padding-right: 15px;"
+                       placeholder="Поиск по арт..."
+                       value="{{ .SearchProducts.SearchArticle }}"
+                       autocomplete="off"
+                       maxlength="7">
+
+                {{if .SearchProducts.SearchArticle }}
+                <span id="clearSearchIcon"
+                      style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 14px;">
+        ✗
+    </span>
+                {{end}}
+            </label>
+        </div>
+    </form>
+
+    {{ if and .IsSearch (ne .SearchProducts.SearchArticle "") }}
+    <!-- Показываем только когда есть поисковый запрос -->
+    <div class="alert {{ if eq (len .Productions) 0 }}alert-warning{{ else }}alert-info{{ end }} mt-2 py-1 px-3">
+        <i class="bi bi-{{ if eq (len .Productions) 0 }}exclamation-triangle{{ else }}info-circle{{ end }}"></i>
+        {{ if eq (len .Productions) 0 }}
+        По запросу "{{ .SearchProducts.SearchArticle }}" ничего не найдено
+        {{ else }}
+        По запросу "{{ .SearchProducts.SearchArticle }}" найдено: {{ len .Productions }} вариантов упаковки
+        {{ end }}
+    </div>
+    {{ end }}
+</div>
+
 <!-- Карточка с таблицей - всегда отображаем -->
 <div class="card shadow-sm">
     <div class="card-body p-0">
@@ -167,6 +206,12 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="alert {{ if eq (len .Productions) 0 }}alert-warning{{ else }}alert-info{{ end }} mt-2 py-1 px-3">
+    <i class="bi bi-{{ if eq (len .Productions) 0 }}exclamation-triangle{{ else }}info-circle{{ end }}"></i>
+    Всего: {{ len .Productions }}
+    <!--    Всего найдено: {{ len .Productions }} вариантов упаковки-->
 </div>
 
 {{ end }}

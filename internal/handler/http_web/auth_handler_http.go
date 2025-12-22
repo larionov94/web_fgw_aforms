@@ -90,7 +90,8 @@ func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
 		"Панель форма комплектов", "dashboard", performerData,
 		nil,
 		nil,
-		nil)
+		nil,
+		false)
 
 	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML)
 }
@@ -112,6 +113,7 @@ func (a *AuthHandlerHTML) LoginPage(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodGet {
 		http_err.SendErrorHTTP(w, http.StatusMethodNotAllowed, "", a.logg, r)
+
 		return
 	}
 

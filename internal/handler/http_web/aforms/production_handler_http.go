@@ -24,14 +24,6 @@ type ProductionHandlerHTML struct {
 	authMiddleware    *handler.AuthMiddleware
 }
 
-type Filter struct {
-	SearchArticle string
-	SearchName    string
-	SearchId      string
-	SortField     string
-	SortOrder     string
-}
-
 func NewProductionHandlerHTML(productionService service.ProductionUserCase, performerService service.PerformerUseCase,
 	roleService service.RoleUseCase, logg *common.Logger, authMiddleware *handler.AuthMiddleware) *ProductionHandlerHTML {
 
@@ -66,7 +58,7 @@ func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http
 	}
 
 	data := page.NewDataPage("Варианты упаковки продукции", "productions", performerData,
-		productions, sortFields, searchFields)
+		productions, sortFields, searchFields, true)
 
 	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML)
 }

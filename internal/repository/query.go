@@ -14,6 +14,6 @@ const (
 
 // ПРОДУКЦИЯ
 const (
-	FGWsvAFormsProductionAllQuery    = "exec dbo.svAFormsProductionAll ?, ?;"       //ХП выводит список продукции.
-	FGWsvAFormsProductionFilterQuery = "exec dbo.svAFormsProductionFilter ?, ?, ?;" // ХП ищет продукцию по артиклю и наименованию и коду продукции.
+	FGWsvAFormsProductionAllQuery    = "exec dbo.svAFormsProductionAll ?, ?;"           //ХП выводит список продукции.
+	FGWsvAFormsProductionFilterQuery = "exec dbo.svAFormsProductionFilterById ?, ?, ?;" // ХП ищет продукцию по артиклю и наименованию и коду продукции.
 )

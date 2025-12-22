@@ -127,9 +127,9 @@ SELECT idProduction,
        PrHWD,
        PrEditDate
 FROM dbo.svTB_Production
-WHERE (@ArticlePattern = '' OR CONVERT(VARCHAR(7), PrArticle) LIKE '%' + @ArticlePattern + '%')
+WHERE PrArticle LIKE '%' + @ArticlePattern + '%'
   AND (@NamePattern = '' OR PrPackName LIKE '%' + @NamePattern + '%')
-  AND (@IdPattern = '' OR CONVERT(VARCHAR(7), idProduction) LIKE '%' + @IdPattern + '%')
+  AND idProduction LIKE '%' + @IdPattern + '%'
 ORDER BY idProduction;
 
 END
