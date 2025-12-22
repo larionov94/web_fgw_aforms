@@ -5,7 +5,6 @@ import (
 	"fgw_web_aforms/internal/handler"
 	"fgw_web_aforms/internal/handler/http_err"
 	"fgw_web_aforms/internal/handler/page"
-	"fgw_web_aforms/internal/model"
 	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
@@ -57,29 +56,6 @@ type RedirectData struct {
 	AddTempState    bool
 }
 
-type InfoPerformerPage struct {
-	PerformerFIO  string
-	PerformerId   int
-	PerformerRole string
-}
-
-type SortProductionsPage struct {
-	SortField string
-	SortOrder string
-}
-
-type DataPage struct {
-	Title         string
-	CurrentPage   string
-	InfoPerformer *InfoPerformerPage
-	Productions   []*model.Production
-	SortProducts  *SortProductionsPage
-}
-
-func NewDataPage(title string, currentPage string, infoPerformer *InfoPerformerPage, productions []*model.Production, sortProducts *SortProductionsPage) *DataPage {
-	return &DataPage{title, currentPage, infoPerformer, productions, sortProducts}
-}
-
 func NewAuthHandlerHTML(
 	performerService service.PerformerUseCase,
 	roleService service.RoleUseCase,
@@ -103,18 +79,18 @@ func (a *AuthHandlerHTML) ServerHTTPRouter(mux *http.ServeMux) {
 }
 
 func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
-	performerFIO, performerId, roleName, err := a.authMiddleware.GetUserData(r, a.performerService, a.roleService)
+	performerData, err := a.authMiddleware.GetUserData(r, a.performerService, a.roleService)
 	if err != nil {
 		a.redirectToLoginWithHistoryClear(w, r)
 
 		return
 	}
 
-	data := NewDataPage("Панель форма комплектов", "dashboard", &InfoPerformerPage{
-		PerformerFIO:  performerFIO,
-		PerformerId:   performerId,
-		PerformerRole: roleName,
-	}, nil, nil)
+	data := page.NewDataPage(
+		"Панель форма комплектов", "dashboard", performerData,
+		nil,
+		nil,
+		nil)
 
 	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML)
 }

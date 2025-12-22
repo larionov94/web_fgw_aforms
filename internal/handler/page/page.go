@@ -1,6 +1,8 @@
 package page
 
 import (
+	"fgw_web_aforms/internal/handler"
+	"fgw_web_aforms/internal/model"
 	"fgw_web_aforms/pkg/common/msg"
 	"fgw_web_aforms/pkg/convert"
 	"html/template"
@@ -13,6 +15,31 @@ const (
 	tmplErrorHTML     = "error.html"
 )
 
+type SortProductionsPage struct {
+	SortField string
+	SortOrder string
+}
+
+type SearchProductionsPage struct {
+	SearchArticle string
+	SearchName    string
+	SearchId      string
+}
+
+type DataPage struct {
+	Title          string
+	CurrentPage    string
+	InfoPerformer  *handler.PerformerData
+	Productions    []*model.Production
+	SortProducts   *SortProductionsPage
+	SearchProducts *SearchProductionsPage
+}
+
+func NewDataPage(title string, currentPage string, infoPerformer *handler.PerformerData, productions []*model.Production,
+	sortProducts *SortProductionsPage, searchProductions *SearchProductionsPage) *DataPage {
+
+	return &DataPage{title, currentPage, infoPerformer, productions, sortProducts, searchProductions}
+}
 func SetSecureHTMLHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private, max-age=0")

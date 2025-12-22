@@ -40,6 +40,12 @@ type UserSession struct {
 	Expires      time.Time
 }
 
+type PerformerData struct {
+	PerformerFIO  string
+	PerformerId   int
+	PerformerRole string
+}
+
 func NewAuthMiddleware(store *sessions.CookieStore, logg *common.Logger) *AuthMiddleware {
 	return &AuthMiddleware{
 		store:        store,
@@ -51,13 +57,13 @@ func NewAuthMiddleware(store *sessions.CookieStore, logg *common.Logger) *AuthMi
 }
 
 // GetUserData получаем данные пользователя.
-func (m *AuthMiddleware) GetUserData(r *http.Request, performerService service.PerformerUseCase, roleService service.RoleUseCase) (string, int, string, error) {
+func (m *AuthMiddleware) GetUserData(r *http.Request, performerService service.PerformerUseCase, roleService service.RoleUseCase) (*PerformerData, error) {
 	performerId, ok1 := m.GetPerformerId(r)
 	roleId, ok2 := m.GetRoleId(r)
 	if !ok1 || !ok2 {
 		m.logg.LogE(msg.E3103, nil)
 
-		return "", 0, "", errors.New("пользователь не авторизован")
+		return nil, errors.New("пользователь не авторизован")
 	}
 
 	var performerFIO string
@@ -70,7 +76,11 @@ func (m *AuthMiddleware) GetUserData(r *http.Request, performerService service.P
 		roleName = cached.RoleName
 		m.cacheMu.RUnlock()
 
-		return performerFIO, performerId, roleName, nil
+		return &PerformerData{
+			PerformerFIO:  performerFIO,
+			PerformerId:   performerId,
+			PerformerRole: roleName,
+		}, nil
 	}
 	m.cacheMu.RUnlock()
 
@@ -81,14 +91,22 @@ func (m *AuthMiddleware) GetUserData(r *http.Request, performerService service.P
 	if err != nil {
 		m.logg.LogE(msg.E3206, err)
 
-		return "", performerId, "", err
+		return &PerformerData{
+			PerformerFIO:  "",
+			PerformerId:   performerId,
+			PerformerRole: "",
+		}, err
 	}
 
 	role, err := roleService.FindRoleById(ctx, roleId)
 	if err != nil {
 		m.logg.LogE(msg.E3206, err)
 
-		return performerFIO, performerId, "", err
+		return &PerformerData{
+			PerformerFIO:  performerFIO,
+			PerformerId:   performerId,
+			PerformerRole: "",
+		}, err
 	}
 
 	// 3. Сохраняем в кеш.
@@ -103,7 +121,11 @@ func (m *AuthMiddleware) GetUserData(r *http.Request, performerService service.P
 	}
 	m.cacheMu.Unlock()
 
-	return performer.FIO, performerId, role.Name, nil
+	return &PerformerData{
+		PerformerFIO:  performer.FIO,
+		PerformerId:   performerId,
+		PerformerRole: role.Name,
+	}, nil
 }
 
 // RequireAuth - основной middleware для проверки аутентификации.

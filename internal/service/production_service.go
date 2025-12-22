@@ -6,6 +6,7 @@ import (
 	"fgw_web_aforms/internal/repository"
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
+	"strings"
 )
 
 type ProductionService struct {
@@ -19,6 +20,7 @@ func NewProductionService(production repository.ProductionRepository, logg *comm
 
 type ProductionUserCase interface {
 	AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error)
+	SearchProductions(ctx context.Context, articlePattern, namePattern, idPattern string) ([]*model.Production, error)
 }
 
 func (p *ProductionService) AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error) {
@@ -30,4 +32,12 @@ func (p *ProductionService) AllProductions(ctx context.Context, sortField, sortO
 	}
 
 	return productions, nil
+}
+
+func (p *ProductionService) SearchProductions(ctx context.Context, articlePattern, namePattern, idPattern string) ([]*model.Production, error) {
+	articlePattern = strings.TrimSpace(articlePattern)
+	namePattern = strings.TrimSpace(namePattern)
+	idPattern = strings.TrimSpace(idPattern)
+
+	return p.productionRepo.Filter(ctx, articlePattern, namePattern, idPattern)
 }
