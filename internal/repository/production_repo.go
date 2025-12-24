@@ -21,6 +21,7 @@ func NewProductionRepo(mssql *sql.DB, logg *common.Logger) *ProductionRepo {
 type ProductionRepository interface {
 	All(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error)
 	Filter(ctx context.Context, articlePattern, namePattern, idPattern string) ([]*model.Production, error)
+	Add(ctx context.Context, production *model.Production) error
 }
 
 func (p *ProductionRepo) All(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error) {
@@ -101,4 +102,37 @@ func (p *ProductionRepo) Filter(ctx context.Context, articlePattern, namePattern
 	}
 
 	return productions, nil
+}
+
+func (p *ProductionRepo) Add(ctx context.Context, production *model.Production) error {
+	if _, err := p.mssql.ExecContext(ctx, FGWsvAFormsProductionAddQuery,
+		&production.PrName,
+		&production.PrShortName,
+		&production.PrPackName,
+		&production.PrDecl,
+		&production.PrSun,
+		&production.PrProdType,
+		&production.PrParty,
+		&production.PrUmbrella,
+		&production.PrColor,
+		&production.PrGL,
+		&production.PrArticle,
+		&production.PrSAP,
+		&production.PrCount,
+		&production.PrRows,
+		&production.PrWeight,
+		&production.PrHWD,
+		&production.PrInfo,
+		&production.PrPart,
+		&production.PrPartLastDate,
+		&production.PrPartAutoInc,
+		&production.PrPerGodn,
+		&production.AuditRec.CreatedBy,
+		&production.AuditRec.UpdatedBy,
+	); err != nil {
+		p.logg.LogE(msg.E3204, err)
+
+		return err
+	}
+	return nil
 }

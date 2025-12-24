@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fgw_web_aforms/internal/model"
 	"fgw_web_aforms/internal/repository"
 	"fgw_web_aforms/pkg/common"
@@ -21,6 +22,7 @@ func NewProductionService(production repository.ProductionRepository, logg *comm
 type ProductionUserCase interface {
 	AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error)
 	SearchProductions(ctx context.Context, articlePattern, namePattern, idPattern string) ([]*model.Production, error)
+	AddProduction(ctx context.Context, production *model.Production) error
 }
 
 func (p *ProductionService) AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error) {
@@ -40,4 +42,12 @@ func (p *ProductionService) SearchProductions(ctx context.Context, articlePatter
 	idPattern = strings.TrimSpace(idPattern)
 
 	return p.productionRepo.Filter(ctx, articlePattern, namePattern, idPattern)
+}
+
+func (p *ProductionService) AddProduction(ctx context.Context, production *model.Production) error {
+	if production == nil {
+		return errors.New("продукция не должна быть nil")
+	}
+
+	return p.productionRepo.Add(ctx, production)
 }
