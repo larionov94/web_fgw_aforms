@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	tmplIndexHTML      = "index.html"
-	tmplProductionHTML = "productions.html"
+	tmplIndexHTML         = "index.html"
+	tmplProductionHTML    = "productions.html"
+	tmplProductionAddHTML = "web/html/aforms/production_add.html"
 )
 
 type ProductionHandlerHTML struct {
@@ -32,6 +33,7 @@ func NewProductionHandlerHTML(productionService service.ProductionUserCase, perf
 
 func (p *ProductionHandlerHTML) ServeHTTPHTMLRouter(mux *http.ServeMux) {
 	mux.HandleFunc("/aforms/productions", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.AllProductionHTML)))
+	mux.HandleFunc("/aforms/productions/add", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.AddProductionHTML)))
 }
 
 func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http.Request) {
@@ -100,4 +102,17 @@ func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Re
 			SortField: sortField,
 			SortOrder: sortOrder,
 		}, nil
+}
+
+func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	data := struct {
+		Title string
+	}{
+		Title: "Добавить вариант упаковки",
+	}
+
+	page.RenderSinglePage(w, tmplProductionAddHTML, data, r)
+
 }

@@ -17,9 +17,10 @@ import (
 )
 
 const (
-	tmplRedirectHTML   = "redirect.html"
-	tmplAuthHTML       = "auth.html"
-	tmplProductionHTML = "productions.html"
+	tmplRedirectHTML      = "redirect.html"
+	tmplAuthHTML          = "auth.html"
+	tmplProductionHTML    = "productions.html"
+	tmplProductionAddHTML = "production_add.html"
 
 	urlAForms             = "/aforms"
 	urlAuth               = "/auth"
@@ -93,7 +94,7 @@ func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
 		nil,
 		false)
 
-	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML)
+	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML, tmplProductionAddHTML)
 }
 
 func (a *AuthHandlerHTML) ShowAuthForm(w http.ResponseWriter, r *http.Request) {

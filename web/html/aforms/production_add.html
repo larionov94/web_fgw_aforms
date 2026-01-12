@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/web/libs/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/aforms/prod_add.css" type="text/css">
+    <script src="/web/libs/bootstrap.bundle.js"></script>
+    <script src="/web/js/prod_add.js"></script>
+    <title>{{ .Title }}</title>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="h3 mb-0">Добавить вариант упаковки</h1>
+            <p class="text-muted mb-0">Заполните информацию о продукции во всех вкладках</p>
+        </div>
+
+
+        <!-- Навигационные вкладки -->
+        <ul class="nav nav-tabs px-3" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="product-tab" data-bs-toggle="tab"
+                        data-bs-target="#product" type="button" role="tab"
+                        aria-controls="product" aria-selected="true">
+                    Продукция
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="packaging-tab" data-bs-toggle="tab"
+                        data-bs-target="#packaging" type="button" role="tab"
+                        aria-controls="packaging" aria-selected="false">
+                    Упаковка
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="comments-tab" data-bs-toggle="tab"
+                        data-bs-target="#comments" type="button" role="tab"
+                        aria-controls="comments" aria-selected="false">
+                    Комментарии
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="dates-tab" data-bs-toggle="tab"
+                        data-bs-target="#dates" type="button" role="tab"
+                        aria-controls="dates" aria-selected="false">
+                    Дополнительно
+                </button>
+            </li>
+        </ul>
+
+        <!-- Форма -->
+        <form action="/aforms/productions/add" method="POST" id="productForm">
+            <div class="tab-content" id="productTabsContent">
+
+                <!-- Вкладка 1: Продукция -->
+                <div class="tab-pane fade show active" id="product" role="tabpanel"
+                     aria-labelledby="product-tab" tabindex="0">
+
+                    <!-- Основная информация -->
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Основная информация</h3>
+
+                        <div class="row g-1"> <!-- Минимальный gap -->
+                            <div class="col-12 mb-1">
+                                <label for="PrName" class="form-label required-field mb-0 fs-6">
+                                    Наименование с комментарием упаковщика
+                                </label>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrName" name="PrName" required>
+                            </div>
+
+                            <div class="col-12 mb-1">
+                                <label for="PrPackName" class="form-label mb-0 fs-6">
+                                    Конструкторское наименование
+                                </label>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrPackName" name="PrPackName">
+                            </div>
+
+                            <div class="col-12 mb-1">
+                                <label for="PrShortName" class="form-label mb-0 fs-6">
+                                    Наименование для печати на этикетке
+                                </label>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrShortName" name="PrShortName">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Тип продукции - КОМПАКТНАЯ ВЕРСИЯ -->
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Тип продукции</h3>
+                        <div class="row g-0"> <!-- Убрали отступы между строками -->
+                            <div class="col-12">
+                                <!-- Используем form-check-inline для компактности -->
+                                <div class="d-flex flex-wrap gap-2"> <!-- gap-2 - маленькие отступы между элементами -->
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="PrDecl" name="PrDecl">
+                                        <label class="form-check-label fs-7" for="PrDecl">
+                                            Декларированная
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="PrSunProtect" name="PrSunProtect">
+                                        <label class="form-check-label fs-7" for="PrSunProtect">
+                                            Беречь от солнца
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="PrProdType" name="PrProdType">
+                                        <label class="form-check-label fs-7" for="PrProdType">
+                                            Пищевая
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="PrParty" name="PrParty">
+                                        <label class="form-check-label fs-7" for="PrParty">
+                                            Партионная
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="PrUmbrella" name="PrUmbrella">
+                                        <label class="form-check-label fs-7" for="PrUmbrella">
+                                            Беречь от влаги
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Характеристики продукции -->
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Характеристики продукции</h3>
+                        <div class="row g-1 mb-2"> <!-- Уменьшен gap и отступ -->
+                            <div class="col-md-6 mb-1">
+                                <label for="PrColor" class="form-label mb-0 fs-6">Цвет стекла</label>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrColor" name="PrColor">
+                            </div>
+
+                            <div class="col-md-6 mb-1">
+                                <label for="PrGL" class="form-label mb-0 fs-6">GL</label>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL">
+                            </div>
+                        </div>
+
+                        <div class="row g-1"> <!-- Уменьшен gap -->
+                            <div class="col-md-6 mb-1">
+                                <label for="PrArticle" class="form-label required-field mb-0 fs-6">
+                                    Артикул варианта упаковки
+                                </label>
+                                <input type="number" class="form-control form-control-sm py-1" id="PrArticle" name="PrArticle" required>
+                            </div>
+
+                            <div class="col-md-6 mb-1">
+                                <label for="PrSAP" class="form-label mb-0 fs-6">
+                                    САП код
+                                </label>
+                                <input type="number" class="form-control form-control-sm py-1" id="PrSAP" name="PrSAP">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Навигация по вкладкам -->
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+                            ← Назад к списку
+                        </button>
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="packaging-tab">
+                            Далее: Упаковка →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Вкладка 2: Упаковка -->
+                <div class="tab-pane fade" id="packaging" role="tabpanel"
+                     aria-labelledby="packaging-tab" tabindex="0">
+                    <div class="form-section">
+                        <h3>Информация об упаковке</h3>
+                        <p class="text-muted mb-4">Эта вкладка будет заполнена позже</p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Раздел "Упаковка" находится в разработке
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="product-tab">
+                            ← Назад: Продукция
+                        </button>
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="comments-tab">
+                            Далее: Комментарии →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Вкладка 3: Комментарии -->
+                <div class="tab-pane fade" id="comments" role="tabpanel"
+                     aria-labelledby="comments-tab" tabindex="0">
+                    <div class="form-section">
+                        <h3>Комментарии и примечания</h3>
+                        <p class="text-muted mb-4">Эта вкладка будет заполнена позже</p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Раздел "Комментарии" находится в разработке
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="packaging-tab">
+                            ← Назад: Упаковка
+                        </button>
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="dates-tab">
+                            Далее: Дата →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Вкладка 4: Дата -->
+                <div class="tab-pane fade" id="dates" role="tabpanel"
+                     aria-labelledby="dates-tab" tabindex="0">
+                    <div class="form-section">
+                        <h3>Даты и сроки</h3>
+                        <p class="text-muted mb-4">Эта вкладка будет заполнена позже</p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Раздел "Дата" находится в разработке
+                        </div>
+                    </div>
+
+                    <!-- Кнопки действий в последней вкладке -->
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="comments-tab">
+                            ← Назад: Комментарии
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Сохранить продукцию
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
