@@ -77,7 +77,7 @@
                                 </label>
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control form-control-sm py-1" id="PrPackName"
-                                           name="PrPackName" disabled required>
+                                           name="PrPackName" required readonly>
                                     <button class="btn btn-outline-secondary" type="button" id="btnDesignNameSelect"
                                             data-bs-toggle="modal" data-bs-target="#designNameModal">
                                         ...
@@ -151,7 +151,7 @@
                                            class="form-control form-control-sm py-1"
                                            id="PrColor"
                                            name="PrColor"
-                                           disabled required>
+                                           readonly required>
                                     <button class="btn btn-outline-secondary"
                                             type="button"
                                             id="btnColorSelect"
@@ -164,7 +164,7 @@
 
                             <div class="col-md-6 mb-1">
                                 <label for="PrGL" class="form-label mb-0 fs-6">GL</label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL" disabled required>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL" readonly required>
                             </div>
                         </div>
 
@@ -173,13 +173,15 @@
                                 <label for="PrArticle" class="form-label required-field mb-0 fs-6">
                                     Артикул варианта упаковки
                                 </label>
-                                <input type="text"
+                                <input type="number"
                                        class="form-control form-control-sm py-1"
                                        id="PrArticle"
                                        name="PrArticle"
+                                       min="0"
+                                       max="99"
+                                       step="1"
+                                       oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                        maxlength="2"
-                                       pattern="[0-9]{1,2}"
-                                       title="Введите от 1 до 2 цифр"
                                        required>
                                 <small class="text-muted">Максимум 2 цифры (1-я цифра № печки, 2-я цифра № линии, остальные 3 цифры сгенерируются)</small>
                             </div>

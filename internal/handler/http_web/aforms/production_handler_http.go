@@ -8,7 +8,9 @@ import (
 	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
+	"fgw_web_aforms/pkg/convert"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -108,30 +110,86 @@ func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Re
 func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	designNameList, err := p.catalogService.DesignNameAll(r.Context())
-	if err != nil {
-		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+	// Обработка GET запроса - отображение формы
+	if r.Method == http.MethodGet {
+		designNameList, err := p.catalogService.DesignNameAll(r.Context())
+		if err != nil {
+			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+			return
+		}
+
+		colorList, err := p.catalogService.ColorAll(r.Context())
+		if err != nil {
+			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+			return
+		}
+
+		data := struct {
+			Title          string
+			DesignNameList []*model.Catalog
+			ColorList      []*model.Catalog
+		}{
+			Title:          "Добавить вариант упаковки",
+			DesignNameList: designNameList,
+			ColorList:      colorList,
+		}
+
+		page.RenderSinglePage(w, tmplProductionAddHTML, data, r)
 
 		return
 	}
 
-	colorList, err := p.catalogService.ColorAll(r.Context())
-	if err != nil {
-		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+	// Обработка POST запроса - сохранение данных
+	if r.Method == http.MethodPost {
+		if err := r.ParseForm(); err != nil {
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, "Ошибка парсинга формы: "+err.Error(), p.logg, r)
+
+			return
+		}
+
+		// Создаем продукт из данных формы
+		product := &model.Production{
+			PrName:         strings.TrimSpace(r.FormValue("PrName")),
+			PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
+			PrPackName:     strings.TrimSpace(r.FormValue("PrPackName")),
+			PrType:         "",
+			PrArticle:      strings.TrimSpace(r.FormValue("PrArticle")),
+			PrColor:        strings.TrimSpace(r.FormValue("PrColor")),
+			PrBarCode:      "",
+			PrCount:        0,
+			PrRows:         0,
+			PrWeight:       0,
+			PrHWD:          "",
+			PrInfo:         "",
+			PrStatus:       "",
+			PrEditDate:     "",
+			PrEditUser:     0,
+			PrPart:         0,
+			PrPartLastDate: "",
+			PrPartAutoInc:  0,
+			PrPartRealDate: "",
+			PrArchive:      false,
+			PrPerGodn:      0,
+			PrSAP:          strings.TrimSpace(r.FormValue("PrSAP")),
+			PrProdType:     false,
+			PrUmbrella:     convert.ParseFormFieldBool(r, "PrUmbrella"),
+			PrSun:          convert.ParseFormFieldBool(r, "PrSun"),
+			PrDecl:         convert.ParseFormFieldBool(r, "PrDecl"),
+			PrParty:        convert.ParseFormFieldBool(r, "PrParty"),
+			PrGL:           convert.ParseFormFieldInt(r, "PrGL"),
+			AuditRec:       model.Audit{},
+		}
+
+		if err := p.productionService.AddProduction(r.Context(), product); err != nil {
+			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+			return
+		}
+		http.Redirect(w, r, "/aforms/productions", http.StatusSeeOther)
 
 		return
 	}
 
-	data := struct {
-		Title          string
-		DesignNameList []*model.Catalog
-		ColorList      []*model.Catalog
-	}{
-		Title:          "Добавить вариант упаковки",
-		DesignNameList: designNameList,
-		ColorList:      colorList,
-	}
-
-	page.RenderSinglePage(w, tmplProductionAddHTML, data, r)
+	http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 
 }

@@ -147,8 +147,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const designId = this.getAttribute('data-id');
 
             // Заполняем поле конструкторского наименования
-            document.getElementById('PrPackName').value = designName;
             document.getElementById('PrName').value = designName;
+            document.getElementById('PrPackName').value = designName;
             document.getElementById('PrShortName').value = designName;
 
             // Если нужно сохранить ID в скрытом поле
@@ -218,9 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // ========== ОБРАБОТКА ЦВЕТА СТЕКЛА ==========
-    const colorSearchInput = document.getElementById('colorSearch');
-    const colorRowCountElement = document.getElementById('colorRowCount');
-    const colorTableBody = document.getElementById('colorTableBody');
 
     // Обработка выбора цвета
     document.querySelectorAll('.select-color').forEach(button => {
