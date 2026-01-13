@@ -59,7 +59,7 @@
                      aria-labelledby="product-tab" tabindex="0">
 
                     <!-- Основная информация -->
-                    <div class="form-section">
+                    <div class="form-section mb-2">
                         <h3 class="mb-2 fs-6 fw-bold">Основная информация</h3>
 
                         <div class="row g-1"> <!-- Минимальный gap -->
@@ -67,32 +67,41 @@
                                 <label for="PrName" class="form-label required-field mb-0 fs-6">
                                     Наименование с комментарием упаковщика
                                 </label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrName" name="PrName" required>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrName" name="PrName"
+                                       required>
                             </div>
 
                             <div class="col-12 mb-1">
                                 <label for="PrPackName" class="form-label mb-0 fs-6">
                                     Конструкторское наименование
                                 </label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrPackName" name="PrPackName">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control form-control-sm py-1" id="PrPackName"
+                                           name="PrPackName" disabled required>
+                                    <button class="btn btn-outline-secondary" type="button" id="btnDesignNameSelect"
+                                            data-bs-toggle="modal" data-bs-target="#designNameModal">
+                                        ...
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="col-12 mb-1">
                                 <label for="PrShortName" class="form-label mb-0 fs-6">
                                     Наименование для печати на этикетке
                                 </label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrShortName" name="PrShortName">
+                                <input type="text" class="form-control form-control-sm py-1" id="PrShortName"
+                                       name="PrShortName" required>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Тип продукции - КОМПАКТНАЯ ВЕРСИЯ -->
-                    <div class="form-section">
+
+                    <!-- Тип продукции -->
+                    <div class="form-section mb-2">
                         <h3 class="mb-2 fs-6 fw-bold">Тип продукции</h3>
-                        <div class="row g-0"> <!-- Убрали отступы между строками -->
+                        <div class="row g-0">
                             <div class="col-12">
-                                <!-- Используем form-check-inline для компактности -->
-                                <div class="d-flex flex-wrap gap-2"> <!-- gap-2 - маленькие отступы между элементами -->
+                                <div class="d-flex flex-wrap gap-2">
                                     <div class="form-check form-check-inline mb-0">
                                         <input class="form-check-input" type="checkbox" id="PrDecl" name="PrDecl">
                                         <label class="form-check-label fs-7" for="PrDecl">
@@ -100,13 +109,15 @@
                                         </label>
                                     </div>
                                     <div class="form-check form-check-inline mb-0">
-                                        <input class="form-check-input" type="checkbox" id="PrSunProtect" name="PrSunProtect">
+                                        <input class="form-check-input" type="checkbox" id="PrSunProtect"
+                                               name="PrSunProtect">
                                         <label class="form-check-label fs-7" for="PrSunProtect">
                                             Беречь от солнца
                                         </label>
                                     </div>
                                     <div class="form-check form-check-inline mb-0">
-                                        <input class="form-check-input" type="checkbox" id="PrProdType" name="PrProdType">
+                                        <input class="form-check-input" type="checkbox" id="PrProdType"
+                                               name="PrProdType">
                                         <label class="form-check-label fs-7" for="PrProdType">
                                             Пищевая
                                         </label>
@@ -118,7 +129,8 @@
                                         </label>
                                     </div>
                                     <div class="form-check form-check-inline mb-0">
-                                        <input class="form-check-input" type="checkbox" id="PrUmbrella" name="PrUmbrella">
+                                        <input class="form-check-input" type="checkbox" id="PrUmbrella"
+                                               name="PrUmbrella">
                                         <label class="form-check-label fs-7" for="PrUmbrella">
                                             Беречь от влаги
                                         </label>
@@ -134,12 +146,25 @@
                         <div class="row g-1 mb-2"> <!-- Уменьшен gap и отступ -->
                             <div class="col-md-6 mb-1">
                                 <label for="PrColor" class="form-label mb-0 fs-6">Цвет стекла</label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrColor" name="PrColor">
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrColor"
+                                           name="PrColor"
+                                           disabled required>
+                                    <button class="btn btn-outline-secondary"
+                                            type="button"
+                                            id="btnColorSelect"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#colorModal">
+                                        ...
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="col-md-6 mb-1">
                                 <label for="PrGL" class="form-label mb-0 fs-6">GL</label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL">
+                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL" disabled required>
                             </div>
                         </div>
 
@@ -148,7 +173,15 @@
                                 <label for="PrArticle" class="form-label required-field mb-0 fs-6">
                                     Артикул варианта упаковки
                                 </label>
-                                <input type="number" class="form-control form-control-sm py-1" id="PrArticle" name="PrArticle" required>
+                                <input type="text"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrArticle"
+                                       name="PrArticle"
+                                       maxlength="2"
+                                       pattern="[0-9]{1,2}"
+                                       title="Введите от 1 до 2 цифр"
+                                       required>
+                                <small class="text-muted">Максимум 2 цифры (1-я цифра № печки, 2-я цифра № линии, остальные 3 цифры сгенерируются)</small>
                             </div>
 
                             <div class="col-md-6 mb-1">
@@ -238,6 +271,130 @@
         </form>
     </div>
 </div>
+
+<!-- Модальное окно для выбора конструкторского наименования -->
+<div class="modal fade" id="designNameModal" tabindex="-1" aria-labelledby="designNameModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- Изменено с modal-md на modal-lg -->
+        <div class="modal-content" style="min-width: 700px;"> <!-- Минимальная ширина -->
+            <div class="modal-header py-1">
+                <h5 class="modal-title fs-6" id="designNameModalLabel">Выбор конструкторского наименования</h5>
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-2">
+                <!-- Поле поиска в HTML -->
+                <div class="mb-2">
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           id="designNameSearch"
+                           placeholder="Поиск по ИД и наименованию...">
+                </div>
+
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-sm table-hover mb-0" style="line-height: 1.2; min-width: 650px;">
+                        <thead>
+                        <tr>
+                            <th class="py-0 align-middle" style="width: 80px; height: 24px;">ИД</th>
+                            <th class="py-0 align-middle" style="height: 24px; min-width: 400px;">Наименование</th>
+                            <!-- Увеличенная ширина -->
+                            <th class="py-0 align-middle" style="width: 100px; height: 24px;">Действие</th>
+                        </tr>
+                        </thead>
+                        <tbody id="designNameTableBody">
+                        {{ range .DesignNameList }}
+                        <tr style="height: 28px;">
+                            <td class="text-muted py-0 align-middle">{{ .Id }}</td>
+                            <td class="py-0 align-middle text-truncate" style="max-width: 450px;" title="{{ .Name }}">{{
+                                .Name }}
+                            </td>
+                            <td class="py-0 align-middle">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary select-design-name py-1 px-2"
+                                        data-name="{{ .Name }}"
+                                        data-id="{{ .Id }}"
+                                        style="font-size: 0.75rem; line-height: 1;">
+                                    Выбрать
+                                </button>
+                            </td>
+                        </tr>
+                        {{ else }}
+                        <tr style="height: 28px;">
+                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных конструкторских
+                                наименований
+                            </td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer py-1">
+                <!-- Счетчик строк слева -->
+                <div class="me-auto d-flex align-items-center small text-muted">
+                    <span>Всего: <span id="rowCount" class="fw-bold ms-1">{{ len .DesignNameList }}</span></span>
+                </div>
+
+                <!-- Кнопка закрытия справа -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для выбора цвета стекла -->
+<div class="modal fade" id="colorModal" tabindex="-1" aria-labelledby="colorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header py-1">
+                <h5 class="modal-title fs-6" id="colorModalLabel">Выбор цвета стекла</h5>
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-2">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-sm table-hover mb-0" style="line-height: 1.2;">
+                        <thead>
+                        <tr>
+                            <th class="py-0 align-middle" style="height: 24px;">Наименование цвета</th>
+                            <th class="py-0 align-middle" style="height: 24px;">GL</th>
+                            <th class="py-0 align-middle" style="width: 90px; height: 24px;">Действие</th>
+                        </tr>
+                        </thead>
+                        <tbody id="colorTableBody">
+                        {{ range .ColorList }}
+                        <tr style="height: 28px;">
+                            <td class="py-0 align-middle">{{ .Name }}</td>
+                            <td class="py-0 align-middle">{{ .DopInt1 }}</td>
+                            <td class="py-0 align-middle">
+                                <button type="button" class="btn btn-sm btn-outline-primary select-color py-1 px-1"
+                                        data-name="{{ .Name }}"
+                                        data-gl="{{ .DopInt1 }}"
+                                        style="font-size: 0.75rem; line-height: 1;">
+                                    Выбрать
+                                </button>
+                            </td>
+                        </tr>
+                        {{ else }}
+                        <tr style="height: 28px;">
+                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных цветов</td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer py-1">
+                <!-- Счетчик строк слева -->
+                <div class="me-auto d-flex align-items-center small text-muted">
+                    <span>Всего: <span id="colorRowCount">{{ len .ColorList }}</span></span>
+                </div>
+
+                <!-- Кнопка закрытия справа -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </body>
 </html>

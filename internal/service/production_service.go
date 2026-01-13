@@ -19,7 +19,7 @@ func NewProductionService(production repository.ProductionRepository, logg *comm
 	return &ProductionService{production, logg}
 }
 
-type ProductionUserCase interface {
+type ProductionUseCase interface {
 	AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error)
 	SearchProductions(ctx context.Context, articlePattern, namePattern, idPattern string) ([]*model.Production, error)
 	AddProduction(ctx context.Context, production *model.Production) error

@@ -18,3 +18,8 @@ const (
 	FGWsvAFormsProductionFilterQuery = "exec dbo.svAFormsProductionFilterById ?, ?, ?;"                                                      // ХП ищет продукцию по артиклю и наименованию и коду продукции.
 	FGWsvAFormsProductionAddQuery    = "exec dbo.svAFormsProductionAdd ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;" // ХП добавляет продукцию.
 )
+
+const (
+	FGWsvAFormsDesignNameAllQuery = "exec dbo.svAFormsDesignNameAll;" // ХП возвращает список конструкторских наименование.
+	FGWsvAFormsColorAllQuery      = "exec dbo.svAFormsColorAll;"      // ХП возвращает цвета.
+)

@@ -136,4 +136,106 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function() {
         formChanged = false;
     });
+
+    //-------------------------------------------------------------------------------------------------------------------
+    // МОДАЛЬНОЕ ОКНО----------------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------------------------
+    // Обработка выбора конструкторского наименования
+    document.querySelectorAll('.select-design-name').forEach(button => {
+        button.addEventListener('click', function() {
+            const designName = this.getAttribute('data-name');
+            const designId = this.getAttribute('data-id');
+
+            // Заполняем поле конструкторского наименования
+            document.getElementById('PrPackName').value = designName;
+            document.getElementById('PrName').value = designName;
+            document.getElementById('PrShortName').value = designName;
+
+            // Если нужно сохранить ID в скрытом поле
+            const hiddenIdField = document.getElementById('DesignNameId');
+            if (!hiddenIdField) {
+                // Создаем скрытое поле для ID, если его нет
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.id = 'DesignNameId';
+                hiddenInput.name = 'DesignNameId';
+                hiddenInput.value = designId;
+                document.querySelector('form').appendChild(hiddenInput);
+            } else {
+                hiddenIdField.value = designId;
+            }
+
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('designNameModal'));
+            modal.hide();
+        });
+    });
+
+    // Обработка поиска
+    const searchInput = document.getElementById('designNameSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#designNameModal tbody tr');
+
+            rows.forEach(row => {
+                // Пропускаем строку "нет данных"
+                if (row.querySelector('td.text-center')) {
+                    return;
+                }
+
+                const nameCell = row.querySelector('td:nth-child(2)'); // Вторая колонка (Наименование)
+                const idCell = row.querySelector('td:nth-child(1)');   // Первая колонка (ID)
+
+                if (nameCell && idCell) {
+                    const name = nameCell.textContent.toLowerCase();
+                    const id = idCell.textContent.toLowerCase();
+                    // Ищем как по названию, так и по ID
+                    const matches = name.includes(searchTerm) || id.includes(searchTerm);
+                    row.style.display = matches ? '' : 'none';
+                }
+            });
+        });
+    }
+
+    // Сброс поиска при открытии модального окна
+    document.getElementById('designNameModal').addEventListener('shown.bs.modal', function() {
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input')); // Сбрасываем фильтрацию
+            searchInput.focus(); // Фокус на поле поиска
+        }
+    });
+
+    // Сброс поиска при закрытии модального окна
+    document.getElementById('designNameModal').addEventListener('hidden.bs.modal', function() {
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input')); // Сбрасываем фильтрацию
+        }
+    });
+
+
+
+    // ========== ОБРАБОТКА ЦВЕТА СТЕКЛА ==========
+    const colorSearchInput = document.getElementById('colorSearch');
+    const colorRowCountElement = document.getElementById('colorRowCount');
+    const colorTableBody = document.getElementById('colorTableBody');
+
+    // Обработка выбора цвета
+    document.querySelectorAll('.select-color').forEach(button => {
+        button.addEventListener('click', function() {
+            const colorName = this.getAttribute('data-name');
+            const colorGL = this.getAttribute('data-gl');
+
+
+            // Заполняем поле "Цвет стекла"
+            document.getElementById('PrColor').value = colorName;
+            document.getElementById('PrGL').value = colorGL;
+
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('colorModal'));
+            modal.hide();
+        });
+    });
 });

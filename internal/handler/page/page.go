@@ -120,13 +120,15 @@ func RenderErrorPage(w http.ResponseWriter, statusCode int, msgCode string, r *h
 func RenderSinglePage(w http.ResponseWriter, tmplFile string, data interface{}, r *http.Request) {
 	tmpl, err := template.ParseFiles(tmplFile)
 	if err != nil {
-		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
+		RenderErrorPage(w, http.StatusInternalServerError, msg.H7002+err.Error(), r)
+
 		return
 	}
 
 	err = tmpl.Execute(w, data)
 	if err != nil {
-		http.Error(w, "Template execution error: "+err.Error(), http.StatusInternalServerError)
+		RenderErrorPage(w, http.StatusInternalServerError, msg.H7003+err.Error(), r)
+
 		return
 	}
 }

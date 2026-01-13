@@ -18,17 +18,18 @@ const (
 )
 
 type ProductionHandlerHTML struct {
-	productionService service.ProductionUserCase
+	productionService service.ProductionUseCase
 	performerService  service.PerformerUseCase
 	roleService       service.RoleUseCase
+	catalogService    service.CatalogUseCase
 	logg              *common.Logger
 	authMiddleware    *handler.AuthMiddleware
 }
 
-func NewProductionHandlerHTML(productionService service.ProductionUserCase, performerService service.PerformerUseCase,
-	roleService service.RoleUseCase, logg *common.Logger, authMiddleware *handler.AuthMiddleware) *ProductionHandlerHTML {
+func NewProductionHandlerHTML(productionService service.ProductionUseCase, performerService service.PerformerUseCase,
+	roleService service.RoleUseCase, catalogService service.CatalogUseCase, logg *common.Logger, authMiddleware *handler.AuthMiddleware) *ProductionHandlerHTML {
 
-	return &ProductionHandlerHTML{productionService, performerService, roleService, logg, authMiddleware}
+	return &ProductionHandlerHTML{productionService, performerService, roleService, catalogService, logg, authMiddleware}
 }
 
 func (p *ProductionHandlerHTML) ServeHTTPHTMLRouter(mux *http.ServeMux) {
@@ -107,10 +108,28 @@ func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Re
 func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
+	designNameList, err := p.catalogService.DesignNameAll(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+
+	colorList, err := p.catalogService.ColorAll(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+
 	data := struct {
-		Title string
+		Title          string
+		DesignNameList []*model.Catalog
+		ColorList      []*model.Catalog
 	}{
-		Title: "Добавить вариант упаковки",
+		Title:          "Добавить вариант упаковки",
+		DesignNameList: designNameList,
+		ColorList:      colorList,
 	}
 
 	page.RenderSinglePage(w, tmplProductionAddHTML, data, r)
