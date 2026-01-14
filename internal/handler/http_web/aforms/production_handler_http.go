@@ -16,7 +16,7 @@ import (
 const (
 	tmplIndexHTML         = "index.html"
 	tmplProductionHTML    = "productions.html"
-	tmplProductionAddHTML = "web/html/aforms/production_add.html"
+	tmplProductionAddHTML = "production_add.html"
 )
 
 type ProductionHandlerHTML struct {
@@ -63,9 +63,9 @@ func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http
 	}
 
 	data := page.NewDataPage("Варианты упаковки продукции", "productions", performerData,
-		productions, sortFields, searchFields, true)
+		productions, sortFields, searchFields, true, nil, nil)
 
-	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML)
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML)
 }
 
 func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Request) ([]*model.Production, *page.SearchProductionsPage, *page.SortProductionsPage, error) {
@@ -110,6 +110,13 @@ func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Re
 func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
+	performerData, err := p.authMiddleware.GetUserData(r, p.performerService, p.roleService)
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
+
+		return
+	}
+
 	// Обработка GET запроса - отображение формы
 	if r.Method == http.MethodGet {
 		designNameList, err := p.catalogService.DesignNameAll(r.Context())
@@ -124,17 +131,30 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			return
 		}
 
-		data := struct {
-			Title          string
-			DesignNameList []*model.Catalog
-			ColorList      []*model.Catalog
-		}{
-			Title:          "Добавить вариант упаковки",
-			DesignNameList: designNameList,
-			ColorList:      colorList,
-		}
+		data := page.NewDataPage(
+			"Добавить вариант упаковки",
+			"productionAdd",
+			performerData,
+			nil,
+			nil,
+			nil,
+			false,
+			designNameList,
+			colorList)
 
-		page.RenderSinglePage(w, tmplProductionAddHTML, data, r)
+		//data := struct {
+		//	Title          string
+		//	DesignNameList []*model.Catalog
+		//	ColorList      []*model.Catalog
+		//}{
+		//	Title:          "Добавить вариант упаковки",
+		//	DesignNameList: designNameList,
+		//	ColorList:      colorList,
+		//}
+
+		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML)
+
+		//page.RenderSinglePage(w, tmplProductionAddHTML, data, r)
 
 		return
 	}

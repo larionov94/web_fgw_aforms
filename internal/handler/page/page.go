@@ -34,12 +34,30 @@ type DataPage struct {
 	SortProducts   *SortProductionsPage
 	SearchProducts *SearchProductionsPage
 	IsSearch       bool
+	DesignNameList []*model.Catalog
+	ColorList      []*model.Catalog
 }
 
-func NewDataPage(title string, currentPage string, infoPerformer *handler.PerformerData, productions []*model.Production,
-	sortProducts *SortProductionsPage, searchProductions *SearchProductionsPage, isSearch bool) *DataPage {
+func NewDataPage(
+	title string,
+	currentPage string,
+	infoPerformer *handler.PerformerData,
+	productions []*model.Production,
+	sortProducts *SortProductionsPage,
+	searchProductions *SearchProductionsPage,
+	isSearch bool,
+	designNameList, colorList []*model.Catalog) *DataPage {
 
-	return &DataPage{title, currentPage, infoPerformer, productions, sortProducts, searchProductions, isSearch}
+	return &DataPage{
+		title,
+		currentPage,
+		infoPerformer,
+		productions,
+		sortProducts,
+		searchProductions,
+		isSearch,
+		designNameList,
+		colorList}
 }
 func SetSecureHTMLHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

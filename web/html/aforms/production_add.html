@@ -1,19 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/web/libs/bootstrap.css" type="text/css">
-    <link rel="stylesheet" href="/web/css/aforms/prod_add.css" type="text/css">
-    <script src="/web/libs/bootstrap.bundle.js"></script>
-    <script src="/web/js/prod_add.js"></script>
-    <title>{{ .Title }}</title>
-</head>
-<body>
+{{ define "production_add" }}
 
 <div class="main-container">
     <div class="card">
         <div class="card-header">
-            <h1 class="h3 mb-0">Добавить вариант упаковки</h1>
+            <h1 class="h3 mb-0">{{ .Title }}</h1>
             <p class="text-muted mb-0">Заполните информацию о продукции во всех вкладках</p>
         </div>
 
@@ -398,5 +388,4 @@
 </div>
 
 
-</body>
-</html>
+{{ end }}

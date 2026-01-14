@@ -6,10 +6,12 @@
     <link rel="stylesheet" href="/web/libs/bootstrap.css" type="text/css">
     <link rel="stylesheet" href="/web/css/aforms/aforms.css" type="text/css">
     <link rel="stylesheet" href="/web/css/aforms/prod_table.css" type="text/css">
+    <link rel="stylesheet" href="/web/css/aforms/prod_add.css" type="text/css">
     <script src="/web/libs/bootstrap.bundle.js"></script>
     <script src="/web/js/aforms.js"></script>
     <script src="/web/js/search.js"></script>
     <script src="/web/js/productions.js"></script>
+    <script src="/web/js/prod_add.js"></script>
 
     <title>{{ .Title }}</title>
 </head>
@@ -127,6 +129,9 @@
 
     {{ else if eq .CurrentPage `productions` }}
     {{ template "productions_content" . }}
+
+    {{ else if eq .CurrentPage `productionAdd` }}
+    {{ template "production_add" . }}
 
     {{ else }}
     <!-- Страница по умолчанию или 404 -->
