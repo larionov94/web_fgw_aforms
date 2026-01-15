@@ -235,4 +235,5 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.hide();
         });
     });
+
 });

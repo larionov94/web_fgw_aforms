@@ -58,8 +58,9 @@
                                     Наименование с комментарием упаковщика
                                 </label>
                                 <input type="text" class="form-control form-control-sm py-1" id="PrName" name="PrName"
-                                       required>
+                                >
                             </div>
+
 
                             <div class="col-12 mb-1">
                                 <label for="PrPackName" class="form-label mb-0 fs-6">
@@ -80,7 +81,7 @@
                                     Наименование для печати на этикетке
                                 </label>
                                 <input type="text" class="form-control form-control-sm py-1" id="PrShortName"
-                                       name="PrShortName" required>
+                                       name="PrShortName">
                             </div>
                         </div>
                     </div>
@@ -154,7 +155,8 @@
 
                             <div class="col-md-6 mb-1">
                                 <label for="PrGL" class="form-label mb-0 fs-6">GL</label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL" readonly required>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL"
+                                       readonly required>
                             </div>
                         </div>
 
@@ -170,10 +172,11 @@
                                        min="0"
                                        max="99"
                                        step="1"
-                                       oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                       oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                        maxlength="2"
                                        required>
-                                <small class="text-muted">Максимум 2 цифры (1-я цифра № печки, 2-я цифра № линии, остальные 3 цифры сгенерируются)</small>
+                                <small class="text-muted">Максимум 2 цифры (1-я цифра № печки, 2-я цифра № линии,
+                                    остальные 3 цифры сгенерируются)</small>
                             </div>
 
                             <div class="col-md-6 mb-1">
@@ -339,7 +342,8 @@
         <div class="modal-content">
             <div class="modal-header py-1">
                 <h5 class="modal-title fs-6" id="colorModalLabel">Выбор цвета стекла</h5>
-                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body py-2">
                 <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
