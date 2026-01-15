@@ -1,3 +1,84 @@
+// Добавьте этот код в ваш скрипт session.js или создайте новый файл
+
+// 1. Функция проверки сессии для навигации
+function checkSessionBeforeNavigation(callback) {
+    fetch('/api/session-check', {
+        method: 'HEAD',
+        credentials: 'include'
+    })
+        .then(function (response) {
+            if (!response.ok) {
+                // Сессия невалидна - logout
+                alert('Ваша сессия истекла. Пожалуйста, войдите снова.');
+                window.location.href = '/logout';
+                return false;
+            }
+            // Сессия валидна - выполняем callback
+            if (typeof callback === 'function') {
+                callback();
+            }
+            return true;
+        })
+        .catch(function (error) {
+            console.error('Ошибка проверки сессии:', error);
+            alert('Ошибка проверки сессии. Попробуйте снова.');
+            return false;
+        });
+}
+
+// 2. Обертка для всех ссылок и кнопок, которые ведут на защищенные страницы
+function protectNavigationLinks() {
+    // Защита кнопки "Добавить продукцию"
+    const addProductionBtn = document.getElementById('addProductionBtn');
+    const saveProductionBtn = document.getElementById('saveProductionBtn');
+    if (addProductionBtn) {
+        addProductionBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            checkSessionBeforeNavigation(function () {
+                // Если сессия валидна, выполняем навигацию
+                window.open('/aforms/productions/add', '_self');
+            });
+        });
+    }
+
+    if (saveProductionBtn) {
+        saveProductionBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            checkSessionBeforeNavigation(function () {
+                // Если сессия валидна, выполняем навигацию
+                window.open('/aforms/productions/add', '_self');
+            });
+        });
+    }
+
+    // Защита всех ссылок в навигации
+    document.querySelectorAll('a[href^="/aforms"]').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            // Не проверяем для текущей страницы
+            if (this.href === window.location.href) {
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            checkSessionBeforeNavigation(function () {
+                window.open(this.href, '_self');
+            }.bind(this));
+        });
+    });
+}
+
+// 3. Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function () {
+    protectNavigationLinks();
+});
+
+
 // 1. Защита от навигации по истории для защищенных страниц
 (function () {
     let sessionCheckInterval;
