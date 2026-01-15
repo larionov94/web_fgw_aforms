@@ -48,14 +48,14 @@ body {
 
 .tab-content {
     background-color: #fff;
-    padding: 2rem;
+    padding: 1rem;
     border-radius: 0 0 10px 10px;
 }
 
 .form-section {
     background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 0.6rem;
     margin-bottom: 1.5rem;
     border-left: 4px solid #0d6efd;
 }

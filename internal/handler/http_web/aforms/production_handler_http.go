@@ -17,6 +17,8 @@ const (
 	tmplIndexHTML         = "index.html"
 	tmplProductionHTML    = "productions.html"
 	tmplProductionAddHTML = "production_add.html"
+
+	urlProductions = "/aforms/productions"
 )
 
 type ProductionHandlerHTML struct {
@@ -142,19 +144,7 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			designNameList,
 			colorList)
 
-		//data := struct {
-		//	Title          string
-		//	DesignNameList []*model.Catalog
-		//	ColorList      []*model.Catalog
-		//}{
-		//	Title:          "Добавить вариант упаковки",
-		//	DesignNameList: designNameList,
-		//	ColorList:      colorList,
-		//}
-
 		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML)
-
-		//page.RenderSinglePage(w, tmplProductionAddHTML, data, r)
 
 		return
 	}
@@ -162,7 +152,7 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 	// Обработка POST запроса - сохранение данных
 	if r.Method == http.MethodPost {
 		if err := r.ParseForm(); err != nil {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, "Ошибка парсинга формы: "+err.Error(), p.logg, r)
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
 
 			return
 		}
@@ -197,7 +187,10 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			PrDecl:         convert.ParseFormFieldBool(r, "PrDecl"),
 			PrParty:        convert.ParseFormFieldBool(r, "PrParty"),
 			PrGL:           convert.ParseFormFieldInt(r, "PrGL"),
-			AuditRec:       model.Audit{},
+			AuditRec: model.Audit{
+				CreatedBy: performerData.PerformerId,
+				UpdatedBy: performerData.PerformerId,
+			},
 		}
 
 		if err := p.productionService.AddProduction(r.Context(), product); err != nil {
@@ -205,11 +198,10 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 
 			return
 		}
-		http.Redirect(w, r, "/aforms/productions", http.StatusSeeOther)
+		http.Redirect(w, r, urlProductions, http.StatusSeeOther)
 
 		return
 	}
 
-	http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
-
+	http.Error(w, msg.H7000, http.StatusMethodNotAllowed)
 }
