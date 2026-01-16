@@ -157,13 +157,20 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			return
 		}
 
+		prArticle := strings.TrimSpace(r.FormValue("PrArticle"))
+		if len(prArticle) != 2 {
+			page.RenderErrorPage(w, 400, msg.H7100, r)
+
+			return
+		}
+
 		// Создаем продукт из данных формы
 		product := &model.Production{
 			PrName:         strings.TrimSpace(r.FormValue("PrName")),
 			PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
 			PrPackName:     strings.TrimSpace(r.FormValue("PrPackName")),
 			PrType:         "",
-			PrArticle:      strings.TrimSpace(r.FormValue("PrArticle")),
+			PrArticle:      prArticle,
 			PrColor:        strings.TrimSpace(r.FormValue("PrColor")),
 			PrBarCode:      "",
 			PrCount:        0,

@@ -19,6 +19,7 @@ func SendErrorHTTP(w http.ResponseWriter, statusCode int, msgErr string, logg *c
 	result := fmt.Sprintf("H7777 %s --- %s:%d", msgErr, fileName, lineCode)
 
 	logg.LogHttpErr(result, statusCode, r.Method, r.URL.Path)
+
 	http.Error(w, fmt.Sprintf(" %s", msgErr), statusCode)
 
 }
