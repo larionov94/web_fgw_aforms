@@ -38,27 +38,24 @@ document.addEventListener('DOMContentLoaded', function() {
         let firstInvalidField = null;
 
         requiredFields.forEach(field => {
+            // Всегда удаляем старые сообщения об ошибках
+            field.classList.remove('is-invalid');
+            const oldError = field.parentNode.querySelector('.invalid-feedback');
+            if (oldError) oldError.remove();
+
+            // Проверяем поле
             if (!field.value.trim()) {
                 isValid = false;
                 field.classList.add('is-invalid');
 
-                // Добавляем сообщение об ошибке
-                if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('invalid-feedback')) {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'invalid-feedback';
-                    errorDiv.textContent = 'Это поле обязательно для заполнения';
-                    field.parentNode.appendChild(errorDiv);
-                }
+                // Всегда создаем новое сообщение
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'invalid-feedback';
+                errorDiv.textContent = 'Это поле обязательно для заполнения';
+                field.parentNode.appendChild(errorDiv);
 
-                // Запоминаем первое невалидное поле
                 if (!firstInvalidField) {
                     firstInvalidField = field;
-                }
-            } else {
-                field.classList.remove('is-invalid');
-                const errorDiv = field.parentNode.querySelector('.invalid-feedback');
-                if (errorDiv) {
-                    errorDiv.remove();
                 }
             }
         });
