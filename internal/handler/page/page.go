@@ -131,7 +131,6 @@ func RenderErrorPage(w http.ResponseWriter, statusCode int, msgCode string, r *h
 		Path:       r.URL.Path,
 	}
 
-	w.WriteHeader(statusCode)
 	RenderPage(w, tmplErrorHTML, data, r)
 }
 
