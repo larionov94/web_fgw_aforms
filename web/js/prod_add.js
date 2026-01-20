@@ -49,7 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const oldError = field.parentNode.querySelector('.invalid-feedback');
             if (oldError) oldError.remove();
 
-            if (!field.value.trim()) {
+            const value = field.value.trim();
+
+            if (!value) {
                 hasErrors = true;
                 field.classList.add('is-invalid');
 
