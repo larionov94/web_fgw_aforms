@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('productForm');
     const requiredFields = form.querySelectorAll('[required]');
 
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        return { isValid, firstInvalidField };
+        return {isValid, firstInvalidField};
     }
 
     // Функция проверки конкретной вкладки
@@ -87,12 +87,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        return { hasErrors, firstInvalidField };
+        return {hasErrors, firstInvalidField};
     }
 
     // Валидация при отправке формы
-    form.addEventListener('submit', function(e) {
-        const { isValid, firstInvalidField } = validateForm();
+    form.addEventListener('submit', function (e) {
+        const {isValid, firstInvalidField} = validateForm();
 
         if (!isValid) {
             e.preventDefault();
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalidField.scrollIntoView({behavior: 'smooth', block: 'center'});
                 firstInvalidField.focus();
             }
 
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Убираем ошибки при вводе
     form.querySelectorAll('input, textarea, select').forEach(field => {
-        field.addEventListener('input', function() {
+        field.addEventListener('input', function () {
             this.classList.remove('is-invalid');
             const errorDiv = this.parentNode.querySelector('.invalid-feedback');
             if (errorDiv) errorDiv.remove();
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formChanged = true;
         });
 
-        field.addEventListener('change', function() {
+        field.addEventListener('change', function () {
             this.classList.remove('is-invalid');
             const errorDiv = this.parentNode.querySelector('.invalid-feedback');
             if (errorDiv) errorDiv.remove();
@@ -152,11 +152,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Обработка кнопок "Далее"
     const nextButtons = document.querySelectorAll('.next-tab');
     nextButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+        button.addEventListener('click', function (e) {
             e.preventDefault();
 
             const currentTabPane = this.closest('.tab-pane');
-            const { hasErrors, firstInvalidField } = validateTab(currentTabPane);
+            const {hasErrors, firstInvalidField} = validateTab(currentTabPane);
 
             if (hasErrors) {
                 // Показываем сообщение об ошибке
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Обработка кнопок "Назад"
     const prevButtons = document.querySelectorAll('.prev-tab');
     prevButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+        button.addEventListener('click', function (e) {
             e.preventDefault();
 
             const prevTabId = this.getAttribute('data-prev-tab');
@@ -197,6 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ========== ФУНКЦИИ ВСПОМОГАТЕЛЬНЫЕ ==========
     let currentAlert = null;
+
     // Функция показа сообщений
     function showAlert(message, type) {
         // Удаляем старые алерты
@@ -234,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ========== ПОДТВЕРЖДЕНИЕ ПРИ ЗАКРЫТИИ СТРАНИЦЫ ==========
 
-    window.addEventListener('beforeunload', function(e) {
+    window.addEventListener('beforeunload', function (e) {
         if (formChanged) {
             e.preventDefault();
             e.returnValue = 'У вас есть несохраненные изменения. Вы уверены, что хотите уйти?';
@@ -245,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Обработка выбора конструкторского наименования
     document.querySelectorAll('.select-design-name').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const designName = this.getAttribute('data-name');
             const designId = this.getAttribute('data-id');
 
@@ -286,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Обработка выбора цвета стекла
     document.querySelectorAll('.select-color').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const colorName = this.getAttribute('data-name');
             const colorGL = this.getAttribute('data-gl');
 
@@ -318,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Обработка поиска конструкторского наименования
     const designNameSearch = document.getElementById('designNameSearch');
     if (designNameSearch) {
-        designNameSearch.addEventListener('input', function() {
+        designNameSearch.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             const rows = document.querySelectorAll('#designNameModal tbody tr');
 
@@ -344,7 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Сброс поиска при открытии/закрытии модальных окон
     const designNameModal = document.getElementById('designNameModal');
     if (designNameModal) {
-        designNameModal.addEventListener('shown.bs.modal', function() {
+        designNameModal.addEventListener('shown.bs.modal', function () {
             if (designNameSearch) {
                 designNameSearch.value = '';
                 designNameSearch.dispatchEvent(new Event('input'));
@@ -352,11 +353,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        designNameModal.addEventListener('hidden.bs.modal', function() {
+        designNameModal.addEventListener('hidden.bs.modal', function () {
             if (designNameSearch) {
                 designNameSearch.value = '';
                 designNameSearch.dispatchEvent(new Event('input'));
             }
         });
     }
+
+    // ========== РАСЧЕТ ВЕСА ==========
+
+    // Функция расчета
+    function calculateTotal() {
+        const prCount = document.getElementById('PrCount');
+        const prRows = document.getElementById('PrRows');
+        const weightBottle = document.getElementById('WeightBottle');
+        const weightPallet = document.getElementById('WeightPallet');
+        const weightTotal = document.getElementById('WeightTotal');
+        const weightCommon = document.getElementById('PrWeight');
+
+        if (!prCount || !prRows || !weightBottle || !weightPallet || !weightTotal) {
+            return; // Если поля не найдены, выходим
+        }
+
+        const count = parseFloat(prCount.value) || 0;
+        const rows = parseFloat(prRows.value) || 0;
+        const bottleWeight = parseFloat(weightBottle.value) || 0;
+        const palletWeight = parseFloat(weightPallet.value) || 45;
+
+        const total = (count * rows * bottleWeight) + palletWeight;
+        weightTotal.value = total.toFixed(3);
+        weightCommon.value = total.toFixed(0)
+    }
+
+    // Вешаем обработчики на все поля для расчета
+    ['PrCount', 'PrRows', 'WeightBottle', 'WeightPallet'].forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.addEventListener('input', calculateTotal);
+            field.addEventListener('change', calculateTotal);
+        }
+    });
+
+    // Вызываем первый расчет
+    calculateTotal();
 });

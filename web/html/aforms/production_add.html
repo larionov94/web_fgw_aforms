@@ -20,7 +20,7 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="packaging-tab" data-bs-toggle="tab"
                         data-bs-target="#packaging" type="button" role="tab"
-                        aria-controls="packaging" aria-selected="false" disabled>
+                        aria-controls="packaging" aria-selected="false">
                     Упаковка
                 </button>
             </li>
@@ -210,13 +210,74 @@
                 </div>
 
                 <!-- Вкладка 2: Упаковка -->
-                <div class="tab-pane fade" id="packaging" role="tabpanel"
-                     aria-labelledby="packaging-tab" tabindex="0">
+                <div class="tab-pane fade" id="packaging" role="tabpanel" aria-labelledby="packaging-tab" tabindex="0">
+
                     <div class="form-section">
-                        <h3>Информация об упаковке</h3>
-                        <p class="text-muted mb-4">Эта вкладка будет заполнена позже</p>
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> Раздел "Упаковка" находится в разработке
+                        <h3 class="mb-2 fs-6 fw-bold">Информация об упаковке</h3>
+                        <div class="row g-1">
+                            <div class="col-md-4 mb-1">
+                                <label for="PrCount" class="form-label mb-0 fs-6">
+                                    Количество продукции в ряду (шт)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrCount"
+                                       name="PrCount"
+                                       required>
+
+                                <label for="PrRows" class="form-label mb-0 fs-6">
+                                    Количество рядов (шт)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrRows"
+                                       name="PrRows"
+                                       required>
+
+                                <label for="PrWeight" class="form-label mb-0 fs-6">
+                                    Вес (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrWeight"
+                                       name="PrWeight"
+                                       min="0"
+                                       required>
+                            </div>
+
+                            <div class="col-md-4 mb-1">
+                                <label for="WeightBottle" class="form-label mb-0 fs-6">
+                                    Вес бутылки (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="WeightBottle"
+                                       name="WeightBottle"
+                                       min="0"
+                                       step="0.001">
+
+                                <label for="WeightPallet" class="form-label mb-0 fs-6">
+                                    Вес паллета (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="WeightPallet"
+                                       name="WeightPallet"
+                                       min="0"
+                                       value="45">
+
+                                <label for="WeightTotal" class="form-label mb-0 fs-6">
+                                    Итого вес (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="WeightTotal"
+                                       name="WeightTotal"
+                                       min="0"
+                                       step="0.001"
+                                       disabled>
+                            </div>
+
                         </div>
                     </div>
 
