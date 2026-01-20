@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('productForm');
     const requiredFields = form.querySelectorAll('[required]');
 
+    // Добавляем поле артикула в валидацию
+    const articleField = document.getElementById('PrArticle');
+
     // Флаг для отслеживания изменений формы
     let formChanged = false;
 
@@ -51,6 +54,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const value = field.value.trim();
 
+            // Специальная проверка для артикула
+            if (field.id === 'PrArticle') {
+                if (!value) {
+                    hasErrors = true;
+                    field.classList.add('is-invalid');
+
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'invalid-feedback p-0';
+                    errorDiv.textContent = 'Артикул обязателен для заполнения';
+                    field.parentNode.appendChild(errorDiv);
+
+                    if (!firstInvalidField) {
+                        firstInvalidField = field;
+                    }
+                } else if (value.length !== 2) {
+                    hasErrors = true;
+                    field.classList.add('is-invalid');
+
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'invalid-feedback p-0';
+                    errorDiv.textContent = `Артикул должен содержать ровно 2 символа`;
+                    field.parentNode.appendChild(errorDiv);
+
+                    if (!firstInvalidField) {
+                        firstInvalidField = field;
+                    }
+                }
+                return; // Выходим из обработки
+            }
+
             if (!value) {
                 hasErrors = true;
                 field.classList.add('is-invalid');
@@ -88,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Скроллим к первому невалидному полю
                 firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 firstInvalidField.focus();
             }
