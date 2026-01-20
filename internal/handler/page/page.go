@@ -5,6 +5,7 @@ import (
 	"fgw_web_aforms/internal/model"
 	"fgw_web_aforms/pkg/common/msg"
 	"fgw_web_aforms/pkg/convert"
+	"fmt"
 	"html/template"
 	"net/http"
 )
@@ -68,6 +69,39 @@ func SetSecureHTMLHeaders(w http.ResponseWriter) {
 	w.Header().Set("X-Frame-Options", "DENY")
 }
 
+// Вспомогательная функция для рендеринга ошибки напрямую
+func renderErrorDirectly(w http.ResponseWriter, statusCode int, msgCode string, r *http.Request) {
+	SetSecureHTMLHeaders(w)
+	w.WriteHeader(statusCode)
+
+	// Простой HTML для ошибки (без рекурсии)
+	errorHTML := fmt.Sprintf(`
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ошибка %d</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .error { color: #d9534f; border: 1px solid #d9534f; padding: 15px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Ошибка %d</h1>
+    <div class="error">
+        <strong>Сообщение:</strong> %s<br>
+        <strong>Метод:</strong> %s<br>
+        <strong>Путь:</strong> %s
+    </div>
+</body>
+</html>`, statusCode, statusCode, msgCode, r.Method, r.URL.Path)
+
+	_, err := fmt.Fprint(w, errorHTML)
+	if err != nil {
+		return
+	}
+}
+
 func RenderPage(w http.ResponseWriter, tmpl string, data interface{}, r *http.Request) {
 	templatePath := prefixDefaultTmpl + tmpl
 
@@ -77,13 +111,13 @@ func RenderPage(w http.ResponseWriter, tmpl string, data interface{}, r *http.Re
 		}).ParseFiles(templatePath)
 
 	if err != nil {
-		RenderErrorPage(w, http.StatusInternalServerError, msg.H7002+err.Error(), r)
+		renderErrorDirectly(w, http.StatusInternalServerError, msg.H7002+err.Error(), r)
 
 		return
 	}
 
 	if err = parseTmpl.ExecuteTemplate(w, tmpl, data); err != nil {
-		RenderErrorPage(w, http.StatusInternalServerError, msg.H7003+err.Error(), r)
+		renderErrorDirectly(w, http.StatusInternalServerError, msg.H7003+err.Error(), r)
 
 		return
 	}
@@ -102,13 +136,13 @@ func RenderPages(w http.ResponseWriter, tmpl string, data interface{}, r *http.R
 		}).ParseFiles(templatePaths...)
 
 	if err != nil {
-		RenderErrorPage(w, http.StatusInternalServerError, msg.H7002+err.Error(), r)
+		renderErrorDirectly(w, http.StatusInternalServerError, msg.H7002+err.Error(), r)
 
 		return
 	}
 
 	if err = parseTmpl.ExecuteTemplate(w, tmpl, data); err != nil {
-		RenderErrorPage(w, http.StatusInternalServerError, msg.H7003+err.Error(), r)
+		renderErrorDirectly(w, http.StatusInternalServerError, msg.H7003+err.Error(), r)
 
 		return
 	}
@@ -116,6 +150,19 @@ func RenderPages(w http.ResponseWriter, tmpl string, data interface{}, r *http.R
 
 func RenderErrorPage(w http.ResponseWriter, statusCode int, msgCode string, r *http.Request) {
 	SetSecureHTMLHeaders(w)
+
+	templatePath := prefixDefaultTmpl + tmplErrorHTML
+
+	parseTmpl, err := template.New(tmplErrorHTML).Funcs(
+		template.FuncMap{
+			"formatDateTime": convert.FormatDateTime,
+		}).ParseFiles(templatePath)
+
+	if err != nil {
+		renderErrorDirectly(w, statusCode, msgCode, r)
+
+		return
+	}
 
 	data := struct {
 		Title      string
@@ -131,21 +178,8 @@ func RenderErrorPage(w http.ResponseWriter, statusCode int, msgCode string, r *h
 		Path:       r.URL.Path,
 	}
 
-	RenderPage(w, tmplErrorHTML, data, r)
-}
-
-func RenderSinglePage(w http.ResponseWriter, tmplFile string, data interface{}, r *http.Request) {
-	tmpl, err := template.ParseFiles(tmplFile)
-	if err != nil {
-		RenderErrorPage(w, http.StatusInternalServerError, msg.H7002+err.Error(), r)
-
-		return
-	}
-
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		RenderErrorPage(w, http.StatusInternalServerError, msg.H7003+err.Error(), r)
-
+	if err = parseTmpl.Execute(w, data); err != nil {
+		renderErrorDirectly(w, statusCode, msgCode, r)
 		return
 	}
 }

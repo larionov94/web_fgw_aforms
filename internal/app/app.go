@@ -23,6 +23,7 @@ const addr = ":7777"
 const fileEnv = ".env"
 
 func StartApp() {
+
 	config.InitSessionStore()
 
 	logger, err := common.NewLogger("")

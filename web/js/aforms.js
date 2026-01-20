@@ -1,18 +1,48 @@
-// Добавьте этот код в ваш скрипт session.js или создайте новый файл
+// session-check.js
 
-// 1. Функция проверки сессии для навигации
+// Дебаунс функция для ограничения частоты вызовов
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// 1. Функция проверки сессии с кешированием
+let lastSessionCheck = 0;
+const SESSION_CHECK_CACHE_TIME = 30000; // 30 секунд
+
 function checkSessionBeforeNavigation(callback) {
-    fetch('/api/session-check', {
+    const now = Date.now();
+
+    // Используем кеширование, если недавно проверяли
+    if (now - lastSessionCheck < SESSION_CHECK_CACHE_TIME) {
+        if (typeof callback === 'function') {
+            callback();
+        }
+        return Promise.resolve(true);
+    }
+
+    return fetch('/api/session-check', {
         method: 'HEAD',
-        credentials: 'include'
+        credentials: 'include',
+        cache: 'no-store'
     })
         .then(function (response) {
+            lastSessionCheck = Date.now();
+
             if (!response.ok) {
                 // Сессия невалидна - logout
                 alert('Ваша сессия истекла. Пожалуйста, войдите снова.');
                 window.location.href = '/logout';
                 return false;
             }
+
             // Сессия валидна - выполняем callback
             if (typeof callback === 'function') {
                 callback();
@@ -21,182 +51,128 @@ function checkSessionBeforeNavigation(callback) {
         })
         .catch(function (error) {
             console.error('Ошибка проверки сессии:', error);
-            alert('Ошибка проверки сессии. Попробуйте снова.');
+            // При ошибке сети разрешаем навигацию (опционально)
+            if (typeof callback === 'function') {
+                callback();
+            }
             return false;
         });
 }
 
-// 2. Обертка для всех ссылок и кнопок, которые ведут на защищенные страницы
+// 2. Оптимизированная защита ссылок
 function protectNavigationLinks() {
-    // Защита кнопки "Добавить продукцию"
+    // Единый обработчик для всех ссылок (делегирование событий)
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('a[href^="/aforms"]');
+        if (!link) return;
+
+        // Не проверяем для текущей страницы
+        if (link.href === window.location.href) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        checkSessionBeforeNavigation(function () {
+            window.location.href = link.href;
+        });
+    });
+
+    // Отдельно обрабатываем кнопку если нужно
     const addProductionBtn = document.getElementById('addProductionBtn');
-    const saveProductionBtn = document.getElementById('saveProductionBtn');
     if (addProductionBtn) {
         addProductionBtn.addEventListener('click', function (e) {
             e.preventDefault();
-            e.stopPropagation();
-
             checkSessionBeforeNavigation(function () {
-                // Если сессия валидна, выполняем навигацию
-                window.open('/aforms/productions/add', '_self');
+                window.location.href = '/aforms/productions/add';
             });
         });
     }
-
-    if (saveProductionBtn) {
-        saveProductionBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            checkSessionBeforeNavigation(function () {
-                // Если сессия валидна, выполняем навигацию
-                window.open('/aforms/productions/add', '_self');
-            });
-        });
-    }
-
-    // Защита всех ссылок в навигации
-    document.querySelectorAll('a[href^="/aforms"]').forEach(function (link) {
-        link.addEventListener('click', function (e) {
-            // Не проверяем для текущей страницы
-            if (this.href === window.location.href) {
-                return;
-            }
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            checkSessionBeforeNavigation(function () {
-                window.open(this.href, '_self');
-            }.bind(this));
-        });
-    });
 }
 
-// 3. Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function () {
-    protectNavigationLinks();
-});
-
-
-// 1. Защита от навигации по истории для защищенных страниц
+// 3. Оптимизированный мониторинг сессии и активности
 (function () {
     let sessionCheckInterval;
-    let isCheckingSession = false;
     let lastActivity = Date.now();
+    let inactivityWarningShown = false;
 
-    // 2. Функция проверки сессии
+    // Дебаунсированное обновление активности
+    const updateActivity = debounce(() => {
+        lastActivity = Date.now();
+        inactivityWarningShown = false;
+    }, 1000); // Обновляем не чаще чем раз в секунду
+
+    // Проверка сессии с защитой от повторных вызовов
     function checkSession() {
-        if (isCheckingSession) return;
-
-        isCheckingSession = true;
-
-        fetch('/api/session-check', {
+        return fetch('/api/session-check', {
             method: 'HEAD',
-            credentials: 'include'
+            credentials: 'include',
+            cache: 'no-store'
         })
             .then(function (response) {
                 if (!response.ok) {
-                    // 2.1. Сессия невалидна - logout
                     console.log('Сессия истекла, выполняется выход...');
                     window.location.href = '/logout';
-                    return;
+                    return false;
                 }
-
-                // 2.2. Проверяем заголовки если нужно
-                const sessionStatus = response.headers.get('Session-Status');
-                if (sessionStatus && sessionStatus !== 'active') {
-                    console.log('Статус сессии:', sessionStatus);
-                    window.location.href = '/logout';
-                }
-
-                // 2.3. Обновляем время последней активности
-                lastActivity = Date.now();
+                return true;
             })
             .catch(function (error) {
                 console.error('Ошибка проверки сессии:', error);
-                // 2.4 При ошибке сети не делаем logout сразу можно попробовать снова через некоторое время
-            })
-            .finally(function () {
-                isCheckingSession = false;
+                return false; // Не выходим при ошибке сети
             });
     }
 
-    // 1. Функция проверки не активности пользователя
+    // Проверка неактивности
     function checkInactivity() {
         const now = Date.now();
         const inactiveTime = now - lastActivity;
 
-        // 2. Если неактивны более 10 минут - показываем предупреждение
-        if (inactiveTime > 10 * 60 * 1000) {
-            const userConfirmed = confirm('Вы неактивны более 10 минут. Сессия будет завершена через 5 минут.');
+        // Предупреждение через 10 минут
+        if (!inactivityWarningShown && inactiveTime > 10 * 60 * 1000) {
+            inactivityWarningShown = true;
+            const userConfirmed = confirm('Вы неактивны более 10 минут. Нажмите OK для продления сессии.');
             if (userConfirmed) {
-                // 2.1. Сброс времени активности
-                lastActivity = Date.now();
-                // 2.2. Принудительная проверка сессии
-                checkSession();
+                updateActivity();
+                checkSession(); // Дополнительная проверка сессии
             }
         }
 
-        // 3. Если неактивны более 15 минут - принудительный выход
+        // Выход через 15 минут
         if (inactiveTime > 15 * 60 * 1000) {
-            alert('Сессия завершена из-за не активности.');
+            alert('Сессия завершена из-за неактивности.');
             window.location.href = '/logout';
         }
     }
 
-    // 1. Обновление времени активности при действиях пользователя
-    function updateActivity() {
-        lastActivity = Date.now();
-    }
-
-    // 2. События активности пользователя
-    ['click', 'keypress', 'mousemove', 'scroll', 'touchstart'].forEach(function (eventName) {
-        document.addEventListener(eventName, updateActivity, {passive: true});
-    });
-
-    // 3. Инициализация
+    // Инициализация
     function initSessionMonitoring() {
-        // 3.1. Первая проверка через 1 минуту после загрузки
-        setTimeout(checkSession, 60000);
+        // События активности с дебаунсом
+        ['click', 'keypress', 'mousemove', 'scroll', 'touchstart'].forEach(function (eventName) {
+            document.addEventListener(eventName, updateActivity, { passive: true });
+        });
 
-        // 3.2. Затем каждые 5 минут
+        // Проверка сессии каждые 5 минут
         sessionCheckInterval = setInterval(checkSession, 300000);
 
-        // 3.3. Проверка не активности каждую минуту
+        // Проверка неактивности каждую минуту
         setInterval(checkInactivity, 60000);
+
+        // Первая проверка
+        setTimeout(checkSession, 60000);
     }
 
-    // 4. Заменяем состояние в истории
-    if (window.history.replaceState) {
-        history.replaceState({
-            authed: true,
-            timestamp: new Date().toISOString()
-        }, '', window.location.pathname);
-    }
+    // Запускаем при загрузке
+    document.addEventListener('DOMContentLoaded', function () {
+        protectNavigationLinks();
+        initSessionMonitoring();
 
-    // 5. Обработчик навигации
-    window.addEventListener('popstate', function (event) {
-        if (!event.state || event.state.authed !== true) {
-            // Пытаемся уйти с защищенной страницы
-            window.location.href = '/logout';
-        }
-    });
-
-    // 6. Защита от кэширования
-    window.addEventListener('pageshow', function (event) {
-        if (event.persisted) {
-            window.location.reload();
-        }
-    });
-
-    // 7. Запускаем мониторинг сессии
-    initSessionMonitoring();
-
-    // 8. Очистка при закрытии страницы
-    window.addEventListener('beforeunload', function () {
-        if (sessionCheckInterval) {
-            clearInterval(sessionCheckInterval);
-        }
+        // Очистка при закрытии
+        window.addEventListener('beforeunload', function () {
+            if (sessionCheckInterval) {
+                clearInterval(sessionCheckInterval);
+            }
+        });
     });
 })();
