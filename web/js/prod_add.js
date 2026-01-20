@@ -123,6 +123,29 @@ document.addEventListener('DOMContentLoaded', function () {
         formChanged = false;
     });
 
+    form.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target.matches('input:not([type="button"]):not([type="submit"]), textarea')) {
+            e.preventDefault();
+
+            const activeTab = document.querySelector('.tab-pane.active');
+            if (!activeTab) return;
+
+            // Проверяем валидацию текущей вкладки
+            const { hasErrors } = validateTab(activeTab);
+
+            if (!hasErrors) {
+                if (activeTab.id === 'dates') {
+                    document.getElementById('saveProductionBtn1')?.click();
+                } else {
+                    activeTab.querySelector('.next-tab')?.click();
+                }
+            } else {
+                // Если есть ошибки, показываем сообщение
+                showAlert('Заполните обязательные поля перед переходом дальше', 'warning');
+            }
+        }
+    });
+
     // Убираем ошибки при вводе
     form.querySelectorAll('input, textarea, select').forEach(field => {
         field.addEventListener('input', function () {
@@ -397,4 +420,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Вызываем первый расчет
     calculateTotal();
+
+    // Функция сборки HWD
+    function updateHWD() {
+        const height = document.getElementById('PrHeight').value.trim();
+        const width = document.getElementById('PrWidth').value.trim();
+        const depth = document.getElementById('PrDepth').value.trim();
+
+        const hwdField = document.getElementById('PrHWD');
+
+        // Собираем только если все поля заполнены
+        if (height && width && depth) {
+            hwdField.value = `${height}x${width}x${depth}`;
+        } else {
+            hwdField.value = ''; // Очищаем если не все заполнено
+        }
+    }
+
+    // Вешаем обработчики на все 3 поля
+    ['PrHeight', 'PrWidth', 'PrDepth'].forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.addEventListener('input', updateHWD);
+            field.addEventListener('change', updateHWD);
+        }
+    });
+
+    // Инициализация при загрузке
+    updateHWD();
 });

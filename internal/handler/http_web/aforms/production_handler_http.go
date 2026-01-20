@@ -176,7 +176,7 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			PrCount:        convert.ParseFormFieldInt(r, "PrCount"),
 			PrRows:         convert.ParseFormFieldInt(r, "PrRows"),
 			PrWeight:       convert.ParseFormFieldFloat(r, "PrWeight"),
-			PrHWD:          "",
+			PrHWD:          strings.TrimSpace(r.FormValue("PrHWD")),
 			PrInfo:         "",
 			PrStatus:       "",
 			PrEditDate:     "",
