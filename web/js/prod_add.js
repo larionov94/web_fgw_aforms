@@ -56,19 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Специальная проверка для артикула
             if (field.id === 'PrArticle') {
-                if (!value) {
-                    hasErrors = true;
-                    field.classList.add('is-invalid');
-
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'invalid-feedback p-0';
-                    errorDiv.textContent = 'Артикул обязателен для заполнения';
-                    field.parentNode.appendChild(errorDiv);
-
-                    if (!firstInvalidField) {
-                        firstInvalidField = field;
-                    }
-                } else if (value.length !== 2) {
+                if (value.length !== 2) {
                     hasErrors = true;
                     field.classList.add('is-invalid');
 
@@ -142,6 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const errorDiv = this.parentNode.querySelector('.invalid-feedback');
             if (errorDiv) errorDiv.remove();
 
+            // Автоматически скрываем алерт при изменении
+            hideAlert();
+
             // Отмечаем, что форма была изменена
             formChanged = true;
         });
@@ -205,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ========== ФУНКЦИИ ВСПОМОГАТЕЛЬНЫЕ ==========
-
+    let currentAlert = null;
     // Функция показа сообщений
     function showAlert(message, type) {
         // Удаляем старые алерты
@@ -216,14 +207,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade show m-1 p-1 small`;
         alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close btn-sm m-1 p-1" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
+        ${message}
+        <button type="button" class="btn-close btn-sm m-1 p-1" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+        // Сохраняем ссылку на текущий алерт
+        currentAlert = alertDiv;
 
         // Вставляем после заголовка
         const cardHeader = document.querySelector('.card-header');
         if (cardHeader) {
             cardHeader.parentNode.insertBefore(alertDiv, cardHeader.nextSibling);
+        }
+    }
+
+    // Функция скрытия алерта
+    function hideAlert() {
+        if (currentAlert) {
+            const closeButton = currentAlert.querySelector('.btn-close');
+            if (closeButton) {
+                closeButton.click();
+            }
+            currentAlert = null;
         }
     }
 
