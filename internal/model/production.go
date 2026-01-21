@@ -14,11 +14,11 @@ type Production struct {
 	PrWeight       float64 `json:"prWeight"`       // PrWeight - вес п\п (кг).
 	PrHWD          string  `json:"prHWD"`          // PrHWD - габариты (мм) 1000(высота)х1200(ширина)х1000(глубина).
 	PrInfo         string  `json:"prInfo"`         // PrInfo - информация о продукции\комментарий.
-	PrStatus       string  `json:"prStatus"`       // PrStatus - статус продукции.
+	PrStatus       bool    `json:"prStatus"`       // PrStatus - статус продукции.
 	PrEditDate     string  `json:"prEditDate"`     // PrEditDate - дата и время изменения записи.
 	PrEditUser     int     `json:"prEditUser"`     // PrEditUser - роль сотрудника. По умолчанию 1 - администратор, 5 - оператор.
 	PrPart         int     `json:"prPart"`         // PrPart - номер текущей партии, номер партии и дата указываются вручную и не будут изменяться автоматически с течением времени.
-	PrPartLastDate string  `json:"prPartLastDate"` // PrPartLastDate - дата выпуска партии.
+	PrPartLastDate string  `json:"prPartLastDate"` // PrPartLastDate - дата выпуска партии. Тут в ручную указывается дата для отображения на этикетке.
 	PrPartAutoInc  int     `json:"prPartAutoInc"`  // PrPartAutoInc - нумерация партии и даты! Ручная(0), Автоматическая(1), С указанной даты(2).
 	PrPartRealDate string  `json:"prPartRealDate"` // PrPartRealDate - дата продукции пока неизвестное поле.
 	PrArchive      bool    `json:"prArchive"`      // PrArchive - архивная запись или нет.
