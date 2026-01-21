@@ -1,6 +1,6 @@
 {{ define "production_add" }}
 
-<div class="main-container">
+<div class="main-container" xmlns="http://www.w3.org/1999/html">
     <div class="card">
         <div class="card-header p-2">
             <h1 class="h3 mb-0">{{ .Title }}</h1>
@@ -20,15 +20,15 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="packaging-tab" data-bs-toggle="tab"
                         data-bs-target="#packaging" type="button" role="tab"
-                        aria-controls="packaging" aria-selected="false" disabled>
+                        aria-controls="packaging" aria-selected="false">
                     Упаковка
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="comments-tab" data-bs-toggle="tab"
                         data-bs-target="#comments" type="button" role="tab"
-                        aria-controls="comments" aria-selected="false" disabled>
-                    Комментарии
+                        aria-controls="comments" aria-selected="false">
+                    Комментарий
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -64,7 +64,7 @@
                             </div>
 
                             <div class="col-12 mb-1">
-                                <label for="PrPackName" class="form-label mb-0 fs-6">
+                                <label for="PrPackName" class="form-label required-field mb-0 fs-6">
                                     Конструкторское наименование
                                 </label>
                                 <div class="input-group input-group-sm">
@@ -85,7 +85,7 @@
                             </div>
 
                             <div class="col-12 mb-1">
-                                <label for="PrShortName" class="form-label mb-0 fs-6">
+                                <label for="PrShortName" class="form-label required-field mb-0 fs-6">
                                     Наименование для печати на этикетке
                                 </label>
                                 <input type="text"
@@ -146,7 +146,9 @@
                         <h3 class="mb-2 fs-6 fw-bold">Характеристики продукции</h3>
                         <div class="row g-1 mb-2"> <!-- Уменьшен gap и отступ -->
                             <div class="col-md-6 mb-1">
-                                <label for="PrColor" class="form-label mb-0 fs-6">Цвет стекла</label>
+                                <label for="PrColor" class="form-label required-field mb-0 fs-6">
+                                    Цвет стекла
+                                </label>
                                 <div class="input-group input-group-sm">
                                     <input type="text"
                                            class="form-control form-control-sm py-1"
@@ -164,7 +166,9 @@
                             </div>
 
                             <div class="col-md-6 mb-1">
-                                <label for="PrGL" class="form-label mb-0 fs-6">GL</label>
+                                <label for="PrGL" class="form-label required-field mb-0 fs-6">
+                                    GL
+                                </label>
                                 <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL"
                                        readonly required>
                             </div>
@@ -217,7 +221,7 @@
 
                         <div class="row g-1">
                             <div class="col-md-4 mb-1">
-                                <label for="PrCount" class="form-label mb-0 fs-6">
+                                <label for="PrCount" class="form-label required-field mb-0 fs-6">
                                     Количество продукции в ряду (шт)
                                 </label>
                                 <input type="number"
@@ -226,7 +230,7 @@
                                        name="PrCount"
                                        required>
 
-                                <label for="PrRows" class="form-label mb-0 fs-6">
+                                <label for="PrRows" class="form-label required-field mb-0 fs-6">
                                     Количество рядов (шт)
                                 </label>
                                 <input type="number"
@@ -235,7 +239,7 @@
                                        name="PrRows"
                                        required>
 
-                                <label for="PrWeight" class="form-label mb-0 fs-6">
+                                <label for="PrWeight" class="form-label required-field mb-0 fs-6">
                                     Вес (кг)
                                 </label>
                                 <input type="number"
@@ -283,7 +287,7 @@
 
                         <!-- ГАБАРИТЫ ВЫСОТАхШИРИНАхГЛУБИНА-->
                         <div class="col-md-4 mb-1 pt-2">
-                            <label class="form-label mb-0 fs-6">
+                            <label class="form-label required-field mb-0 fs-6">
                                 Габариты (В×Ш×Г, мм)
                             </label>
 
@@ -345,14 +349,27 @@
                 </div>
 
                 <!-- Вкладка 3: Комментарии -->
-                <div class="tab-pane fade" id="comments" role="tabpanel"
-                     aria-labelledby="comments-tab" tabindex="0">
+                <div class="tab-pane fade" id="comments" role="tabpanel" aria-labelledby="comments-tab" tabindex="0">
+
                     <div class="form-section">
-                        <h3>Комментарии и примечания</h3>
-                        <p class="text-muted mb-4">Эта вкладка будет заполнена позже</p>
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> Раздел "Комментарии" находится в разработке
+                        <h3 class="mb-2 fs-6 fw-bold">Комментарии и примечания</h3>
+
+                        <div class="row g-0">
+                            <div class="col-12 mb-1">
+                                <label for="PrInfo" class="form-label mb-0 fs-6">
+                                    Комментарий
+                                </label>
+                                <textarea type="text"
+                                          class="form-control form-control-sm py-1"
+                                          id="PrInfo"
+                                          name="PrInfo"
+                                          rows="6"
+                                          placeholder="Напишите ваш комментарий здесь..."
+                                          maxlength="2000">
+                                </textarea>
+                            </div>
                         </div>
+
                     </div>
 
                     <div class="d-flex justify-content-between">

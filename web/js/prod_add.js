@@ -124,8 +124,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     form.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && e.target.matches('input:not([type="button"]):not([type="submit"]), textarea')) {
+        if (e.key === 'Enter' && e.target.matches('input:not([type="button"]):not([type="submit"])')) {
             e.preventDefault();
+
+            if (e.target.tagName === 'TEXTAREA') {
+                e.target.value += '\n';
+            }
 
             const activeTab = document.querySelector('.tab-pane.active');
             if (!activeTab) return;
