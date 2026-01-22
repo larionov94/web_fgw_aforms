@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
         formChanged = false;
     });
 
-    form.addEventListener('keypress', function(e) {
+    form.addEventListener('keypress', function (e) {
         if (e.key === 'Enter' && e.target.matches('input:not([type="button"]):not([type="submit"])')) {
             e.preventDefault();
 
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!activeTab) return;
 
             // Проверяем валидацию текущей вкладки
-            const { hasErrors } = validateTab(activeTab);
+            const {hasErrors} = validateTab(activeTab);
 
             if (!hasErrors) {
                 if (activeTab.id === 'additionally') {
@@ -456,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //----- ВЫБОРКА ЧЕКБОКСА МЕЖДУ ПИЩЕВОЙ И ПАРФБМЕРНОЙ ПРОДУКЦИИ--------//
     // Простой скрипт для взаимного исключения
     document.querySelectorAll('.exclusive-check').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
+        checkbox.addEventListener('change', function () {
             if (this.checked) {
                 // Снимаем галочку с другого чекбокса
                 document.querySelectorAll('.exclusive-check').forEach(cb => {
@@ -473,47 +473,47 @@ document.addEventListener('DOMContentLoaded', function () {
         const checkboxPrUmbrella = document.getElementById('PrUmbrella');
 
         // ПОЛНАЯ БЛОКИРОВКА
-        checkboxPrDecl.addEventListener('click', function(e) {
+        checkboxPrDecl.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             return false;
         });
-        checkboxPrSun.addEventListener('click', function(e) {
+        checkboxPrSun.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             return false;
         });
-        checkboxPrUmbrella.addEventListener('click', function(e) {
+        checkboxPrUmbrella.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             return false;
         });
 
         // Дополнительная блокировка через change
-        checkboxPrDecl.addEventListener('change', function(e) {
+        checkboxPrDecl.addEventListener('change', function (e) {
             this.checked = true; // Всегда возвращаем к исходному состоянию
         });
-        checkboxPrSun.addEventListener('change', function(e) {
+        checkboxPrSun.addEventListener('change', function (e) {
             this.checked = true; // Всегда возвращаем к исходному состоянию
         });
-        checkboxPrUmbrella.addEventListener('change', function(e) {
+        checkboxPrUmbrella.addEventListener('change', function (e) {
             this.checked = true; // Всегда возвращаем к исходному состоянию
         });
 
         // Блокировка клавиатуры
-        checkboxPrDecl.addEventListener('keydown', function(e) {
+        checkboxPrDecl.addEventListener('keydown', function (e) {
             if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
                 return false;
             }
         });
-        checkboxPrSun.addEventListener('keydown', function(e) {
+        checkboxPrSun.addEventListener('keydown', function (e) {
             if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
                 return false;
             }
         });
-        checkboxPrUmbrella.addEventListener('keydown', function(e) {
+        checkboxPrUmbrella.addEventListener('keydown', function (e) {
             if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
                 return false;

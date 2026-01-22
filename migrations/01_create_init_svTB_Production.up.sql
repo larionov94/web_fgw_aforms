@@ -72,6 +72,7 @@ CREATE PROCEDURE dbo.svAFormsProductionAdd -- ХП добавляет проду
     @PrProdType BIT,
     @PrParty BIT,
     @PrUmbrella BIT,
+    @PrPerfumery BIT,
     @PrColor VARCHAR(20),
     @PrGL SMALLINT,
     @PrArticle VARCHAR(2), -- вводим только 2 цифры ВП и МЛ
@@ -92,33 +93,23 @@ CREATE PROCEDURE dbo.svAFormsProductionAdd -- ХП добавляет проду
     @UpdatedBy INT
 AS
 BEGIN
-    SET
-NOCOUNT ON;
+    SET NOCOUNT ON;
 
-    DECLARE
-@NewPrArticle VARCHAR(5);
-    DECLARE
-@MaxSequence INT;
-    DECLARE
-@NewSequence VARCHAR(3);
-    DECLARE
-@PrVP SMALLINT;
-    DECLARE
-@PrML SMALLINT;
+    DECLARE @NewPrArticle VARCHAR(5);
+    DECLARE @MaxSequence INT;
+    DECLARE @NewSequence VARCHAR(3);
+    DECLARE @PrVP SMALLINT;
+    DECLARE @PrML SMALLINT;
 
     -- 1. Проверяем, что артикул состоит из 2 цифр
-    IF
-LEN(@PrArticle) <> 2 OR ISNUMERIC(@PrArticle) = 0
+    IF LEN(@PrArticle) <> 2 OR ISNUMERIC(@PrArticle) = 0
 BEGIN
-            RAISERROR
-(N'Артикул должен состоять из 2 цифр (1-ВП, 2-МЛ "Например:12")', 16, 1);
+            RAISERROR (N'Артикул должен состоять из 2 цифр (1-ВП, 2-МЛ "Например:12")', 16, 1);
 END;
 
     -- 2. Извлекаем VP и ML из первых 2 цифр
-    SET
-@PrVP = CAST(SUBSTRING(@PrArticle, 1, 1) AS SMALLINT);
-    SET
-@PrML = CAST(SUBSTRING(@PrArticle, 2, 1) AS SMALLINT);
+    SET @PrVP = CAST(SUBSTRING(@PrArticle, 1, 1) AS SMALLINT);
+    SET @PrML = CAST(SUBSTRING(@PrArticle, 2, 1) AS SMALLINT);
 
     -- 3. Находим максимальные последние 3 цифры для этого префикса
 SELECT @MaxSequence = ISNULL(MAX(
@@ -130,24 +121,19 @@ WHERE PrArticle LIKE @PrArticle + '%' -- Ищем по первым двум ц�
   AND LEN(PrArticle) = 5;
 
 -- 4. Увеличиваем на 1 (если нет записей, -1 + 1 = 0)
-SET
-@MaxSequence = @MaxSequence + 1;
+SET @MaxSequence = @MaxSequence + 1;
 
     -- 5. Проверяем, не превышает ли 999
-    IF
-@MaxSequence > 999
+    IF @MaxSequence > 999
 BEGIN
-            RAISERROR
-(N'Достигнут максимальный номер последовательности (999) для префикса %s', 16, 1, @PrArticle);
+            RAISERROR (N'Достигнут максимальный номер последовательности (999) для префикса %s', 16, 1, @PrArticle);
 END;
 
     -- 6. Форматируем в 3 цифры с ведущими нулями
-    SET
-@NewSequence = RIGHT('000' + CAST(@MaxSequence AS VARCHAR(3)), 3);
+    SET @NewSequence = RIGHT('000' + CAST(@MaxSequence AS VARCHAR(3)), 3);
 
     -- 7. Формируем полный артикул из 5 цифр
-    SET
-@NewPrArticle = @PrArticle + @NewSequence;
+    SET @NewPrArticle = @PrArticle + @NewSequence;
 
 INSERT INTO dbo.svTB_Production
 (PrName,
@@ -158,6 +144,7 @@ INSERT INTO dbo.svTB_Production
  PrProdType,
  PrParty,
  PrUmbrella,
+ PrPerfumery,
  PrColor,
  PrGL,
  PrArticle,
@@ -173,10 +160,7 @@ INSERT INTO dbo.svTB_Production
  PrPerGodn,
  PrVP,
  PrML,
- PrEditDate,
- Created_at,
  Created_by,
- Updated_at,
  Updated_by)
 VALUES (@PrName,
         @PrShortName,
@@ -186,6 +170,7 @@ VALUES (@PrName,
         @PrProdType,
         @PrParty,
         @PrUmbrella,
+        @PrPerfumery,
         @PrColor,
         @PrGL,
         @NewPrArticle,
@@ -201,17 +186,14 @@ VALUES (@PrName,
         @PrPerGond,
         @PrVP,
         @PrML,
-        GETDATE(),
-        GETDATE(),
         @CreatedBy,
-        GETDATE(),
         @UpdatedBy);
 
 -- 9. Возвращаем сгенерированный артикул
 --     SELECT @NewPrArticle AS GeneratedArticle;
 
 END
-GO;
+go
 
 -- exec dbo.svAFormsProductionAdd N'TEST', N'TEST', N'TEST', 1, 0, 1, 0, 1, N'RED', 500, N'12', '', 10, 2, 523,
 --      N'100x100x111', '', 100, '20251223 00:00:00.000', 1, 50, 1, 1;
