@@ -114,6 +114,7 @@ func (p *ProductionRepo) Add(ctx context.Context, production *model.Production) 
 		&production.PrProdType,
 		&production.PrParty,
 		&production.PrUmbrella,
+		&production.PrPerfumery,
 		&production.PrColor,
 		&production.PrGL,
 		&production.PrArticle,

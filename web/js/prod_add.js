@@ -452,4 +452,88 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Инициализация при загрузке
     updateHWD();
+
+    //----- ВЫБОРКА ЧЕКБОКСА МЕЖДУ ПИЩЕВОЙ И ПАРФБМЕРНОЙ ПРОДУКЦИИ--------//
+    // Простой скрипт для взаимного исключения
+    document.querySelectorAll('.exclusive-check').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Снимаем галочку с другого чекбокса
+                document.querySelectorAll('.exclusive-check').forEach(cb => {
+                    if (cb !== this) cb.checked = false;
+                });
+            }
+        });
+    });
+
+    // Функция для инициализации tooltip
+    function initCheckBox() {
+        const checkboxPrDecl = document.getElementById('PrDecl');
+        const checkboxPrSun = document.getElementById('PrSun');
+        const checkboxPrUmbrella = document.getElementById('PrUmbrella');
+
+        // ПОЛНАЯ БЛОКИРОВКА
+        checkboxPrDecl.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+        checkboxPrSun.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+        checkboxPrUmbrella.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+
+        // Дополнительная блокировка через change
+        checkboxPrDecl.addEventListener('change', function(e) {
+            this.checked = true; // Всегда возвращаем к исходному состоянию
+        });
+        checkboxPrSun.addEventListener('change', function(e) {
+            this.checked = true; // Всегда возвращаем к исходному состоянию
+        });
+        checkboxPrUmbrella.addEventListener('change', function(e) {
+            this.checked = true; // Всегда возвращаем к исходному состоянию
+        });
+
+        // Блокировка клавиатуры
+        checkboxPrDecl.addEventListener('keydown', function(e) {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                return false;
+            }
+        });
+        checkboxPrSun.addEventListener('keydown', function(e) {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                return false;
+            }
+        });
+        checkboxPrUmbrella.addEventListener('keydown', function(e) {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Визуальные изменения
+        checkboxPrDecl.style.cursor = 'not-allowed';
+        checkboxPrDecl.style.pointerEvents = 'none';
+        checkboxPrDecl.style.opacity = '0.7';
+
+        checkboxPrSun.style.cursor = 'not-allowed';
+        checkboxPrSun.style.pointerEvents = 'none';
+        checkboxPrSun.style.opacity = '0.7';
+
+        checkboxPrUmbrella.style.cursor = 'not-allowed';
+        checkboxPrUmbrella.style.pointerEvents = 'none';
+        checkboxPrUmbrella.style.opacity = '0.7';
+    }
+
+    initCheckBox();
 });
+

@@ -19,6 +19,7 @@ CREATE TABLE dbo.svTB_Production
     PrHWD          VARCHAR(100)   DEFAULT ''        NOT NULL, -- PrHWD - габариты (мм) 1000(высота)х1200(ширина)х1000(глубина).
     PrInfo         VARCHAR(1024),                             -- PrInfo - информация о продукции\комментарий.
     PrStatus       BIT            DEFAULT 1         NOT NULL, -- PrStatus - статус продукции.
+    PrCreationDate DATETIME       DEFAULT GETDATE(),          -- PrCreationDate - дата создания продукции.
     PrEditDate     DATETIME       DEFAULT GETDATE(),          -- PrEditDate - дата и время изменения записи.
     PrEditUser     INT            DEFAULT 1,                  -- PrEditUser - роль сотрудника. По умолчанию 1 - администратор, 5 - оператор.
     PrPart         INT            DEFAULT 0         NOT NULL, -- PrPart - номер текущей партии, номер партии и дата указываются вручную и не будут изменяться автоматически с течением времени.
@@ -29,6 +30,7 @@ CREATE TABLE dbo.svTB_Production
     PrPerGodn      SMALLINT       DEFAULT 0,                  -- PrPerGodn - срок годности в месяцах.
     PrSAP          VARCHAR(15),                               -- PrSAP - сап-код.
     PrProdType     BIT            DEFAULT 1         NOT NULL, -- PrProdType - тип продукции пищевая\не пищевая.
+    PrPerfumery    BIT            DEFAULT 0         NOT NULL, -- PrPerfumery - тип парфимерия.
     PrUmbrella     BIT            DEFAULT 1         NOT NULL, -- PrUmbrella - беречь от влаги.
     PrSun          BIT            DEFAULT 1         NOT NULL, -- PrSun - беречь от солнца.
     PrDecl         BIT            DEFAULT 0         NOT NULL, -- PrDecl - декларирования или нет.
@@ -116,7 +118,7 @@ END;
     SET
 @PrVP = CAST(SUBSTRING(@PrArticle, 1, 1) AS SMALLINT);
     SET
-@PrML = CAST(SUBSTRING(@PrArticle, 1, 1) AS SMALLINT);
+@PrML = CAST(SUBSTRING(@PrArticle, 2, 1) AS SMALLINT);
 
     -- 3. Находим максимальные последние 3 цифры для этого префикса
 SELECT @MaxSequence = ISNULL(MAX(

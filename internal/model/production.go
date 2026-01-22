@@ -26,6 +26,7 @@ type Production struct {
 	PrSAP          string  `json:"prSAP"`          // PrSAP - сап-код.
 	PrProdType     bool    `json:"prProdType"`     // PrProdType - тип продукции пищевая\не пищевая.
 	PrUmbrella     bool    `json:"prUmbrella"`     // PrUmbrella - беречь от влаги.
+	PrPerfumery    bool    `json:"prPerfumery"`    // prPerfumery - парфбмерия.
 	PrSun          bool    `json:"prSun"`          // PrSun - беречь от солнца.
 	PrDecl         bool    `json:"prDecl"`         // PrDecl - декларирования или нет.
 	PrParty        bool    `json:"prParty"`        // PrParty - партионная или нет.

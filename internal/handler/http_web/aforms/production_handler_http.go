@@ -191,6 +191,7 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			PrSAP:          strings.TrimSpace(r.FormValue("PrSAP")),
 			PrProdType:     convert.ParseFormFieldBool(r, "PrProdType"),
 			PrUmbrella:     convert.ParseFormFieldBool(r, "PrUmbrella"),
+			PrPerfumery:    convert.ParseFormFieldBool(r, "PrPerfumery"),
 			PrSun:          convert.ParseFormFieldBool(r, "PrSun"),
 			PrDecl:         convert.ParseFormFieldBool(r, "PrDecl"),
 			PrParty:        convert.ParseFormFieldBool(r, "PrParty"),
