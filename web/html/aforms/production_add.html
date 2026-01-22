@@ -20,21 +20,21 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="packaging-tab" data-bs-toggle="tab"
                         data-bs-target="#packaging" type="button" role="tab"
-                        aria-controls="packaging" aria-selected="false">
+                        aria-controls="packaging" aria-selected="false" disabled>
                     Упаковка
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="comments-tab" data-bs-toggle="tab"
                         data-bs-target="#comments" type="button" role="tab"
-                        aria-controls="comments" aria-selected="false">
+                        aria-controls="comments" aria-selected="false" disabled>
                     Комментарий
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="dates-tab" data-bs-toggle="tab"
-                        data-bs-target="#dates" type="button" role="tab"
-                        aria-controls="dates" aria-selected="false" disabled>
+                <button class="nav-link" id="additionally-tab" data-bs-toggle="tab"
+                        data-bs-target="#additionally" type="button" role="tab"
+                        aria-controls="additionally" aria-selected="false">
                     Дополнительно
                 </button>
             </li>
@@ -95,7 +95,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     <!-- Тип продукции -->
                     <div class="form-section mb-2">
@@ -376,21 +375,74 @@
                         <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="packaging-tab">
                             ← Назад: Упаковка
                         </button>
-                        <button type="button" class="btn btn-primary next-tab" data-next-tab="dates-tab">
-                            Далее: Дата →
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="additionally-tab">
+                            Далее: Дополнительно →
                         </button>
                     </div>
                 </div>
 
                 <!-- Вкладка 4: Дата -->
-                <div class="tab-pane fade" id="dates" role="tabpanel"
-                     aria-labelledby="dates-tab" tabindex="0">
+                <div class="tab-pane fade" id="additionally" role="tabpanel" aria-labelledby="additionally-tab"
+                     tabindex="0">
+
                     <div class="form-section">
-                        <h3>Даты и сроки</h3>
-                        <p class="text-muted mb-4">Эта вкладка будет заполнена позже</p>
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> Раздел "Дата" находится в разработке
+                        <h3 class="mb-2 fs-6 fw-bold">Дополнительно</h3>
+
+                        <div class="row g-1 mb-2">
+                            <div class="col-md-4 mb-1">
+                                <label for="PrPart" class="form-label required-field mb-0 fs-6">
+                                    Текущая партия
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1 mb-4"
+                                       id="PrPart"
+                                       name="PrPart"
+                                       required>
+
+                                <label for="PrPartLastDate" class="form-label required-field mb-2 fs-6">
+                                    Дата выпуска партии
+                                </label>
+                                <input type="datetime-local"
+                                       class="form-control form-control-sm py-1 mb-4"
+                                       id="PrPartLastDate"
+                                       name="PrPartLastDate"
+                                       required>
+
+                                <label for="PrPartAutoInc" class="form-label required-field mb-0 fs-6">
+                                    Нумерация партии и даты
+                                </label>
+                                <select name="PrPartAutoInc"
+                                        class="form-control form-control-sm mb-4 py-1"
+                                        id="PrPartAutoInc">
+                                    <option value="1">Автоматическая</option>
+                                    <option value="2">Ручная</option>
+                                    <option value="3">С указанной даты</option>
+                                </select>
+
+                                <label for="PrPerGodn" class="form-label required-field mb-0 fs-6">
+                                   Срок годности
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1 mb-4"
+                                       id="PrPerGodn"
+                                       name="PrPerGodn"
+                                       min="0"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-7 mb-1 px-3">
+                                <div class="col-md-7 mb-1 px-3">
+                                    <small id="PrPartLabel"></small>
+                                </div>
+                                <div class="col-md-7 mb-1 px-3 ">
+                                    <small id="PrPartDateLabel"></small>
+                                </div>
+                            </div>
+
+
                         </div>
+
                     </div>
 
                     <!-- Кнопки действий в последней вкладке -->
@@ -532,5 +584,49 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const select = document.getElementById('PrPartAutoInc');
+        const partLabel = document.getElementById('PrPartLabel');
+        const dateLabel = document.getElementById('PrPartDateLabel');
+        const partInput = document.getElementById('PrPart');
+        const dateInput = document.getElementById('PrPartLastDate');
 
+        // Объект с описаниями для каждого варианта
+        const descriptions = {
+            '1': { // Автоматическая
+                part: 'Увеличивается на 1 автоматически каждый день после 00:00<br> ' +
+                    '<p style="color: red">Номер партии не будет меняться до установленной даты (ВКЛЮЧИТЕЛЬНО)</p>',
+                date: 'Дата выпуска партии указывается на этикетке в поле: Дата изготовления<br> ' +
+                    '<p style="color:red;">Не может быть меньше текущей даты.<br>' +
+                    'Не меняется пока указанная дата больше текущей даты</p>',
+            },
+            '2': { // Ручная
+                part: 'Номер партии и дата указываются вручную и не будут изменяться автоматически в течении времени.',
+                date: '<br>Дата выпуска партии указывается на этикетке в поле: Дата изготовления',
+            },
+            '3': { // С указанной даты
+                part: 'Увеличивается на 1 автоматически каждый день после 00:00',
+                date: '<br><br>Дата выпуска партии указывается на этикетке в поле: Дата изготовления.<br> ' +
+                    '<p style="color: red">Увеличивается на 1 день в полночь</p>',
+            }
+        };
+
+        function updateLabels() {
+            const value = select.value;
+            const desc = descriptions[value];
+
+            if (desc) {
+                partLabel.innerHTML = desc.part;
+                dateLabel.innerHTML = desc.date;
+            }
+        }
+
+        // Обработчик изменения select
+        select.addEventListener('change', updateLabels);
+
+        // Инициализация при загрузке
+        updateLabels();
+    });
+</script>
 {{ end }}

@@ -164,6 +164,14 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			return
 		}
 
+		prPartLastDate := strings.TrimSpace(r.FormValue("PrPartLastDate"))
+		formatPrPartLastDate, err := convert.ParseToMSSQLDateTime(prPartLastDate)
+		if err != nil {
+			page.RenderErrorPage(w, 400, msg.H7101, r)
+
+			return
+		}
+
 		// Создаем продукт из данных формы
 		product := &model.Production{
 			PrName:         strings.TrimSpace(r.FormValue("PrName")),
@@ -176,10 +184,10 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			PrWeight:       convert.ParseFormFieldFloat(r, "PrWeight"),
 			PrHWD:          strings.TrimSpace(r.FormValue("PrHWD")),
 			PrInfo:         strings.TrimSpace(r.FormValue("PrInfo")),
-			PrPart:         0,
-			PrPartLastDate: "", // Дата выпуска продукции дата идет на этикетку
-			PrPartAutoInc:  0,
-			PrPerGodn:      0,
+			PrPart:         convert.ParseFormFieldInt(r, "PrPart"),
+			PrPartLastDate: formatPrPartLastDate, // Дата выпуска продукции, дата идет на этикетку.
+			PrPartAutoInc:  convert.ParseFormFieldInt(r, "PrPartAutoInc"),
+			PrPerGodn:      convert.ParseFormFieldInt(r, "PrPerGodn"),
 			PrSAP:          strings.TrimSpace(r.FormValue("PrSAP")),
 			PrProdType:     convert.ParseFormFieldBool(r, "PrProdType"),
 			PrUmbrella:     convert.ParseFormFieldBool(r, "PrUmbrella"),

@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const { hasErrors } = validateTab(activeTab);
 
             if (!hasErrors) {
-                if (activeTab.id === 'dates') {
+                if (activeTab.id === 'additionally') {
                     document.getElementById('saveProductionBtn1')?.click();
                 } else {
                     activeTab.querySelector('.next-tab')?.click();
