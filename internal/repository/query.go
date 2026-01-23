@@ -14,9 +14,11 @@ const (
 
 // ПРОДУКЦИЯ
 const (
-	FGWsvAFormsProductionAllQuery    = "exec dbo.svAFormsProductionAll ?, ?;"                                                                   //ХП выводит список продукции.
-	FGWsvAFormsProductionFilterQuery = "exec dbo.svAFormsProductionFilterById ?, ?, ?;"                                                         // ХП ищет продукцию по артиклю и наименованию и коду продукции.
-	FGWsvAFormsProductionAddQuery    = "exec dbo.svAFormsProductionAdd ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;" // ХП добавляет продукцию.
+	FGWsvAFormsProductionAllQuery      = "exec dbo.svAFormsProductionAll ?, ?;"                                                                      //ХП выводит список продукции.
+	FGWsvAFormsProductionFilterQuery   = "exec dbo.svAFormsProductionFilterById ?, ?, ?;"                                                            // ХП ищет продукцию по артиклю и наименованию и коду продукции.
+	FGWsvAFormsProductionAddQuery      = "exec dbo.svAFormsProductionAdd ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;"    // ХП добавляет продукцию.
+	FGWsvAFormsProductionUpdQuery      = "exec dbo.svAFormsProductionUpd ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?;" // ХП добавляет продукцию.
+	FGWsvAFormsProductionFindByIdQuery = "exec dbo.svAFormsProductionFindById ?"
 )
 
 const (

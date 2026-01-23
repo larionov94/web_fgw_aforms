@@ -23,6 +23,8 @@ type ProductionUseCase interface {
 	AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error)
 	SearchProductions(ctx context.Context, articlePattern, namePattern, idPattern string) ([]*model.Production, error)
 	AddProduction(ctx context.Context, production *model.Production) error
+	UpdProduction(ctx context.Context, idProduction int, production *model.Production) error
+	FindByIdProduction(ctx context.Context, idProduction int) (*model.Production, error)
 }
 
 func (p *ProductionService) AllProductions(ctx context.Context, sortField, sortOrder string) ([]*model.Production, error) {
@@ -50,4 +52,25 @@ func (p *ProductionService) AddProduction(ctx context.Context, production *model
 	}
 
 	return p.productionRepo.Add(ctx, production)
+}
+
+func (p *ProductionService) UpdProduction(ctx context.Context, idProduction int, production *model.Production) error {
+	if err := p.productionRepo.Upd(ctx, idProduction, production); err != nil {
+		p.logg.LogE(msg.E3216, err)
+
+		return err
+	}
+
+	return nil
+}
+
+func (p *ProductionService) FindByIdProduction(ctx context.Context, idProduction int) (*model.Production, error) {
+	production, err := p.productionRepo.FindById(ctx, idProduction)
+	if err != nil {
+		p.logg.LogE(msg.E3212, err)
+
+		return nil, err
+	}
+
+	return production, nil
 }

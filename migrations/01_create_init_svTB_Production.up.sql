@@ -282,3 +282,68 @@ ORDER BY idProduction;
 
 END
 GO;
+
+CREATE PROCEDURE dbo.svAFormsProductionUpd -- ХП обновляет продукцию.
+    @IdProduction INT,
+-- Продукция
+    @PrName VARCHAR(300),
+    @PrShortName VARCHAR(100),
+    @PrPackName VARCHAR(300),
+    @PrDecl BIT,
+    @PrSun BIT,
+    @PrProdType BIT,
+    @PrParty BIT,
+    @PrUmbrella BIT,
+    @PrPerfumery BIT,
+    @PrColor VARCHAR(20),
+    @PrGL SMALLINT,
+    @PrArticle VARCHAR(2), -- вводим только 2 цифры ВП и МЛ
+    @PrSAP VARCHAR(15),
+    -- Упаковка
+    @PrCount INT,
+    @PrRows INT,
+    @PrWeight DECIMAL(19, 3),
+    @PrHWD VARCHAR(100),
+    -- Комментарии
+    @PrInfo VARCHAR(1024),
+    @PrPart INT,
+    @PrPartLastDate DATETIME,
+    @PrPartAutoInc SMALLINT,
+    @PrPerGond SMALLINT,
+
+    -- Аудит
+    @CreatedBy INT,
+    @UpdatedBy INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+UPDATE svTB_Production
+SET PrName         = @PrName,
+    PrShortName    = @PrShortName,
+    PrPackName     = @PrPackName,
+    PrDecl         = @PrDecl,
+    PrSun          = @PrSun,
+    PrProdType     = @PrProdType,
+    PrParty        = @PrParty,
+    PrUmbrella     = @PrUmbrella,
+    PrPerfumery    = @PrPerfumery,
+    PrColor        = @PrColor,
+    PrGL           = @PrGL,
+    PrArticle      = @PrArticle,
+    PrSAP          = @PrSAP,
+    PrCount        = @PrCount,
+    PrRows         = @PrRows,
+    PrWeight       = @PrWeight,
+    PrHWD          = @PrHWD,
+    PrInfo         = @PrInfo,
+    PrPart         = @PrPart,
+    PrPartLastDate = @PrPartLastDate,
+    PrPartAutoInc  = @PrPartAutoInc,
+    PrPerGodn      = @PrPerGond,
+    Created_by     = @CreatedBy,
+    Updated_by     = @UpdatedBy
+WHERE idProduction = @IdProduction;
+
+END
+GO;

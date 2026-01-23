@@ -9,6 +9,7 @@ import (
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
 	"fgw_web_aforms/pkg/convert"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -123,6 +124,30 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 
 	// Обработка GET запроса - отображение формы
 	if r.Method == http.MethodGet {
+		idProductionStr := r.URL.Query().Get("idProduction")
+		if idProductionStr == "" {
+			fmt.Println(idProductionStr + "idProductionStr")
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, "ID продукции не указан", p.logg, r)
+			return
+		}
+
+		idProduction := convert.ConvStrToInt(idProductionStr)
+		if idProduction == 0 {
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, "Неверный ID продукции", p.logg, r)
+			return
+		}
+
+		production, err := p.productionService.FindByIdProduction(r.Context(), idProduction)
+		if err != nil {
+			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+			return
+		}
+
+		if production == nil {
+			http_err.SendErrorHTTP(w, http.StatusNotFound, "Продукция не найдена", p.logg, r)
+			return
+		}
+
 		designNameList, err := p.catalogService.DesignNameAll(r.Context())
 		if err != nil {
 			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
@@ -139,7 +164,7 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 			"Редактировать вариант упаковки",
 			"productionUpd",
 			performerData,
-			nil,
+			[]*model.Production{production},
 			nil,
 			nil,
 			false,
@@ -147,6 +172,70 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 			colorList)
 
 		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+
+		return
+	}
+
+	// Обработка POST запроса - сохранение данных
+	if r.Method == http.MethodPost {
+		if err := r.ParseForm(); err != nil {
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
+
+			return
+		}
+
+		idProduction := convert.ConvStrToInt(r.FormValue("idProduction"))
+		if idProduction == 0 {
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, "ID продукции не указан", p.logg, r)
+			return
+		}
+
+		prArticle := strings.TrimSpace(r.FormValue("PrArticle"))
+
+		prPartLastDate := strings.TrimSpace(r.FormValue("PrPartLastDate"))
+		formatPrPartLastDate, err := convert.ParseToMSSQLDateTime(prPartLastDate)
+		if err != nil {
+			page.RenderErrorPage(w, 400, msg.H7101, r)
+
+			return
+		}
+
+		// Создаем продукт из данных формы
+		product := &model.Production{
+			PrName:         strings.TrimSpace(r.FormValue("PrName")),
+			PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
+			PrPackName:     strings.TrimSpace(r.FormValue("PrPackName")),
+			PrArticle:      prArticle,
+			PrColor:        strings.TrimSpace(r.FormValue("PrColor")),
+			PrCount:        convert.ParseFormFieldInt(r, "PrCount"),
+			PrRows:         convert.ParseFormFieldInt(r, "PrRows"),
+			PrWeight:       convert.ParseFormFieldFloat(r, "PrWeight"),
+			PrHWD:          strings.TrimSpace(r.FormValue("PrHWD")),
+			PrInfo:         strings.TrimSpace(r.FormValue("PrInfo")),
+			PrPart:         convert.ParseFormFieldInt(r, "PrPart"),
+			PrPartLastDate: formatPrPartLastDate, // Дата выпуска продукции, дата идет на этикетку.
+			PrPartAutoInc:  convert.ParseFormFieldInt(r, "PrPartAutoInc"),
+			PrPerGodn:      convert.ParseFormFieldInt(r, "PrPerGodn"),
+			PrSAP:          strings.TrimSpace(r.FormValue("PrSAP")),
+			PrProdType:     convert.ParseFormFieldBool(r, "PrProdType"),
+			PrUmbrella:     convert.ParseFormFieldBool(r, "PrUmbrella"),
+			PrPerfumery:    convert.ParseFormFieldBool(r, "PrPerfumery"),
+			PrSun:          convert.ParseFormFieldBool(r, "PrSun"),
+			PrDecl:         convert.ParseFormFieldBool(r, "PrDecl"),
+			PrParty:        convert.ParseFormFieldBool(r, "PrParty"),
+			PrGL:           convert.ParseFormFieldInt(r, "PrGL"),
+			AuditRec: model.Audit{
+				CreatedBy: performerData.PerformerId,
+				UpdatedBy: performerData.PerformerId,
+			},
+		}
+
+		if err := p.productionService.UpdProduction(r.Context(), idProduction, product); err != nil {
+			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+			return
+		}
+		http.Redirect(w, r, urlProductions, http.StatusSeeOther)
 
 		return
 	}

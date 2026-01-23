@@ -34,4 +34,5 @@ type Production struct {
 	PrVP           int     `json:"prVP"`           // PrVP - ванная печь.
 	PrML           int     `json:"prML"`           // PrML - машинная линия на печи.
 	AuditRec       Audit   `json:"auditRec"`       // AuditRec - аудит.
+	PrCreationDate string  `json:"prCreationDate"` // PrCreationDate - официальная дата создания продукции.
 }
