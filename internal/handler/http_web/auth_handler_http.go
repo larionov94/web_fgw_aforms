@@ -21,6 +21,7 @@ const (
 	tmplAuthHTML          = "auth.html"
 	tmplProductionHTML    = "productions.html"
 	tmplProductionAddHTML = "production_add.html"
+	tmplProductionUpdHTML = "production_upd.html"
 
 	urlAForms             = "/aforms"
 	urlAuth               = "/auth"
@@ -96,7 +97,7 @@ func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
 		nil,
 		nil)
 
-	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML, tmplProductionAddHTML)
+	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
 }
 
 func (a *AuthHandlerHTML) ShowAuthForm(w http.ResponseWriter, r *http.Request) {

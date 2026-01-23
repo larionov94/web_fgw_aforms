@@ -132,6 +132,9 @@
     {{ else if eq .CurrentPage `productionAdd` }}
     {{ template "production_add" . }}
 
+    {{ else if eq .CurrentPage `productionUpd` }}
+    {{ template "production_upd" . }}
+
     {{ else }}
     <!-- Страница по умолчанию или 404 -->
     <div class="alert alert-warning mt-5">

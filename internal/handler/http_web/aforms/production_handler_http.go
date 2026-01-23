@@ -17,6 +17,7 @@ const (
 	tmplIndexHTML         = "index.html"
 	tmplProductionHTML    = "productions.html"
 	tmplProductionAddHTML = "production_add.html"
+	tmplProductionUpdHTML = "production_upd.html"
 
 	urlProductions = "/aforms/productions"
 )
@@ -39,6 +40,7 @@ func NewProductionHandlerHTML(productionService service.ProductionUseCase, perfo
 func (p *ProductionHandlerHTML) ServeHTTPHTMLRouter(mux *http.ServeMux) {
 	mux.HandleFunc("/aforms/productions", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.AllProductionHTML)))
 	mux.HandleFunc("/aforms/productions/add", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.AddProductionHTML)))
+	mux.HandleFunc("/aforms/productions/upd", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.UpdProductionHTML)))
 }
 
 func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +69,7 @@ func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http
 	data := page.NewDataPage("Варианты упаковки продукции", "productions", performerData,
 		productions, sortFields, searchFields, true, nil, nil)
 
-	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML)
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
 }
 
 func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Request) ([]*model.Production, *page.SearchProductionsPage, *page.SortProductionsPage, error) {
@@ -109,6 +111,47 @@ func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Re
 		}, nil
 }
 
+func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	performerData, err := p.authMiddleware.GetUserData(r, p.performerService, p.roleService)
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
+
+		return
+	}
+
+	// Обработка GET запроса - отображение формы
+	if r.Method == http.MethodGet {
+		designNameList, err := p.catalogService.DesignNameAll(r.Context())
+		if err != nil {
+			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+			return
+		}
+
+		colorList, err := p.catalogService.ColorAll(r.Context())
+		if err != nil {
+			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+			return
+		}
+
+		data := page.NewDataPage(
+			"Редактировать вариант упаковки",
+			"productionUpd",
+			performerData,
+			nil,
+			nil,
+			nil,
+			false,
+			designNameList,
+			colorList)
+
+		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+
+		return
+	}
+}
+
 func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -144,7 +187,7 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			designNameList,
 			colorList)
 
-		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML)
+		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
 
 		return
 	}

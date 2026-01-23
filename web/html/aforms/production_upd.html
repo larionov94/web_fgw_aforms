@@ -1,0 +1,662 @@
+{{ define "production_upd" }}
+
+<div class="main-container" xmlns="http://www.w3.org/1999/html">
+    <div class="card">
+        <div class="card-header p-2">
+            <h1 class="h3 mb-0">{{ .Title }}</h1>
+            <p class="text-muted mb-0">Заполните информацию о продукции во всех вкладках</p>
+        </div>
+
+
+        <!-- Навигационные вкладки -->
+        <ul class="nav nav-tabs px-3" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="product-tab" data-bs-toggle="tab"
+                        data-bs-target="#product" type="button" role="tab"
+                        aria-controls="product" aria-selected="true" disabled>
+                    Продукция
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="packaging-tab" data-bs-toggle="tab"
+                        data-bs-target="#packaging" type="button" role="tab"
+                        aria-controls="packaging" aria-selected="false" disabled>
+                    Упаковка
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="comments-tab" data-bs-toggle="tab"
+                        data-bs-target="#comments" type="button" role="tab"
+                        aria-controls="comments" aria-selected="false" disabled>
+                    Комментарий
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="additionally-tab" data-bs-toggle="tab"
+                        data-bs-target="#additionally" type="button" role="tab"
+                        aria-controls="additionally" aria-selected="false" disabled>
+                    Дополнительно
+                </button>
+            </li>
+        </ul>
+
+        <!-- Форма -->
+        <form action="/aforms/productions/upd" method="POST" id="productForm">
+            <div class="tab-content" id="productTabsContent">
+
+                <!-- Вкладка 1: Продукция -->
+                <div class="tab-pane fade show active" id="product" role="tabpanel"
+                     aria-labelledby="product-tab" tabindex="0">
+
+                    <!-- Основная информация -->
+                    <div class="form-section mb-2">
+                        <h3 class="mb-2 fs-6 fw-bold">Основная информация</h3>
+
+                        <div class="row g-0">
+                            <div class="col-12 mb-1">
+                                <label for="PrName" class="form-label required-field mb-0 fs-6">
+                                    Наименование с комментарием упаковщика
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrName"
+                                       name="PrName">
+                            </div>
+
+                            <div class="col-12 mb-1">
+                                <label for="PrPackName" class="form-label required-field mb-0 fs-6">
+                                    Конструкторское наименование
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrPackName"
+                                           name="PrPackName"
+                                           required
+                                           readonly>
+                                    <button class="btn btn-outline-secondary"
+                                            type="button"
+                                            id="btnDesignNameSelect"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#designNameModal">
+                                        ...
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-1">
+                                <label for="PrShortName" class="form-label required-field mb-0 fs-6">
+                                    Наименование для печати на этикетке
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrShortName"
+                                       name="PrShortName">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Тип продукции -->
+                    <div class="form-section mb-2">
+                        <h3 class="mb-2 fs-6 fw-bold">Тип продукции</h3>
+                        <div class="row g-0">
+                            <div class="col-12">
+                                <div class="d-flex flex-wrap gap-2">
+
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="PrDecl"
+                                               name="PrDecl"
+                                               checked>
+                                        <label class="form-check-label fs-7 text-muted" for="PrDecl">
+                                            Декларированная
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="PrSun"
+                                               name="PrSun"
+                                               checked>
+                                        <label class="form-check-label fs-7" for="PrSun">
+                                            Беречь от солнца
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input exclusive-check"
+                                               type="checkbox"
+                                               id="PrProdType"
+                                               name="PrProdType"
+                                               checked>
+                                        <label class="form-check-label fs-7" for="PrProdType">
+                                            Пищевая
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input exclusive-check"
+                                               type="checkbox"
+                                               id="PrPerfumery"
+                                               name="PrPerfumery">
+                                        <label class="form-check-label fs-7" for="PrPerfumery">
+                                            Парфюмерия
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="PrParty"
+                                               name="PrParty">
+                                        <label class="form-check-label fs-7" for="PrParty">
+                                            Партионная
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="PrUmbrella"
+                                               name="PrUmbrella"
+                                               checked>
+                                        <label class="form-check-label fs-7" for="PrUmbrella">
+                                            Беречь от влаги
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Характеристики продукции -->
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Характеристики продукции</h3>
+                        <div class="row g-1 mb-2"> <!-- Уменьшен gap и отступ -->
+                            <div class="col-md-6 mb-1">
+                                <label for="PrColor" class="form-label required-field mb-0 fs-6">
+                                    Цвет стекла
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrColor"
+                                           name="PrColor"
+                                           readonly required>
+                                    <button class="btn btn-outline-secondary"
+                                            type="button"
+                                            id="btnColorSelect"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#colorModal">
+                                        ...
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-1">
+                                <label for="PrGL" class="form-label required-field mb-0 fs-6">
+                                    GL
+                                </label>
+                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL"
+                                       readonly required>
+                            </div>
+                        </div>
+
+                        <div class="row g-1"> <!-- Уменьшен gap -->
+                            <div class="col-md-6 mb-1">
+                                <label for="PrArticle" class="form-label required-field mb-0 fs-6">
+                                    Артикул варианта упаковки
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrArticle"
+                                       name="PrArticle"
+                                       min="0"
+                                       max="99"
+                                       step="1"
+                                       oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                       maxlength="2"
+                                       required>
+                                <small class="text-muted">Максимум 2 цифры (1-я цифра № печки, 2-я цифра № линии,
+                                    остальные 3 цифры сгенерируются)</small>
+                            </div>
+
+                            <div class="col-md-6 mb-1">
+                                <label for="PrSAP" class="form-label mb-0 fs-6">
+                                    САП код
+                                </label>
+                                <input type="number" class="form-control form-control-sm py-1" id="PrSAP" name="PrSAP">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Навигация по вкладкам -->
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+                            ← Назад к списку
+                        </button>
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="packaging-tab">
+                            Далее: Упаковка →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Вкладка 2: Упаковка -->
+                <div class="tab-pane fade" id="packaging" role="tabpanel" aria-labelledby="packaging-tab" tabindex="0">
+
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Информация об упаковке</h3>
+
+                        <div class="row g-1">
+                            <div class="col-md-4 mb-1">
+                                <label for="PrCount" class="form-label required-field mb-0 fs-6">
+                                    Количество продукции в ряду (шт)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrCount"
+                                       name="PrCount"
+                                       required>
+
+                                <label for="PrRows" class="form-label required-field mb-0 fs-6">
+                                    Количество рядов (шт)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrRows"
+                                       name="PrRows"
+                                       required>
+
+                                <label for="PrWeight" class="form-label required-field mb-0 fs-6">
+                                    Вес (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrWeight"
+                                       name="PrWeight"
+                                       min="0"
+                                       required>
+                            </div>
+
+                            <div class="col-md-4 mb-1">
+                                <label for="WeightBottle" class="form-label mb-0 fs-6">
+                                    Вес бутылки (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="WeightBottle"
+                                       name="WeightBottle"
+                                       min="0"
+                                       step="0.001">
+
+                                <label for="WeightPallet" class="form-label mb-0 fs-6">
+                                    Вес паллета (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="WeightPallet"
+                                       name="WeightPallet"
+                                       min="0"
+                                       value="45">
+
+                                <label for="WeightTotal" class="form-label mb-0 fs-6">
+                                    Итого вес (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="WeightTotal"
+                                       name="WeightTotal"
+                                       min="0"
+                                       step="0.001"
+                                       disabled>
+                            </div>
+
+                        </div>
+
+                        <!-- ГАБАРИТЫ ВЫСОТАхШИРИНАхГЛУБИНА-->
+                        <div class="col-md-4 mb-1 pt-2">
+                            <label class="form-label required-field mb-0 fs-6">
+                                Габариты (В×Ш×Г, мм)
+                            </label>
+
+                            <div class="row g-1">
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrHeight"
+                                           name="PrHeight"
+                                           placeholder="В"
+                                           title="Высота"
+                                           min="0"
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Высота</small>
+                                </div>
+
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrWidth"
+                                           name="PrWidth"
+                                           placeholder="Ш"
+                                           title="Ширина"
+                                           min="0"
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Ширина</small>
+                                </div>
+
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrDepth"
+                                           name="PrDepth"
+                                           placeholder="Г"
+                                           title="Глубина"
+                                           min="0"
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Глубина</small>
+                                </div>
+                            </div>
+
+                            <!-- Скрытое поле для итогового значения -->
+                            <input type="hidden"
+                                   id="PrHWD"
+                                   name="PrHWD"
+                                   value="">
+                        </div>
+                    </div>
+
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="product-tab">
+                            ← Назад: Продукция
+                        </button>
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="comments-tab">
+                            Далее: Комментарии →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Вкладка 3: Комментарии -->
+                <div class="tab-pane fade" id="comments" role="tabpanel" aria-labelledby="comments-tab" tabindex="0">
+
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Комментарии и примечания</h3>
+
+                        <div class="row g-0">
+                            <div class="col-12 mb-1">
+                                <label for="PrInfo" class="form-label mb-0 fs-6">
+                                    Комментарий
+                                </label>
+                                <textarea type="text"
+                                          class="form-control form-control-sm py-1"
+                                          id="PrInfo"
+                                          name="PrInfo"
+                                          rows="6"
+                                          placeholder="Напишите ваш комментарий здесь..."
+                                          maxlength="2000">
+                                </textarea>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="packaging-tab">
+                            ← Назад: Упаковка
+                        </button>
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="additionally-tab">
+                            Далее: Дополнительно →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Вкладка 4: Дата -->
+                <div class="tab-pane fade" id="additionally" role="tabpanel" aria-labelledby="additionally-tab"
+                     tabindex="0">
+
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Дополнительно</h3>
+
+                        <div class="row g-1 mb-2">
+                            <div class="col-md-4 mb-1">
+                                <label for="PrPart" class="form-label required-field mb-0 fs-6">
+                                    Текущая партия
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1 mb-4"
+                                       id="PrPart"
+                                       name="PrPart"
+                                       required>
+
+                                <label for="PrPartLastDate" class="form-label required-field mb-2 fs-6">
+                                    Дата выпуска партии
+                                </label>
+                                <input type="datetime-local"
+                                       class="form-control form-control-sm py-1 mb-4"
+                                       id="PrPartLastDate"
+                                       name="PrPartLastDate"
+                                       required>
+
+                                <label for="PrPartAutoInc" class="form-label required-field mb-0 fs-6">
+                                    Нумерация партии и даты
+                                </label>
+                                <select name="PrPartAutoInc"
+                                        class="form-control form-control-sm mb-4 py-1"
+                                        id="PrPartAutoInc">
+                                    <option value="1">Автоматическая</option>
+                                    <option value="2">Ручная</option>
+                                    <option value="3">С указанной даты</option>
+                                </select>
+
+                                <label for="PrPerGodn" class="form-label required-field mb-0 fs-6">
+                                    Срок годности
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1 mb-4"
+                                       id="PrPerGodn"
+                                       name="PrPerGodn"
+                                       min="0"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-7 mb-1 px-3">
+                                <div class="col-md-7 mb-1 px-3">
+                                    <small id="PrPartLabel"></small>
+                                </div>
+                                <div class="col-md-7 mb-1 px-3 ">
+                                    <small id="PrPartDateLabel"></small>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                    <!-- Кнопки действий в последней вкладке -->
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="comments-tab">
+                            ← Назад: Комментарии
+                        </button>
+                        <!-- Проблема с проверкой кнопки, на данный момент id кнопки не работает (saveProductionBtn)-->
+                        <button type="submit" class="btn btn-success" id="saveProductionBtn1">
+                            <i class="bi bi-check-circle"></i> Сохранить продукцию
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно для выбора конструкторского наименования -->
+<div class="modal fade" id="designNameModal" tabindex="-1" aria-labelledby="designNameModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- Изменено с modal-md на modal-lg -->
+        <div class="modal-content" style="min-width: 700px;"> <!-- Минимальная ширина -->
+            <div class="modal-header py-1">
+                <h5 class="modal-title fs-6" id="designNameModalLabel">Выбор конструкторского наименования</h5>
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-2">
+                <!-- Поле поиска в HTML -->
+                <div class="mb-2">
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           id="designNameSearch"
+                           placeholder="Поиск по ИД и наименованию...">
+                </div>
+
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-sm table-hover mb-0" style="line-height: 1.2; min-width: 650px;">
+                        <thead>
+                        <tr>
+                            <th class="py-0 align-middle" style="width: 80px; height: 24px;">ИД</th>
+                            <th class="py-0 align-middle" style="height: 24px; min-width: 400px;">Наименование</th>
+                            <!-- Увеличенная ширина -->
+                            <th class="py-0 align-middle" style="width: 100px; height: 24px;">Действие</th>
+                        </tr>
+                        </thead>
+                        <tbody id="designNameTableBody">
+                        {{ range .DesignNameList }}
+                        <tr style="height: 28px;">
+                            <td class="text-muted py-0 align-middle">{{ .Id }}</td>
+                            <td class="py-0 align-middle text-truncate" style="max-width: 450px;" title="{{ .Name }}">{{
+                                .Name }}
+                            </td>
+                            <td class="py-0 align-middle">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary select-design-name py-1 px-2"
+                                        data-name="{{ .Name }}"
+                                        data-id="{{ .Id }}"
+                                        style="font-size: 0.75rem; line-height: 1;">
+                                    Выбрать
+                                </button>
+                            </td>
+                        </tr>
+                        {{ else }}
+                        <tr style="height: 28px;">
+                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных конструкторских
+                                наименований
+                            </td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer py-1">
+                <!-- Счетчик строк слева -->
+                <div class="me-auto d-flex align-items-center small text-muted">
+                    <span>Всего: <span id="rowCount" class="fw-bold ms-1">{{ len .DesignNameList }}</span></span>
+                </div>
+
+                <!-- Кнопка закрытия справа -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для выбора цвета стекла -->
+<div class="modal fade" id="colorModal" tabindex="-1" aria-labelledby="colorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header py-1">
+                <h5 class="modal-title fs-6" id="colorModalLabel">Выбор цвета стекла</h5>
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-2">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-sm table-hover mb-0" style="line-height: 1.2;">
+                        <thead>
+                        <tr>
+                            <th class="py-0 align-middle" style="height: 24px;">Наименование цвета</th>
+                            <th class="py-0 align-middle" style="height: 24px;">GL</th>
+                            <th class="py-0 align-middle" style="width: 90px; height: 24px;">Действие</th>
+                        </tr>
+                        </thead>
+                        <tbody id="colorTableBody">
+                        {{ range .ColorList }}
+                        <tr style="height: 28px;">
+                            <td class="py-0 align-middle">{{ .Name }}</td>
+                            <td class="py-0 align-middle">{{ .DopInt1 }}</td>
+                            <td class="py-0 align-middle">
+                                <button type="button" class="btn btn-sm btn-outline-primary select-color py-1 px-1"
+                                        data-name="{{ .Name }}"
+                                        data-gl="{{ .DopInt1 }}"
+                                        style="font-size: 0.75rem; line-height: 1;">
+                                    Выбрать
+                                </button>
+                            </td>
+                        </tr>
+                        {{ else }}
+                        <tr style="height: 28px;">
+                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных цветов</td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer py-1">
+                <!-- Счетчик строк слева -->
+                <div class="me-auto d-flex align-items-center small text-muted">
+                    <span>Всего: <span id="colorRowCount">{{ len .ColorList }}</span></span>
+                </div>
+
+                <!-- Кнопка закрытия справа -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const select = document.getElementById('PrPartAutoInc');
+        const partLabel = document.getElementById('PrPartLabel');
+        const dateLabel = document.getElementById('PrPartDateLabel');
+        const partInput = document.getElementById('PrPart');
+        const dateInput = document.getElementById('PrPartLastDate');
+
+        // Объект с описаниями для каждого варианта
+        const descriptions = {
+            '1': { // Автоматическая
+                part: 'Увеличивается на 1 автоматически каждый день после 00:00<br> ' +
+                    '<p style="color: red">Номер партии не будет меняться до установленной даты (ВКЛЮЧИТЕЛЬНО)</p>',
+                date: 'Дата выпуска партии указывается на этикетке в поле: Дата изготовления<br> ' +
+                    '<p style="color:red;">Не может быть меньше текущей даты.<br>' +
+                    'Не меняется пока указанная дата больше текущей даты</p>',
+            },
+            '2': { // Ручная
+                part: 'Номер партии и дата указываются вручную и не будут изменяться автоматически в течении времени.',
+                date: '<br>Дата выпуска партии указывается на этикетке в поле: Дата изготовления',
+            },
+            '3': { // С указанной даты
+                part: 'Увеличивается на 1 автоматически каждый день после 00:00',
+                date: '<br><br>Дата выпуска партии указывается на этикетке в поле: Дата изготовления.<br> ' +
+                    '<p style="color: red">Увеличивается на 1 день в полночь</p>',
+            }
+        };
+
+        function updateLabels() {
+            const value = select.value;
+            const desc = descriptions[value];
+
+            if (desc) {
+                partLabel.innerHTML = desc.part;
+                dateLabel.innerHTML = desc.date;
+            }
+        }
+
+        // Обработчик изменения select
+        select.addEventListener('change', updateLabels);
+
+        // Инициализация при загрузке
+        updateLabels();
+    });
+</script>
+{{ end }}
