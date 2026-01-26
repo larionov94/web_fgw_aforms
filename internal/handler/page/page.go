@@ -132,7 +132,9 @@ func RenderPages(w http.ResponseWriter, tmpl string, data interface{}, r *http.R
 
 	parseTmpl, err := template.New(tmpl).Funcs(
 		template.FuncMap{
-			"formatDateTime": convert.FormatDateTime,
+			"formatDateTime":      convert.FormatDateTime,
+			"splitDimensions":     convert.SplitDimensions,
+			"formatDateTimeLocal": convert.FormatDateTimeLocal,
 		}).ParseFiles(templatePaths...)
 
 	if err != nil {

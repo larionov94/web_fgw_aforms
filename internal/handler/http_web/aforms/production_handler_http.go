@@ -126,7 +126,6 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 	if r.Method == http.MethodGet {
 		idProductionStr := r.URL.Query().Get("idProduction")
 		if idProductionStr == "" {
-			fmt.Println(idProductionStr + "idProductionStr")
 			http_err.SendErrorHTTP(w, http.StatusBadRequest, "ID продукции не указан", p.logg, r)
 			return
 		}
@@ -175,8 +174,6 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 
 		return
 	}
-
-	// Обработка POST запроса - сохранение данных
 	if r.Method == http.MethodPost {
 		if err := r.ParseForm(); err != nil {
 			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
@@ -184,13 +181,23 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 			return
 		}
 
-		idProduction := convert.ConvStrToInt(r.FormValue("idProduction"))
-		if idProduction == 0 {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, "ID продукции не указан", p.logg, r)
+		idProductionStr := r.FormValue("idProduction")
+		if idProductionStr == "" {
+			// Для отладки: логируем все параметры
+			p.logg.LogE("Не найден idProduction в форме. Все параметры:", nil)
+			for key, values := range r.Form {
+				p.logg.LogW(fmt.Sprintf("  %s: %v", key, values))
+			}
+
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, "ID продукции не указан в форме", p.logg, r)
 			return
 		}
 
-		prArticle := strings.TrimSpace(r.FormValue("PrArticle"))
+		idProduction := convert.ConvStrToInt(idProductionStr)
+		if idProduction == 0 {
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, "Неверный ID продукции", p.logg, r)
+			return
+		}
 
 		prPartLastDate := strings.TrimSpace(r.FormValue("PrPartLastDate"))
 		formatPrPartLastDate, err := convert.ParseToMSSQLDateTime(prPartLastDate)
@@ -205,7 +212,7 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 			PrName:         strings.TrimSpace(r.FormValue("PrName")),
 			PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
 			PrPackName:     strings.TrimSpace(r.FormValue("PrPackName")),
-			PrArticle:      prArticle,
+			PrArticle:      strings.TrimSpace(r.FormValue("PrArticle")),
 			PrColor:        strings.TrimSpace(r.FormValue("PrColor")),
 			PrCount:        convert.ParseFormFieldInt(r, "PrCount"),
 			PrRows:         convert.ParseFormFieldInt(r, "PrRows"),
@@ -230,7 +237,7 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 			},
 		}
 
-		if err := p.productionService.UpdProduction(r.Context(), idProduction, product); err != nil {
+		if err = p.productionService.UpdProduction(r.Context(), idProduction, product); err != nil {
 			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
 
 			return

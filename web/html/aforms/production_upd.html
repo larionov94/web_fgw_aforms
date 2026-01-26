@@ -1,9 +1,12 @@
 {{ define "production_upd" }}
 
+{{ if .Productions }}
+{{ $production := index .Productions 0 }}
+
 <div class="main-container" xmlns="http://www.w3.org/1999/html">
     <div class="card">
         <div class="card-header p-2">
-            <h1 class="h3 mb-0">{{ .Title }}</h1>
+            <h1 class="h3 mb-0">{{ .Title }}: {{ $production.PrPackName }}</h1>
             <p class="text-muted mb-0">Заполните информацию о продукции во всех вкладках</p>
         </div>
 
@@ -44,6 +47,8 @@
         <form action="/aforms/productions/upd" method="POST" id="productForm">
             <div class="tab-content" id="productTabsContent">
 
+
+
                 <!-- Вкладка 1: Продукция -->
                 <div class="tab-pane fade show active" id="product" role="tabpanel"
                      aria-labelledby="product-tab" tabindex="0">
@@ -51,6 +56,8 @@
                     <!-- Основная информация -->
                     <div class="form-section mb-2">
                         <h3 class="mb-2 fs-6 fw-bold">Основная информация</h3>
+
+                        <input type="hidden" name="idProduction" value="{{ $production.IdProduction }}">
 
                         <div class="row g-0">
                             <div class="col-12 mb-1">
@@ -60,7 +67,8 @@
                                 <input type="text"
                                        class="form-control form-control-sm py-1"
                                        id="PrName"
-                                       name="PrName">
+                                       name="PrName"
+                                       value="{{ $production.PrName }}">
                             </div>
 
                             <div class="col-12 mb-1">
@@ -72,6 +80,7 @@
                                            class="form-control form-control-sm py-1"
                                            id="PrPackName"
                                            name="PrPackName"
+                                           value="{{ $production.PrPackName }}"
                                            required
                                            readonly>
                                     <button class="btn btn-outline-secondary"
@@ -91,7 +100,8 @@
                                 <input type="text"
                                        class="form-control form-control-sm py-1"
                                        id="PrShortName"
-                                       name="PrShortName">
+                                       name="PrShortName"
+                                       value="{{ $production.PrShortName }}">
                             </div>
                         </div>
                     </div>
@@ -108,7 +118,7 @@
                                                type="checkbox"
                                                id="PrDecl"
                                                name="PrDecl"
-                                               checked>
+                                               {{ if $production.PrDecl }}checked{{ end }}>
                                         <label class="form-check-label fs-7 text-muted" for="PrDecl">
                                             Декларированная
                                         </label>
@@ -119,7 +129,7 @@
                                                type="checkbox"
                                                id="PrSun"
                                                name="PrSun"
-                                               checked>
+                                               {{ if $production.PrSun }}checked{{ end }}>
                                         <label class="form-check-label fs-7" for="PrSun">
                                             Беречь от солнца
                                         </label>
@@ -130,7 +140,7 @@
                                                type="checkbox"
                                                id="PrProdType"
                                                name="PrProdType"
-                                               checked>
+                                               {{ if $production.PrProdType }}checked{{ end }}>
                                         <label class="form-check-label fs-7" for="PrProdType">
                                             Пищевая
                                         </label>
@@ -140,7 +150,8 @@
                                         <input class="form-check-input exclusive-check"
                                                type="checkbox"
                                                id="PrPerfumery"
-                                               name="PrPerfumery">
+                                               name="PrPerfumery"
+                                               {{ if $production.PrPerfumery }}checked{{ end }}>
                                         <label class="form-check-label fs-7" for="PrPerfumery">
                                             Парфюмерия
                                         </label>
@@ -150,7 +161,8 @@
                                         <input class="form-check-input"
                                                type="checkbox"
                                                id="PrParty"
-                                               name="PrParty">
+                                               name="PrParty"
+                                               {{ if $production.PrParty }}checked{{ end }}>
                                         <label class="form-check-label fs-7" for="PrParty">
                                             Партионная
                                         </label>
@@ -160,7 +172,7 @@
                                                type="checkbox"
                                                id="PrUmbrella"
                                                name="PrUmbrella"
-                                               checked>
+                                               {{ if $production.PrUmbrella }}checked{{ end }}>
                                         <label class="form-check-label fs-7" for="PrUmbrella">
                                             Беречь от влаги
                                         </label>
@@ -183,6 +195,7 @@
                                            class="form-control form-control-sm py-1"
                                            id="PrColor"
                                            name="PrColor"
+                                           value="{{ $production.PrColor }}"
                                            readonly required>
                                     <button class="btn btn-outline-secondary"
                                             type="button"
@@ -198,7 +211,11 @@
                                 <label for="PrGL" class="form-label required-field mb-0 fs-6">
                                     GL
                                 </label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL"
+                                <input type="text"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrGL"
+                                       name="PrGL"
+                                       value="{{ $production.PrGL }}"
                                        readonly required>
                             </div>
                         </div>
@@ -216,8 +233,9 @@
                                        max="99"
                                        step="1"
                                        oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                       maxlength="2"
-                                       required>
+                                       maxlength="5"
+                                       value="{{ $production.PrArticle }}"
+                                       readonly>
                                 <small class="text-muted">Максимум 2 цифры (1-я цифра № печки, 2-я цифра № линии,
                                     остальные 3 цифры сгенерируются)</small>
                             </div>
@@ -226,7 +244,11 @@
                                 <label for="PrSAP" class="form-label mb-0 fs-6">
                                     САП код
                                 </label>
-                                <input type="number" class="form-control form-control-sm py-1" id="PrSAP" name="PrSAP">
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrSAP"
+                                       name="PrSAP"
+                                       value="{{ $production.PrSAP }}">
                             </div>
                         </div>
                     </div>
@@ -257,6 +279,7 @@
                                        class="form-control form-control-sm py-1"
                                        id="PrCount"
                                        name="PrCount"
+                                       value="{{ $production.PrCount }}"
                                        required>
 
                                 <label for="PrRows" class="form-label required-field mb-0 fs-6">
@@ -266,6 +289,7 @@
                                        class="form-control form-control-sm py-1"
                                        id="PrRows"
                                        name="PrRows"
+                                       value="{{ $production.PrRows }}"
                                        required>
 
                                 <label for="PrWeight" class="form-label required-field mb-0 fs-6">
@@ -276,6 +300,7 @@
                                        id="PrWeight"
                                        name="PrWeight"
                                        min="0"
+                                       value="{{ $production.PrWeight }}"
                                        required>
                             </div>
 
@@ -320,6 +345,11 @@
                                 Габариты (В×Ш×Г, мм)
                             </label>
 
+                            <!-- SPLIT HWD -->
+                            {{ $hwd := $production.PrHWD }}
+                            {{ if $hwd }}
+                                {{ $dimensions := splitDimensions $hwd }}
+
                             <div class="row g-1">
                                 <div class="col-4">
                                     <input type="number"
@@ -329,6 +359,7 @@
                                            placeholder="В"
                                            title="Высота"
                                            min="0"
+                                           value="{{ index $dimensions 0 }}"
                                            required>
                                     <small class="form-text text-muted text-center d-block">Высота</small>
                                 </div>
@@ -341,6 +372,7 @@
                                            placeholder="Ш"
                                            title="Ширина"
                                            min="0"
+                                           value="{{ index $dimensions 1 }}"
                                            required>
                                     <small class="form-text text-muted text-center d-block">Ширина</small>
                                 </div>
@@ -353,16 +385,19 @@
                                            placeholder="Г"
                                            title="Глубина"
                                            min="0"
+                                           value="{{ index $dimensions 2 }}"
                                            required>
                                     <small class="form-text text-muted text-center d-block">Глубина</small>
                                 </div>
                             </div>
 
+                            {{ end }}
+
                             <!-- Скрытое поле для итогового значения -->
                             <input type="hidden"
                                    id="PrHWD"
                                    name="PrHWD"
-                                   value="">
+                                   value="{{ $production.PrHWD }}">
                         </div>
                     </div>
 
@@ -394,7 +429,7 @@
                                           name="PrInfo"
                                           rows="6"
                                           placeholder="Напишите ваш комментарий здесь..."
-                                          maxlength="2000">
+                                          maxlength="2000">{{ $production.PrInfo }}
                                 </textarea>
                             </div>
                         </div>
@@ -427,6 +462,7 @@
                                        class="form-control form-control-sm py-1 mb-4"
                                        id="PrPart"
                                        name="PrPart"
+                                       value="{{ $production.PrPart }}"
                                        required>
 
                                 <label for="PrPartLastDate" class="form-label required-field mb-2 fs-6">
@@ -436,6 +472,7 @@
                                        class="form-control form-control-sm py-1 mb-4"
                                        id="PrPartLastDate"
                                        name="PrPartLastDate"
+                                       value="{{ formatDateTimeLocal  $production.PrPartLastDate }}"
                                        required>
 
                                 <label for="PrPartAutoInc" class="form-label required-field mb-0 fs-6">
@@ -444,9 +481,9 @@
                                 <select name="PrPartAutoInc"
                                         class="form-control form-control-sm mb-4 py-1"
                                         id="PrPartAutoInc">
-                                    <option value="1">Автоматическая</option>
-                                    <option value="2">Ручная</option>
-                                    <option value="3">С указанной даты</option>
+                                    <option value="1" {{ if eq $production.PrPartAutoInc 1 }}selected{{ end }}>Автоматическая</option>
+                                    <option value="2" {{ if eq $production.PrPartAutoInc 2 }}selected{{ end }}>Ручная</option>
+                                    <option value="3" {{ if eq $production.PrPartAutoInc 3 }}selected{{ end }}>С указанной даты</option>
                                 </select>
 
                                 <label for="PrPerGodn" class="form-label required-field mb-0 fs-6">
@@ -457,6 +494,7 @@
                                        id="PrPerGodn"
                                        name="PrPerGodn"
                                        min="0"
+                                       value="{{ $production.PrPerGodn }}"
                                        required>
 
                             </div>
@@ -481,8 +519,8 @@
                             ← Назад: Комментарии
                         </button>
                         <!-- Проблема с проверкой кнопки, на данный момент id кнопки не работает (saveProductionBtn)-->
-                        <button type="submit" class="btn btn-success" id="saveProductionBtn1">
-                            <i class="bi bi-check-circle"></i> Сохранить продукцию
+                        <button type="submit" class="btn btn-success" id="updProductionBtn1">
+                            <i class="bi bi-check-circle"></i> Обновить продукцию
                         </button>
                     </div>
                 </div>
@@ -490,6 +528,12 @@
         </form>
     </div>
 </div>
+
+{{ else }}
+<div class="alert alert-danger">
+    <p>Продукция не найдена</p>
+</div>
+{{ end }}
 
 <!-- Модальное окно для выбора конструкторского наименования -->
 <div class="modal fade" id="designNameModal" tabindex="-1" aria-labelledby="designNameModalLabel" aria-hidden="true">

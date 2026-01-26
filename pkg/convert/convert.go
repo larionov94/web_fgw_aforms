@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const SkipNumOfStackFrame = 3
@@ -99,36 +98,17 @@ func ParseFormFieldBool(r *http.Request, fieldName string) bool {
 	return value
 }
 
-func ParseToMSSQLDateTime(goDateTime string) (string, error) {
-	if goDateTime == "" {
-		return "", nil
-	}
+func SplitDimensions(hwd string) []string {
+	// Пробуем разные разделители
+	separators := []string{"x", "*", "х", "×"}
 
-	goDateTime = strings.TrimSpace(goDateTime)
-
-	goDateTime = strings.Replace(goDateTime, "T", " ", 1)
-
-	var t time.Time
-	var err error
-
-	layouts := []string{
-		"2006-01-02 15:04:05",
-		"2006-01-02 15:04",
-		"2006-01-02",
-		"2006-01-02T15:04:05",
-		"2006-01-02T15:04",
-	}
-
-	for _, layout := range layouts {
-		t, err = time.Parse(layout, goDateTime)
-		if err == nil {
-			break
+	for _, sep := range separators {
+		parts := strings.Split(hwd, sep)
+		if len(parts) == 3 {
+			return parts
 		}
 	}
 
-	if err != nil {
-		log.Printf("Ошибка: [%s] --- ссылка на код: [ %s ] --- поле: [%s]", err.Error(), pathToStrCode(), goDateTime)
-	}
-
-	return t.Format("20060102 15:04:05.000"), nil
+	// Если не нашли, возвращаем пустой слайс
+	return []string{"", "", ""}
 }

@@ -192,8 +192,16 @@ VALUES (@PrName,
 -- 9. Возвращаем сгенерированный артикул
 --     SELECT @NewPrArticle AS GeneratedArticle;
 
+-- 10. Вставляем нумератор, если его не существует
+IF (NOT EXISTS(SELECT NumName FROM dbo.svTB_Numerator WHERE NumName = @NewPrArticle))
+BEGIN
+INSERT INTO dbo.svTB_Numerator(NumName, Created_by, Updated_by) VALUES (@NewPrArticle, @CreatedBy, @UpdatedBy);
 END
-go
+
+END
+GO;
+
+
 
 -- exec dbo.svAFormsProductionAdd N'TEST', N'TEST', N'TEST', 1, 0, 1, 0, 1, N'RED', 500, N'12', '', 10, 2, 523,
 --      N'100x100x111', '', 100, '20251223 00:00:00.000', 1, 50, 1, 1;
@@ -343,6 +351,55 @@ SET PrName         = @PrName,
     PrPerGodn      = @PrPerGond,
     Created_by     = @CreatedBy,
     Updated_by     = @UpdatedBy
+WHERE idProduction = @IdProduction;
+
+END
+GO;
+
+CREATE PROCEDURE dbo.svAFormsProductionFindById -- ХП - ищет запись по ИД.
+    @IdProduction INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+SELECT idProduction,
+       PrName,
+       PrShortName,
+       PrPackName,
+       PrType,
+       PrArticle,
+       PrColor,
+       PrBarCode,
+       PrCount,
+       PrRows,
+       PrWeight,
+       PrHWD,
+       PrInfo,
+       PrStatus,
+       PrEditDate,
+       PrEditUser,
+       PrPart,
+       PrPartLastDate,
+       PrPartAutoInc,
+       COALESCE(PrPartRealDate, '') as PrPartRealDate, -- преобразуем NULL в пустую строку
+       PrArchive,
+       PrPerGodn,
+       PrSAP,
+       PrProdType,
+       PrUmbrella,
+       PrSun,
+       PrDecl,
+       PrParty,
+       PrGL,
+       PrVP,
+       PrML,
+       Created_at,
+       Created_by,
+       Updated_at,
+       Updated_by,
+       COALESCE(PrCreationDate, '') as PrCreationDate,
+       PrPerfumery
+FROM dbo.svTB_Production
 WHERE idProduction = @IdProduction;
 
 END
