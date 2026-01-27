@@ -9,7 +9,6 @@ import (
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
 	"fgw_web_aforms/pkg/convert"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -113,8 +112,6 @@ func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Re
 }
 
 func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
 	performerData, err := p.authMiddleware.GetUserData(r, p.performerService, p.roleService)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
@@ -122,40 +119,54 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 		return
 	}
 
-	// Обработка GET запроса - отображение формы
+	switch r.Method {
+	case http.MethodGet:
+		p.getProduction(w, r, performerData)
+	case http.MethodPost:
+		p.postProductionHTML(w, r, performerData)
+	}
+}
+
+func (p *ProductionHandlerHTML) getProduction(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
 	if r.Method == http.MethodGet {
 		idProductionStr := r.URL.Query().Get("idProduction")
 		if idProductionStr == "" {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, "ID продукции не указан", p.logg, r)
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7102, p.logg, r)
+
 			return
 		}
 
 		idProduction := convert.ConvStrToInt(idProductionStr)
 		if idProduction == 0 {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, "Неверный ID продукции", p.logg, r)
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7104, p.logg, r)
+
 			return
 		}
 
 		production, err := p.productionService.FindByIdProduction(r.Context(), idProduction)
 		if err != nil {
 			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
 			return
 		}
 
 		if production == nil {
-			http_err.SendErrorHTTP(w, http.StatusNotFound, "Продукция не найдена", p.logg, r)
+			http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7103, p.logg, r)
+
 			return
 		}
 
 		designNameList, err := p.catalogService.DesignNameAll(r.Context())
 		if err != nil {
 			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
 			return
 		}
 
 		colorList, err := p.catalogService.ColorAll(r.Context())
 		if err != nil {
 			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
 			return
 		}
 
@@ -174,6 +185,11 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 
 		return
 	}
+}
+
+func (p *ProductionHandlerHTML) postProductionHTML(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	if r.Method == http.MethodPost {
 		if err := r.ParseForm(); err != nil {
 			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
@@ -183,19 +199,15 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 
 		idProductionStr := r.FormValue("idProduction")
 		if idProductionStr == "" {
-			// Для отладки: логируем все параметры
-			p.logg.LogE("Не найден idProduction в форме. Все параметры:", nil)
-			for key, values := range r.Form {
-				p.logg.LogW(fmt.Sprintf("  %s: %v", key, values))
-			}
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7102, p.logg, r)
 
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, "ID продукции не указан в форме", p.logg, r)
 			return
 		}
 
 		idProduction := convert.ConvStrToInt(idProductionStr)
 		if idProduction == 0 {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, "Неверный ID продукции", p.logg, r)
+			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7104, p.logg, r)
+
 			return
 		}
 
@@ -207,7 +219,6 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 			return
 		}
 
-		// Создаем продукт из данных формы
 		product := &model.Production{
 			PrName:         strings.TrimSpace(r.FormValue("PrName")),
 			PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
@@ -258,7 +269,6 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 		return
 	}
 
-	// Обработка GET запроса - отображение формы
 	if r.Method == http.MethodGet {
 		designNameList, err := p.catalogService.DesignNameAll(r.Context())
 		if err != nil {
@@ -288,7 +298,6 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 		return
 	}
 
-	// Обработка POST запроса - сохранение данных
 	if r.Method == http.MethodPost {
 		if err := r.ParseForm(); err != nil {
 			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
@@ -311,7 +320,6 @@ func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http
 			return
 		}
 
-		// Создаем продукт из данных формы
 		product := &model.Production{
 			PrName:         strings.TrimSpace(r.FormValue("PrName")),
 			PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
