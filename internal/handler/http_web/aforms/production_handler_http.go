@@ -9,6 +9,7 @@ import (
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
 	"fgw_web_aforms/pkg/convert"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -20,6 +21,13 @@ const (
 	tmplProductionUpdHTML = "production_upd.html"
 
 	urlProductions = "/aforms/productions"
+
+	renderPageTitle = "Варианты упаковки продукции"
+	renderPageKey   = "productions"
+	updPageTitle    = "Редактировать вариант упаковки"
+	updPageKey      = "productionUpd"
+	addPageTitle    = "Добавить вариант упаковки"
+	addPageKey      = "productionAdd"
 )
 
 type ProductionHandlerHTML struct {
@@ -38,12 +46,13 @@ func NewProductionHandlerHTML(productionService service.ProductionUseCase, perfo
 }
 
 func (p *ProductionHandlerHTML) ServeHTTPHTMLRouter(mux *http.ServeMux) {
-	mux.HandleFunc("/aforms/productions", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.AllProductionHTML)))
-	mux.HandleFunc("/aforms/productions/add", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.AddProductionHTML)))
-	mux.HandleFunc("/aforms/productions/upd", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.UpdProductionHTML)))
+	mux.HandleFunc("/aforms/productions", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.RenderProductionsPage)))
+	mux.HandleFunc("/aforms/productions/add", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.AddProductionForm)))
+	mux.HandleFunc("/aforms/productions/upd", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.UpdateProductionForm)))
 }
 
-func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http.Request) {
+// RenderProductionsPage отображает страницу продукции.
+func (p *ProductionHandlerHTML) RenderProductionsPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	if r.Method != http.MethodGet {
@@ -59,20 +68,32 @@ func (p *ProductionHandlerHTML) AllProductionHTML(w http.ResponseWriter, r *http
 		return
 	}
 
-	productions, searchFields, sortFields, err := p.getProductions(w, r)
+	productions, searchFields, sortFields, err := p.fetchProductionsWithParams(w, r)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7007, p.logg, r)
 
 		return
 	}
 
-	data := page.NewDataPage("Варианты упаковки продукции", "productions", performerData,
-		productions, sortFields, searchFields, true, nil, nil)
+	data := page.NewDataPage(
+		renderPageTitle,
+		renderPageKey,
+		performerData,
+		productions,
+		sortFields,
+		searchFields,
+		true,
+		nil,
+		nil,
+	)
 
 	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
 }
 
-func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Request) ([]*model.Production, *page.SearchProductionsPage, *page.SortProductionsPage, error) {
+// fetchProductionsWithParams - получить продукцию с учетом параметров запроса.
+func (p *ProductionHandlerHTML) fetchProductionsWithParams(w http.ResponseWriter, r *http.Request) ([]*model.Production,
+	*page.SearchProductionsPage, *page.SortProductionsPage, error) {
+
 	var productions []*model.Production
 	var err error
 
@@ -111,8 +132,8 @@ func (p *ProductionHandlerHTML) getProductions(w http.ResponseWriter, r *http.Re
 		}, nil
 }
 
-func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http.Request) {
-	performerData, err := p.authMiddleware.GetUserData(r, p.performerService, p.roleService)
+func (p *ProductionHandlerHTML) UpdateProductionForm(w http.ResponseWriter, r *http.Request) {
+	performerData, err := p.authenticatePerformer(r)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
 
@@ -121,243 +142,287 @@ func (p *ProductionHandlerHTML) UpdProductionHTML(w http.ResponseWriter, r *http
 
 	switch r.Method {
 	case http.MethodGet:
-		p.getProduction(w, r, performerData)
+		p.handleGetUpdateForm(w, r, performerData)
 	case http.MethodPost:
-		p.postProductionHTML(w, r, performerData)
-	}
-}
-
-func (p *ProductionHandlerHTML) getProduction(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
-	if r.Method == http.MethodGet {
-		idProductionStr := r.URL.Query().Get("idProduction")
-		if idProductionStr == "" {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7102, p.logg, r)
-
-			return
-		}
-
-		idProduction := convert.ConvStrToInt(idProductionStr)
-		if idProduction == 0 {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7104, p.logg, r)
-
-			return
-		}
-
-		production, err := p.productionService.FindByIdProduction(r.Context(), idProduction)
-		if err != nil {
-			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
-
-			return
-		}
-
-		if production == nil {
-			http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7103, p.logg, r)
-
-			return
-		}
-
-		designNameList, err := p.catalogService.DesignNameAll(r.Context())
-		if err != nil {
-			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
-
-			return
-		}
-
-		colorList, err := p.catalogService.ColorAll(r.Context())
-		if err != nil {
-			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
-
-			return
-		}
-
-		data := page.NewDataPage(
-			"Редактировать вариант упаковки",
-			"productionUpd",
-			performerData,
-			[]*model.Production{production},
-			nil,
-			nil,
-			false,
-			designNameList,
-			colorList)
-
-		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+		p.handlePostUpdateForm(w, r, performerData)
+	default:
+		http.Error(w, msg.H7000, http.StatusMethodNotAllowed)
 
 		return
 	}
 }
 
-func (p *ProductionHandlerHTML) postProductionHTML(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	if r.Method == http.MethodPost {
-		if err := r.ParseForm(); err != nil {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
-
-			return
-		}
-
-		idProductionStr := r.FormValue("idProduction")
-		if idProductionStr == "" {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7102, p.logg, r)
-
-			return
-		}
-
-		idProduction := convert.ConvStrToInt(idProductionStr)
-		if idProduction == 0 {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7104, p.logg, r)
-
-			return
-		}
-
-		prPartLastDate := strings.TrimSpace(r.FormValue("PrPartLastDate"))
-		formatPrPartLastDate, err := convert.ParseToMSSQLDateTime(prPartLastDate)
-		if err != nil {
-			page.RenderErrorPage(w, 400, msg.H7101, r)
-
-			return
-		}
-
-		product := &model.Production{
-			PrName:         strings.TrimSpace(r.FormValue("PrName")),
-			PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
-			PrPackName:     strings.TrimSpace(r.FormValue("PrPackName")),
-			PrArticle:      strings.TrimSpace(r.FormValue("PrArticle")),
-			PrColor:        strings.TrimSpace(r.FormValue("PrColor")),
-			PrCount:        convert.ParseFormFieldInt(r, "PrCount"),
-			PrRows:         convert.ParseFormFieldInt(r, "PrRows"),
-			PrWeight:       convert.ParseFormFieldFloat(r, "PrWeight"),
-			PrHWD:          strings.TrimSpace(r.FormValue("PrHWD")),
-			PrInfo:         strings.TrimSpace(r.FormValue("PrInfo")),
-			PrPart:         convert.ParseFormFieldInt(r, "PrPart"),
-			PrPartLastDate: formatPrPartLastDate, // Дата выпуска продукции, дата идет на этикетку.
-			PrPartAutoInc:  convert.ParseFormFieldInt(r, "PrPartAutoInc"),
-			PrPerGodn:      convert.ParseFormFieldInt(r, "PrPerGodn"),
-			PrSAP:          strings.TrimSpace(r.FormValue("PrSAP")),
-			PrProdType:     convert.ParseFormFieldBool(r, "PrProdType"),
-			PrUmbrella:     convert.ParseFormFieldBool(r, "PrUmbrella"),
-			PrPerfumery:    convert.ParseFormFieldBool(r, "PrPerfumery"),
-			PrSun:          convert.ParseFormFieldBool(r, "PrSun"),
-			PrDecl:         convert.ParseFormFieldBool(r, "PrDecl"),
-			PrParty:        convert.ParseFormFieldBool(r, "PrParty"),
-			PrGL:           convert.ParseFormFieldInt(r, "PrGL"),
-			AuditRec: model.Audit{
-				CreatedBy: performerData.PerformerId,
-				UpdatedBy: performerData.PerformerId,
-			},
-		}
-
-		if err = p.productionService.UpdProduction(r.Context(), idProduction, product); err != nil {
-			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
-
-			return
-		}
-		http.Redirect(w, r, urlProductions, http.StatusSeeOther)
+// handleGetUpdateForm - обработчик формы для GET запроса обновления продукции.
+func (p *ProductionHandlerHTML) handleGetUpdateForm(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
+	production, err := p.ensureProductionExists(r, "idProduction")
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7000+err.Error(), p.logg, r)
 
 		return
 	}
+
+	designNameList, err := p.catalogService.DesignNameAll(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+
+	colorList, err := p.catalogService.ColorAll(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+
+	data := page.NewDataPage(
+		updPageTitle,
+		updPageKey,
+		performerData,
+		[]*model.Production{production},
+		nil,
+		nil,
+		false,
+		designNameList,
+		colorList,
+	)
+
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+
+	return
 }
 
-func (p *ProductionHandlerHTML) AddProductionHTML(w http.ResponseWriter, r *http.Request) {
+// handlePostUpdateForm - обработчик формы для POST запроса обновления продукции.
+func (p *ProductionHandlerHTML) handlePostUpdateForm(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	performerData, err := p.authMiddleware.GetUserData(r, p.performerService, p.roleService)
+	if err := r.ParseForm(); err != nil {
+		http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
+
+		return
+	}
+
+	idProduction, err := p.extractIdParamFormValue(r, "idProduction")
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7104, p.logg, r)
+
+		return
+	}
+
+	prPartLastDate := strings.TrimSpace(r.FormValue("PrPartLastDate"))
+	formatPrPartLastDate, err := convert.ParseToMSSQLDateTime(prPartLastDate)
+	if err != nil {
+		page.RenderErrorPage(w, 400, msg.H7101, r)
+
+		return
+	}
+
+	product := &model.Production{
+		PrName:         strings.TrimSpace(r.FormValue("PrName")),
+		PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
+		PrPackName:     strings.TrimSpace(r.FormValue("PrPackName")),
+		PrArticle:      strings.TrimSpace(r.FormValue("PrArticle")),
+		PrColor:        strings.TrimSpace(r.FormValue("PrColor")),
+		PrCount:        convert.ParseFormFieldInt(r, "PrCount"),
+		PrRows:         convert.ParseFormFieldInt(r, "PrRows"),
+		PrWeight:       convert.ParseFormFieldFloat(r, "PrWeight"),
+		PrHWD:          strings.TrimSpace(r.FormValue("PrHWD")),
+		PrInfo:         strings.TrimSpace(r.FormValue("PrInfo")),
+		PrPart:         convert.ParseFormFieldInt(r, "PrPart"),
+		PrPartLastDate: formatPrPartLastDate, // Дата выпуска продукции, дата идет на этикетку.
+		PrPartAutoInc:  convert.ParseFormFieldInt(r, "PrPartAutoInc"),
+		PrPerGodn:      convert.ParseFormFieldInt(r, "PrPerGodn"),
+		PrSAP:          strings.TrimSpace(r.FormValue("PrSAP")),
+		PrProdType:     convert.ParseFormFieldBool(r, "PrProdType"),
+		PrUmbrella:     convert.ParseFormFieldBool(r, "PrUmbrella"),
+		PrPerfumery:    convert.ParseFormFieldBool(r, "PrPerfumery"),
+		PrSun:          convert.ParseFormFieldBool(r, "PrSun"),
+		PrDecl:         convert.ParseFormFieldBool(r, "PrDecl"),
+		PrParty:        convert.ParseFormFieldBool(r, "PrParty"),
+		PrGL:           convert.ParseFormFieldInt(r, "PrGL"),
+		AuditRec: model.Audit{
+			CreatedBy: performerData.PerformerId,
+			UpdatedBy: performerData.PerformerId,
+		},
+	}
+
+	if err = p.productionService.UpdProduction(r.Context(), idProduction, product); err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+	http.Redirect(w, r, urlProductions, http.StatusSeeOther)
+
+	return
+}
+
+// extractIdParam - извлечь параметр идентификатора.
+func (p *ProductionHandlerHTML) extractIdParam(r *http.Request, paramId string) (int, error) {
+	idParamStr := r.URL.Query().Get(paramId)
+	if idParamStr == "" {
+		return 0, fmt.Errorf("%s idParamStr=%s", msg.H7102, idParamStr)
+	}
+
+	idParam := convert.ConvStrToInt(idParamStr)
+	if idParam == 0 {
+		return 0, fmt.Errorf("%s idParam=%d", msg.H7104, idParam)
+	}
+
+	return idParam, nil
+}
+
+// extractIdParamFormValue - извлечь параметр идентификатора из формы.
+func (p *ProductionHandlerHTML) extractIdParamFormValue(r *http.Request, paramId string) (int, error) {
+	idParamStr := r.FormValue(paramId)
+	if idParamStr == "" {
+		return 0, fmt.Errorf("%s idParamStr=%s", msg.H7102, idParamStr)
+	}
+
+	idParam := convert.ConvStrToInt(idParamStr)
+	if idParam == 0 {
+		return 0, fmt.Errorf("%s idParam=%d", msg.H7104, idParam)
+	}
+
+	return idParam, nil
+}
+
+// ensureProductionExists - обеспечить существование продукции.
+func (p *ProductionHandlerHTML) ensureProductionExists(r *http.Request, paramId string) (*model.Production, error) {
+	idProduction, err := p.extractIdParam(r, paramId)
+	if err != nil {
+		return nil, fmt.Errorf("%s idProduction=%d", msg.H7102, idProduction)
+	}
+
+	production, err := p.productionService.FindByIdProduction(r.Context(), idProduction)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %s", msg.H7103, err.Error())
+	}
+
+	if production == nil {
+		return nil, fmt.Errorf("%s", msg.H7103)
+	}
+
+	return production, nil
+}
+
+func (p *ProductionHandlerHTML) AddProductionForm(w http.ResponseWriter, r *http.Request) {
+	performerData, err := p.authenticatePerformer(r)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
 
 		return
 	}
 
-	if r.Method == http.MethodGet {
-		designNameList, err := p.catalogService.DesignNameAll(r.Context())
-		if err != nil {
-			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
-			return
-		}
+	switch r.Method {
+	case http.MethodGet:
+		p.handlerGetAddForm(w, r, performerData)
+	case http.MethodPost:
+		p.handlerPostAddForm(w, r, performerData)
+	default:
+		http.Error(w, msg.H7000, http.StatusMethodNotAllowed)
 
-		colorList, err := p.catalogService.ColorAll(r.Context())
-		if err != nil {
-			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
-			return
-		}
+		return
+	}
+}
 
-		data := page.NewDataPage(
-			"Добавить вариант упаковки",
-			"productionAdd",
-			performerData,
-			nil,
-			nil,
-			nil,
-			false,
-			designNameList,
-			colorList)
-
-		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+// handlerGetAddForm - обработчик формы для GET запроса добавления продукции.
+func (p *ProductionHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
+	designNameList, err := p.catalogService.DesignNameAll(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
 
 		return
 	}
 
-	if r.Method == http.MethodPost {
-		if err := r.ParseForm(); err != nil {
-			http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
-
-			return
-		}
-
-		prArticle := strings.TrimSpace(r.FormValue("PrArticle"))
-		if len(prArticle) != 2 {
-			page.RenderErrorPage(w, 400, msg.H7100, r)
-
-			return
-		}
-
-		prPartLastDate := strings.TrimSpace(r.FormValue("PrPartLastDate"))
-		formatPrPartLastDate, err := convert.ParseToMSSQLDateTime(prPartLastDate)
-		if err != nil {
-			page.RenderErrorPage(w, 400, msg.H7101, r)
-
-			return
-		}
-
-		product := &model.Production{
-			PrName:         strings.TrimSpace(r.FormValue("PrName")),
-			PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
-			PrPackName:     strings.TrimSpace(r.FormValue("PrPackName")),
-			PrArticle:      prArticle,
-			PrColor:        strings.TrimSpace(r.FormValue("PrColor")),
-			PrCount:        convert.ParseFormFieldInt(r, "PrCount"),
-			PrRows:         convert.ParseFormFieldInt(r, "PrRows"),
-			PrWeight:       convert.ParseFormFieldFloat(r, "PrWeight"),
-			PrHWD:          strings.TrimSpace(r.FormValue("PrHWD")),
-			PrInfo:         strings.TrimSpace(r.FormValue("PrInfo")),
-			PrPart:         convert.ParseFormFieldInt(r, "PrPart"),
-			PrPartLastDate: formatPrPartLastDate, // Дата выпуска продукции, дата идет на этикетку.
-			PrPartAutoInc:  convert.ParseFormFieldInt(r, "PrPartAutoInc"),
-			PrPerGodn:      convert.ParseFormFieldInt(r, "PrPerGodn"),
-			PrSAP:          strings.TrimSpace(r.FormValue("PrSAP")),
-			PrProdType:     convert.ParseFormFieldBool(r, "PrProdType"),
-			PrUmbrella:     convert.ParseFormFieldBool(r, "PrUmbrella"),
-			PrPerfumery:    convert.ParseFormFieldBool(r, "PrPerfumery"),
-			PrSun:          convert.ParseFormFieldBool(r, "PrSun"),
-			PrDecl:         convert.ParseFormFieldBool(r, "PrDecl"),
-			PrParty:        convert.ParseFormFieldBool(r, "PrParty"),
-			PrGL:           convert.ParseFormFieldInt(r, "PrGL"),
-			AuditRec: model.Audit{
-				CreatedBy: performerData.PerformerId,
-				UpdatedBy: performerData.PerformerId,
-			},
-		}
-
-		if err := p.productionService.AddProduction(r.Context(), product); err != nil {
-			http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
-
-			return
-		}
-		http.Redirect(w, r, urlProductions, http.StatusSeeOther)
+	colorList, err := p.catalogService.ColorAll(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
 
 		return
 	}
 
-	http.Error(w, msg.H7000, http.StatusMethodNotAllowed)
+	data := page.NewDataPage(
+		addPageTitle,
+		addPageKey,
+		performerData,
+		nil,
+		nil,
+		nil,
+		false,
+		designNameList,
+		colorList,
+	)
+
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+
+	return
+}
+
+// AddProductionForm - форма для добавления продукции.
+func (p *ProductionHandlerHTML) handlerPostAddForm(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	if err := r.ParseForm(); err != nil {
+		http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
+
+		return
+	}
+
+	prArticle := strings.TrimSpace(r.FormValue("PrArticle"))
+	if len(prArticle) != 2 {
+		page.RenderErrorPage(w, 400, msg.H7100, r)
+
+		return
+	}
+
+	prPartLastDate := strings.TrimSpace(r.FormValue("PrPartLastDate"))
+	formatPrPartLastDate, err := convert.ParseToMSSQLDateTime(prPartLastDate)
+	if err != nil {
+		page.RenderErrorPage(w, 400, msg.H7101, r)
+
+		return
+	}
+
+	product := &model.Production{
+		PrName:         strings.TrimSpace(r.FormValue("PrName")),
+		PrShortName:    strings.TrimSpace(r.FormValue("PrShortName")),
+		PrPackName:     strings.TrimSpace(r.FormValue("PrPackName")),
+		PrArticle:      prArticle,
+		PrColor:        strings.TrimSpace(r.FormValue("PrColor")),
+		PrCount:        convert.ParseFormFieldInt(r, "PrCount"),
+		PrRows:         convert.ParseFormFieldInt(r, "PrRows"),
+		PrWeight:       convert.ParseFormFieldFloat(r, "PrWeight"),
+		PrHWD:          strings.TrimSpace(r.FormValue("PrHWD")),
+		PrInfo:         strings.TrimSpace(r.FormValue("PrInfo")),
+		PrPart:         convert.ParseFormFieldInt(r, "PrPart"),
+		PrPartLastDate: formatPrPartLastDate, // Дата выпуска продукции, дата идет на этикетку.
+		PrPartAutoInc:  convert.ParseFormFieldInt(r, "PrPartAutoInc"),
+		PrPerGodn:      convert.ParseFormFieldInt(r, "PrPerGodn"),
+		PrSAP:          strings.TrimSpace(r.FormValue("PrSAP")),
+		PrProdType:     convert.ParseFormFieldBool(r, "PrProdType"),
+		PrUmbrella:     convert.ParseFormFieldBool(r, "PrUmbrella"),
+		PrPerfumery:    convert.ParseFormFieldBool(r, "PrPerfumery"),
+		PrSun:          convert.ParseFormFieldBool(r, "PrSun"),
+		PrDecl:         convert.ParseFormFieldBool(r, "PrDecl"),
+		PrParty:        convert.ParseFormFieldBool(r, "PrParty"),
+		PrGL:           convert.ParseFormFieldInt(r, "PrGL"),
+		AuditRec: model.Audit{
+			CreatedBy: performerData.PerformerId,
+			UpdatedBy: performerData.PerformerId,
+		},
+	}
+
+	if err := p.productionService.AddProduction(r.Context(), product); err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+	http.Redirect(w, r, urlProductions, http.StatusSeeOther)
+
+	return
+}
+
+// authenticatePerformer - авторизованные данные сотрудника.
+func (p *ProductionHandlerHTML) authenticatePerformer(r *http.Request) (*handler.PerformerData, error) {
+	return p.authMiddleware.GetUserData(r, p.performerService, p.roleService)
 }

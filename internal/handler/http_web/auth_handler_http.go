@@ -95,7 +95,8 @@ func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
 		nil,
 		false,
 		nil,
-		nil)
+		nil,
+	)
 
 	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
 }
