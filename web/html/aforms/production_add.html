@@ -13,7 +13,8 @@
         <div class="card-header p-2">
             {{ if $production }}
             <h1 class="h3 mb-0">Добавить продукцию (на основе существующей)</h1>
-            <p class="text-muted mb-0">Создание новой записи на основе: {{ $production.PrArticle }} {{ $production.PrPackName }}</p>
+            <p class="text-muted mb-0">Создание новой записи на основе: {{ $production.PrArticle }} {{
+                $production.PrPackName }}</p>
             {{ else }}
             <h1 class="h3 mb-0">{{ .Title }}</h1>
             <p class="text-muted mb-0">Заполните информацию о продукции во всех вкладках</p>
@@ -332,7 +333,7 @@
                                        id="PrCount"
                                        name="PrCount"
 
-                                       {{ if $production }}value="{{ $production.PrCount }}"{{ end }}
+                                       {{ if $production }}value="{{ $production.PrCount }}" {{ end }}
 
                                        required>
 
@@ -344,7 +345,7 @@
                                        id="PrRows"
                                        name="PrRows"
 
-                                       {{ if $production }}value="{{ $production.PrRows }}"{{ end }}
+                                       {{ if $production }}value="{{ $production.PrRows }}" {{ end }}
 
                                        required>
 
@@ -357,7 +358,7 @@
                                        name="PrWeight"
                                        min="0"
 
-                                       {{ if $production }}value="{{ $production.PrWeight }}"{{ end }}
+                                       {{ if $production }}value="{{ $production.PrWeight }}" {{ end }}
 
                                        required>
                             </div>
@@ -404,9 +405,9 @@
                             </label>
 
                             {{ if $production }}
-                                {{ $hwd := $production.PrHWD }}
+                            {{ $hwd := $production.PrHWD }}
                             {{ if $hwd }}
-                                {{ $dimensions := splitDimensions $hwd }}
+                            {{ $dimensions := splitDimensions $hwd }}
 
                             <div class="row g-1">
                                 <div class="col-4">
@@ -552,7 +553,7 @@
                                    id="PrHWD"
                                    name="PrHWD"
 
-                                   {{ if $production }}value="{{ $production.PrHWD }}"{{ end }}
+                                   {{ if $production }}value="{{ $production.PrHWD }}" {{ end }}
 
                                    value="">
                         </div>
@@ -620,7 +621,7 @@
                                        id="PrPart"
                                        name="PrPart"
 
-                                       {{ if $production }}value="{{ $production.PrPart }}"{{ else }}value=""{{ end }}
+                                       {{ if $production }}value="{{ $production.PrPart }}" {{ else }}value="" {{ end }}
 
                                        required>
 
@@ -632,7 +633,8 @@
                                        id="PrPartLastDate"
                                        name="PrPartLastDate"
 
-                                       {{ if $production }}value="{{ formatDateTimeLocal $production.PrPartLastDate }}"{{ end }}
+                                       {{ if $production }}value="{{ formatDateTimeLocal $production.PrPartLastDate }}"
+                                       {{ end }}
 
                                        required>
 
@@ -643,14 +645,20 @@
                                         class="form-control form-control-sm mb-4 py-1"
                                         id="PrPartAutoInc">
                                     <option value="1"
-                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 1 }}selected{{ end }}{{ else }}selected{{ end }}>
-                                        Автоматическая</option>
+                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 1 }}selected{{ end
+                                            }}{{ else }}selected{{ end }}>
+                                        Автоматическая
+                                    </option>
                                     <option value="2"
-                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 2 }}selected{{ end }}{{ end }}>
-                                        Ручная</option>
+                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 2 }}selected{{ end
+                                            }}{{ end }}>
+                                        Ручная
+                                    </option>
                                     <option value="3"
-                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 3 }}selected{{ end }}{{ end }}>
-                                        С указанной даты</option>
+                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 3 }}selected{{ end
+                                            }}{{ end }}>
+                                        С указанной даты
+                                    </option>
                                 </select>
 
                                 <label for="PrPerGodn" class="form-label required-field mb-0 fs-6">
@@ -662,7 +670,8 @@
                                        name="PrPerGodn"
                                        min="0"
 
-                                       {{ if $production }}value="{{ $production.PrPerGodn }}"{{ else }}value=""{{ end }}
+                                       {{ if $production }}value="{{ $production.PrPerGodn }}" {{ else }}value="" {{ end
+                                       }}
 
 
                                        required>
@@ -690,7 +699,8 @@
                         </button>
                         <!-- Проблема с проверкой кнопки, на данный момент id кнопки не работает (saveProductionBtn)-->
                         <button type="submit" class="btn btn-success" id="saveProductionBtn1">
-                            <i class="bi bi-check-circle"></i>{{ if $production }}Создать на основе{{ else }}Сохранить продукцию{{ end }}
+                            <i class="bi bi-check-circle"></i>{{ if $production }}Создать на основе{{ else }}Сохранить
+                            продукцию{{ end }}
                         </button>
                     </div>
                 </div>

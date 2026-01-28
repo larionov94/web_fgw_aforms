@@ -342,16 +342,12 @@ func (p *ProductionHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http
 	}
 
 	if r.URL.Query().Get("basedOn") != "" {
-		fmt.Println("2")
 		basedOnProduction, err := p.ensureProductionExists(r, "basedOn")
 		if err != nil {
 			http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7000+err.Error(), p.logg, r)
 
 			return
 		}
-		fmt.Println("2", basedOnProduction.IdProduction, basedOnProduction.PrPackName)
-
-		fmt.Println("1")
 
 		basedOnProduction.IdProduction = 0
 		basedOnProduction.PrArticle = ""
