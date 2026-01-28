@@ -1,10 +1,23 @@
 {{ define "production_add" }}
 
+{{ $production := "" }}
+{{ if .Productions }}
+{{ if gt (len .Productions) 0 }}
+{{ $production = index .Productions 0 }}
+{{ end }}
+{{ end }}
+
+
 <div class="main-container" xmlns="http://www.w3.org/1999/html">
     <div class="card">
         <div class="card-header p-2">
+            {{ if $production }}
+            <h1 class="h3 mb-0">Добавить продукцию (на основе существующей)</h1>
+            <p class="text-muted mb-0">Создание новой записи на основе: {{ $production.PrArticle }} {{ $production.PrPackName }}</p>
+            {{ else }}
             <h1 class="h3 mb-0">{{ .Title }}</h1>
             <p class="text-muted mb-0">Заполните информацию о продукции во всех вкладках</p>
+            {{ end }}
         </div>
 
 
@@ -42,6 +55,15 @@
 
         <!-- Форма -->
         <form action="/aforms/productions/add" method="POST" id="productForm">
+
+            <!-- Скрытое поле для определения типа операции -->
+            {{ if $production }}
+            <input type="hidden" name="action" value="addBasedOn">
+            <input type="hidden" name="sourceId" value="{{ $production.IdProduction }}">
+            {{ else }}
+            <input type="hidden" name="action" value="addNew">
+            {{ end }}
+
             <div class="tab-content" id="productTabsContent">
 
                 <!-- Вкладка 1: Продукция -->
@@ -60,7 +82,8 @@
                                 <input type="text"
                                        class="form-control form-control-sm py-1"
                                        id="PrName"
-                                       name="PrName">
+                                       name="PrName"
+                                       {{ if $production }}value="{{ $production.PrName }}" {{ end }}>
                             </div>
 
                             <div class="col-12 mb-1">
@@ -72,6 +95,7 @@
                                            class="form-control form-control-sm py-1"
                                            id="PrPackName"
                                            name="PrPackName"
+                                           {{ if $production }}value="{{ $production.PrPackName }}" {{ end }}
                                            required
                                            readonly>
                                     <button class="btn btn-outline-secondary"
@@ -91,7 +115,8 @@
                                 <input type="text"
                                        class="form-control form-control-sm py-1"
                                        id="PrShortName"
-                                       name="PrShortName">
+                                       name="PrShortName"
+                                       {{ if $production }}value="{{ $production.PrShortName }}" {{ end }}>
                             </div>
                         </div>
                     </div>
@@ -108,7 +133,13 @@
                                                type="checkbox"
                                                id="PrDecl"
                                                name="PrDecl"
-                                               checked>
+
+                                               {{ if $production }}
+                                               {{ if $production.PrDecl }}checked{{ end }}
+                                               {{ else }}
+                                               checked
+                                               {{ end }}>
+
                                         <label class="form-check-label fs-7 text-muted" for="PrDecl">
                                             Декларированная
                                         </label>
@@ -119,7 +150,13 @@
                                                type="checkbox"
                                                id="PrSun"
                                                name="PrSun"
-                                               checked>
+
+                                               {{ if $production }}
+                                               {{ if $production.PrSun }}checked{{ end }}
+                                               {{ else }}
+                                               checked
+                                               {{ end }}>
+
                                         <label class="form-check-label fs-7" for="PrSun">
                                             Беречь от солнца
                                         </label>
@@ -130,7 +167,13 @@
                                                type="checkbox"
                                                id="PrProdType"
                                                name="PrProdType"
-                                               checked>
+
+                                               {{ if $production }}
+                                               {{ if $production.PrProdType }}checked{{ end }}
+                                               {{ else }}
+                                               checked
+                                               {{ end }}>
+
                                         <label class="form-check-label fs-7" for="PrProdType">
                                             Пищевая
                                         </label>
@@ -140,7 +183,12 @@
                                         <input class="form-check-input exclusive-check"
                                                type="checkbox"
                                                id="PrPerfumery"
-                                               name="PrPerfumery">
+                                               name="PrPerfumery"
+
+                                               {{ if $production }}
+                                               {{ if $production.PrPerfumery }}checked{{ end }}
+                                               {{ end }}>
+
                                         <label class="form-check-label fs-7" for="PrPerfumery">
                                             Парфюмерия
                                         </label>
@@ -150,7 +198,12 @@
                                         <input class="form-check-input"
                                                type="checkbox"
                                                id="PrParty"
-                                               name="PrParty">
+                                               name="PrParty"
+
+                                               {{ if $production }}
+                                               {{ if $production.PrParty }}checked{{ end }}
+                                               {{ end }}>
+
                                         <label class="form-check-label fs-7" for="PrParty">
                                             Партионная
                                         </label>
@@ -160,7 +213,13 @@
                                                type="checkbox"
                                                id="PrUmbrella"
                                                name="PrUmbrella"
-                                               checked>
+
+                                               {{ if $production }}
+                                               {{ if $production.PrUmbrella }}checked{{ end }}
+                                               {{ else }}
+                                               checked
+                                               {{ end }}>
+
                                         <label class="form-check-label fs-7" for="PrUmbrella">
                                             Беречь от влаги
                                         </label>
@@ -183,6 +242,9 @@
                                            class="form-control form-control-sm py-1"
                                            id="PrColor"
                                            name="PrColor"
+
+                                           {{ if $production }}value="{{ $production.PrColor }}" {{ end }}
+
                                            readonly required>
                                     <button class="btn btn-outline-secondary"
                                             type="button"
@@ -198,7 +260,13 @@
                                 <label for="PrGL" class="form-label required-field mb-0 fs-6">
                                     GL
                                 </label>
-                                <input type="text" class="form-control form-control-sm py-1" id="PrGL" name="PrGL"
+                                <input type="text"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrGL"
+                                       name="PrGL"
+
+                                       {{ if $production }}value="{{ $production.PrGL }}" {{ end }}
+
                                        readonly required>
                             </div>
                         </div>
@@ -226,7 +294,13 @@
                                 <label for="PrSAP" class="form-label mb-0 fs-6">
                                     САП код
                                 </label>
-                                <input type="number" class="form-control form-control-sm py-1" id="PrSAP" name="PrSAP">
+                                <input type="number"
+                                       class="form-control form-control-sm py-1"
+                                       id="PrSAP"
+                                       name="PrSAP"
+
+                                       {{ if $production }}value="{{ $production.PrSAP }}" {{ end }}>
+
                             </div>
                         </div>
                     </div>
@@ -257,6 +331,9 @@
                                        class="form-control form-control-sm py-1"
                                        id="PrCount"
                                        name="PrCount"
+
+                                       {{ if $production }}value="{{ $production.PrCount }}"{{ end }}
+
                                        required>
 
                                 <label for="PrRows" class="form-label required-field mb-0 fs-6">
@@ -266,6 +343,9 @@
                                        class="form-control form-control-sm py-1"
                                        id="PrRows"
                                        name="PrRows"
+
+                                       {{ if $production }}value="{{ $production.PrRows }}"{{ end }}
+
                                        required>
 
                                 <label for="PrWeight" class="form-label required-field mb-0 fs-6">
@@ -276,6 +356,9 @@
                                        id="PrWeight"
                                        name="PrWeight"
                                        min="0"
+
+                                       {{ if $production }}value="{{ $production.PrWeight }}"{{ end }}
+
                                        required>
                             </div>
 
@@ -320,6 +403,110 @@
                                 Габариты (В×Ш×Г, мм)
                             </label>
 
+                            {{ if $production }}
+                                {{ $hwd := $production.PrHWD }}
+                            {{ if $hwd }}
+                                {{ $dimensions := splitDimensions $hwd }}
+
+                            <div class="row g-1">
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrHeight"
+                                           name="PrHeight"
+                                           placeholder="В"
+                                           title="Высота"
+                                           min="0"
+
+                                           value="{{ index $dimensions 0 }}"
+
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Высота</small>
+                                </div>
+
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrWidth"
+                                           name="PrWidth"
+                                           placeholder="Ш"
+                                           title="Ширина"
+                                           min="0"
+
+                                           value="{{ index $dimensions 1 }}"
+
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Ширина</small>
+                                </div>
+
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrDepth"
+                                           name="PrDepth"
+                                           placeholder="Г"
+                                           title="Глубина"
+                                           min="0"
+
+                                           value="{{ index $dimensions 2 }}"
+
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Глубина</small>
+                                </div>
+                            </div>
+
+                            {{ else }}
+
+                            <div class="row g-1">
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrHeight"
+                                           name="PrHeight"
+                                           placeholder="В"
+                                           title="Высота"
+                                           min="0"
+
+                                           value="{{ index $dimensions 0 }}"
+
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Высота</small>
+                                </div>
+
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrWidth"
+                                           name="PrWidth"
+                                           placeholder="Ш"
+                                           title="Ширина"
+                                           min="0"
+
+                                           value="{{ index $dimensions 1 }}"
+
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Ширина</small>
+                                </div>
+
+                                <div class="col-4">
+                                    <input type="number"
+                                           class="form-control form-control-sm py-1"
+                                           id="PrDepth"
+                                           name="PrDepth"
+                                           placeholder="Г"
+                                           title="Глубина"
+                                           min="0"
+
+                                           value="{{ index $dimensions 2 }}"
+
+                                           required>
+                                    <small class="form-text text-muted text-center d-block">Глубина</small>
+                                </div>
+                            </div>
+
+                            {{ end }}
+                            {{ else }}
+
                             <div class="row g-1">
                                 <div class="col-4">
                                     <input type="number"
@@ -358,10 +545,15 @@
                                 </div>
                             </div>
 
+                            {{ end }}
+
                             <!-- Скрытое поле для итогового значения -->
                             <input type="hidden"
                                    id="PrHWD"
                                    name="PrHWD"
+
+                                   {{ if $production }}value="{{ $production.PrHWD }}"{{ end }}
+
                                    value="">
                         </div>
                     </div>
@@ -394,7 +586,7 @@
                                           name="PrInfo"
                                           rows="6"
                                           placeholder="Напишите ваш комментарий здесь..."
-                                          maxlength="2000">
+                                          maxlength="2000">{{ if $production }}{{ $production.PrInfo }}{{ end }}
                                 </textarea>
                             </div>
                         </div>
@@ -427,6 +619,9 @@
                                        class="form-control form-control-sm py-1 mb-4"
                                        id="PrPart"
                                        name="PrPart"
+
+                                       {{ if $production }}value="{{ $production.PrPart }}"{{ else }}value=""{{ end }}
+
                                        required>
 
                                 <label for="PrPartLastDate" class="form-label required-field mb-2 fs-6">
@@ -436,6 +631,9 @@
                                        class="form-control form-control-sm py-1 mb-4"
                                        id="PrPartLastDate"
                                        name="PrPartLastDate"
+
+                                       {{ if $production }}value="{{ formatDateTimeLocal $production.PrPartLastDate }}"{{ end }}
+
                                        required>
 
                                 <label for="PrPartAutoInc" class="form-label required-field mb-0 fs-6">
@@ -444,9 +642,15 @@
                                 <select name="PrPartAutoInc"
                                         class="form-control form-control-sm mb-4 py-1"
                                         id="PrPartAutoInc">
-                                    <option value="1">Автоматическая</option>
-                                    <option value="2">Ручная</option>
-                                    <option value="3">С указанной даты</option>
+                                    <option value="1"
+                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 1 }}selected{{ end }}{{ else }}selected{{ end }}>
+                                        Автоматическая</option>
+                                    <option value="2"
+                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 2 }}selected{{ end }}{{ end }}>
+                                        Ручная</option>
+                                    <option value="3"
+                                            {{ if $production }}{{ if eq $production.PrPartAutoInc 3 }}selected{{ end }}{{ end }}>
+                                        С указанной даты</option>
                                 </select>
 
                                 <label for="PrPerGodn" class="form-label required-field mb-0 fs-6">
@@ -457,6 +661,10 @@
                                        id="PrPerGodn"
                                        name="PrPerGodn"
                                        min="0"
+
+                                       {{ if $production }}value="{{ $production.PrPerGodn }}"{{ else }}value=""{{ end }}
+
+
                                        required>
 
                             </div>
@@ -482,7 +690,7 @@
                         </button>
                         <!-- Проблема с проверкой кнопки, на данный момент id кнопки не работает (saveProductionBtn)-->
                         <button type="submit" class="btn btn-success" id="saveProductionBtn1">
-                            <i class="bi bi-check-circle"></i> Сохранить продукцию
+                            <i class="bi bi-check-circle"></i>{{ if $production }}Создать на основе{{ else }}Сохранить продукцию{{ end }}
                         </button>
                     </div>
                 </div>

@@ -244,6 +244,11 @@
                                         onclick="window.open('/aforms/productions/upd?idProduction={{ .IdProduction }}', '_self')">
                                     <span>✏️</span>
                                 </button>
+                                <button class="btn btn-sm btn-outline-success copy-btn px-2 py-1"
+                                        title="Создать на основе этой записи"
+                                        onclick="window.open('/aforms/productions/add?basedOn={{ .IdProduction }}', '_self')">
+                                    <span>📋</span>
+                                </button>
                             </div>
                         </td>
 
