@@ -213,13 +213,6 @@ GO;
 --      N'100x100x111', '', 100, '20251223 00:00:00.000', 1, 50, 1, 1;
 
 
-
-CREATE PROCEDURE dbo.svAFormsProductionAll -- ХП выводит список продукции.
-    AS
-BEGIN
-    SET
-NOCOUNT ON;
-
 CREATE PROCEDURE dbo.svAFormsProductionAll @SortField NVARCHAR(50) = 'idProduction', -- ХП возвращает список продукции с сортировкой.
                                            @SortOrder NVARCHAR(4) = 'DESC'
 AS

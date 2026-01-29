@@ -25,3 +25,7 @@ const (
 	FGWsvAFormsDesignNameAllQuery = "exec dbo.svAFormsDesignNameAll;" // ХП возвращает список конструкторских наименование.
 	FGWsvAFormsColorAllQuery      = "exec dbo.svAFormsColorAll;"      // ХП возвращает цвета.
 )
+
+const (
+	FGWsvAFormsPlanAllQuery = "exec dbo.svAFormsPlanAll ?, ?;" //ХП возвращает список планов с сортировкой
+)
