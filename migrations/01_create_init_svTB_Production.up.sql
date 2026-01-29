@@ -100,6 +100,7 @@ BEGIN
     DECLARE @NewSequence VARCHAR(3);
     DECLARE @PrVP SMALLINT;
     DECLARE @PrML SMALLINT;
+    DECLARE @PrType VARCHAR(100);
 
     -- 1. Проверяем, что артикул состоит из 2 цифр
     IF LEN(@PrArticle) <> 2 OR ISNUMERIC(@PrArticle) = 0
@@ -110,6 +111,8 @@ END;
     -- 2. Извлекаем VP и ML из первых 2 цифр
     SET @PrVP = CAST(SUBSTRING(@PrArticle, 1, 1) AS SMALLINT);
     SET @PrML = CAST(SUBSTRING(@PrArticle, 2, 1) AS SMALLINT);
+
+    SET @PrType = IIF(@PrDecl = 1, N'Декларированная', N'');
 
     -- 3. Находим максимальные последние 3 цифры для этого префикса
 SELECT @MaxSequence = ISNULL(MAX(
@@ -139,6 +142,7 @@ INSERT INTO dbo.svTB_Production
 (PrName,
  PrShortName,
  PrPackName,
+ PrType,
  PrDecl,
  PrSun,
  PrProdType,
@@ -165,6 +169,7 @@ INSERT INTO dbo.svTB_Production
 VALUES (@PrName,
         @PrShortName,
         @PrPackName,
+        @PrType,
         @PrDecl,
         @PrSun,
         @PrProdType,
@@ -195,7 +200,8 @@ VALUES (@PrName,
 -- 10. Вставляем нумератор, если его не существует
 IF (NOT EXISTS(SELECT NumName FROM dbo.svTB_Numerator WHERE NumName = @NewPrArticle))
 BEGIN
-INSERT INTO dbo.svTB_Numerator(NumName, Created_by, Updated_by) VALUES (@NewPrArticle, @CreatedBy, @UpdatedBy);
+INSERT INTO dbo.svTB_Numerator(NumName, Created_by, Updated_by)
+VALUES (@NewPrArticle, @CreatedBy, @UpdatedBy);
 END
 
 END
@@ -305,7 +311,7 @@ CREATE PROCEDURE dbo.svAFormsProductionUpd -- ХП обновляет проду
     @PrPerfumery BIT,
     @PrColor VARCHAR(20),
     @PrGL SMALLINT,
-    @PrArticle VARCHAR(2), -- вводим только 2 цифры ВП и МЛ
+    @PrArticle VARCHAR(5),
     @PrSAP VARCHAR(15),
     -- Упаковка
     @PrCount INT,
@@ -326,10 +332,14 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    DECLARE @PrType VARCHAR(100);
+    SET @PrType = IIF(@PrDecl = 1, N'Декларированная', N'');
+
 UPDATE svTB_Production
 SET PrName         = @PrName,
     PrShortName    = @PrShortName,
     PrPackName     = @PrPackName,
+    PrType         = @PrType,
     PrDecl         = @PrDecl,
     PrSun          = @PrSun,
     PrProdType     = @PrProdType,
@@ -345,12 +355,14 @@ SET PrName         = @PrName,
     PrWeight       = @PrWeight,
     PrHWD          = @PrHWD,
     PrInfo         = @PrInfo,
+    PrEditDate     = GETDATE(),
     PrPart         = @PrPart,
     PrPartLastDate = @PrPartLastDate,
     PrPartAutoInc  = @PrPartAutoInc,
     PrPerGodn      = @PrPerGond,
     Created_by     = @CreatedBy,
-    Updated_by     = @UpdatedBy
+    Updated_by     = @UpdatedBy,
+    Updated_at     = GETDATE()
 WHERE idProduction = @IdProduction;
 
 END
