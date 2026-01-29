@@ -22,6 +22,7 @@ const (
 	tmplProductionHTML    = "productions.html"
 	tmplProductionAddHTML = "production_add.html"
 	tmplProductionUpdHTML = "production_upd.html"
+	tmplPlansHTML         = "plans.html"
 
 	urlAForms             = "/aforms"
 	urlAuth               = "/auth"
@@ -96,9 +97,12 @@ func (a *AuthHandlerHTML) StartPage(w http.ResponseWriter, r *http.Request) {
 		false,
 		nil,
 		nil,
+		nil,
+		nil,
 	)
 
-	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+	page.RenderPages(w, tmplStartPageHTML, data, r, tmplProductionHTML, tmplProductionAddHTML,
+		tmplProductionUpdHTML, tmplPlansHTML)
 }
 
 func (a *AuthHandlerHTML) ShowAuthForm(w http.ResponseWriter, r *http.Request) {
@@ -325,4 +329,8 @@ func (a *AuthHandlerHTML) createSecureSession(w http.ResponseWriter, r *http.Req
 	page.SetSecureHTMLHeaders(w)
 
 	return session.Save(r, w)
+}
+
+func (a *AuthHandlerHTML) AuthenticatePerformer(r *http.Request) (*handler.PerformerData, error) {
+	return a.authMiddleware.GetUserData(r, a.performerService, a.roleService)
 }

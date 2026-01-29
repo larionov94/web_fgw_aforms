@@ -92,6 +92,22 @@
                     </a>
                 </li>
 
+                <li class="nav-item ms-2">
+                    <a class="nav-link {{ if eq .CurrentPage `plans` }}active{{ end }}"
+                       href="/aforms/plans">
+
+                        <span class="me-1" style="color: #ff9800;">
+                            <svg width="16" height="20" viewBox="0 0 16 20">
+                                <path d="M8 1.5l3.5 5a5.5 5.5 0 1 1-7 0z"
+                                      fill="#FF9800"
+                                      stroke="#000000"
+                                      stroke-width="1"/>
+                            </svg>🧴📦
+                        </span>
+                        <span>Сменно-суточные задания</span>
+                    </a>
+                </li>
+
                 <!--                <li class="nav-item ms-2">-->
                 <!--                    <a class="nav-link {{ if eq .CurrentPage `roles` }}active{{ end }}" href="/aforms/roles">-->
                 <!--                        <span>🛡️</span>-->
@@ -134,6 +150,9 @@
 
     {{ else if eq .CurrentPage `productionUpd` }}
     {{ template "production_upd" . }}
+
+    {{ else if eq .CurrentPage `plans` }}
+    {{ template "plans_content" . }}
 
     {{ else }}
     <!-- Страница по умолчанию или 404 -->

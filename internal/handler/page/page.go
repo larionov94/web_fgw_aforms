@@ -21,6 +21,11 @@ type SortProductionsPage struct {
 	SortOrder string
 }
 
+type SortPlanPage struct {
+	SortField string
+	SortOrder string
+}
+
 type SearchProductionsPage struct {
 	SearchArticle string
 	SearchName    string
@@ -28,15 +33,17 @@ type SearchProductionsPage struct {
 }
 
 type DataPage struct {
-	Title          string
-	CurrentPage    string
-	InfoPerformer  *handler.PerformerData
-	Productions    []*model.Production
-	SortProducts   *SortProductionsPage
-	SearchProducts *SearchProductionsPage
-	IsSearch       bool
-	DesignNameList []*model.Catalog
-	ColorList      []*model.Catalog
+	Title          string                 // Title - название страницы
+	CurrentPage    string                 // CurrentPage - шаблон страницы в html
+	InfoPerformer  *handler.PerformerData // InfoPerformer - информация об авторизованном сотруднике
+	Productions    []*model.Production    // Productions - список продукции
+	SortProducts   *SortProductionsPage   // SortProducts - сортировка продукции
+	SearchProducts *SearchProductionsPage // SearchProducts - фильтр продукции
+	IsSearch       bool                   // IsSearch - разрешить поиск
+	DesignNameList []*model.Catalog       // DesignNameList - список конструкторских наименований
+	ColorList      []*model.Catalog       // ColorList - список цветов продукции
+	SortPlans      *SortPlanPage          // SortPlans - сортировка плана
+	Plans          []*model.Plan          // Plans - список планов
 }
 
 func NewDataPage(
@@ -47,7 +54,9 @@ func NewDataPage(
 	sortProducts *SortProductionsPage,
 	searchProductions *SearchProductionsPage,
 	isSearch bool,
-	designNameList, colorList []*model.Catalog) *DataPage {
+	designNameList, colorList []*model.Catalog,
+	sortPlan *SortPlanPage,
+	plans []*model.Plan) *DataPage {
 
 	return &DataPage{
 		title,
@@ -58,7 +67,9 @@ func NewDataPage(
 		searchProductions,
 		isSearch,
 		designNameList,
-		colorList}
+		colorList,
+		sortPlan,
+		plans}
 }
 func SetSecureHTMLHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

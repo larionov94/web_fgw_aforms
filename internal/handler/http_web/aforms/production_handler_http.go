@@ -3,6 +3,7 @@ package aforms
 import (
 	"fgw_web_aforms/internal/handler"
 	"fgw_web_aforms/internal/handler/http_err"
+	"fgw_web_aforms/internal/handler/http_web"
 	"fgw_web_aforms/internal/handler/page"
 	"fgw_web_aforms/internal/model"
 	"fgw_web_aforms/internal/service"
@@ -37,12 +38,14 @@ type ProductionHandlerHTML struct {
 	catalogService    service.CatalogUseCase
 	logg              *common.Logger
 	authMiddleware    *handler.AuthMiddleware
+	authPerformerData *http_web.AuthHandlerHTML
 }
 
 func NewProductionHandlerHTML(productionService service.ProductionUseCase, performerService service.PerformerUseCase,
-	roleService service.RoleUseCase, catalogService service.CatalogUseCase, logg *common.Logger, authMiddleware *handler.AuthMiddleware) *ProductionHandlerHTML {
+	roleService service.RoleUseCase, catalogService service.CatalogUseCase, logg *common.Logger, authMiddleware *handler.AuthMiddleware,
+	authPerformerData *http_web.AuthHandlerHTML) *ProductionHandlerHTML {
 
-	return &ProductionHandlerHTML{productionService, performerService, roleService, catalogService, logg, authMiddleware}
+	return &ProductionHandlerHTML{productionService, performerService, roleService, catalogService, logg, authMiddleware, authPerformerData}
 }
 
 func (p *ProductionHandlerHTML) ServeHTTPHTMLRouter(mux *http.ServeMux) {
@@ -61,7 +64,7 @@ func (p *ProductionHandlerHTML) RenderProductionsPage(w http.ResponseWriter, r *
 		return
 	}
 
-	performerData, err := p.authMiddleware.GetUserData(r, p.performerService, p.roleService)
+	performerData, err := p.authPerformerData.AuthenticatePerformer(r)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
 
@@ -83,6 +86,8 @@ func (p *ProductionHandlerHTML) RenderProductionsPage(w http.ResponseWriter, r *
 		sortFields,
 		searchFields,
 		true,
+		nil,
+		nil,
 		nil,
 		nil,
 	)
@@ -133,7 +138,7 @@ func (p *ProductionHandlerHTML) fetchProductionsWithParams(w http.ResponseWriter
 }
 
 func (p *ProductionHandlerHTML) UpdateProductionForm(w http.ResponseWriter, r *http.Request) {
-	performerData, err := p.authenticatePerformer(r)
+	performerData, err := p.authPerformerData.AuthenticatePerformer(r)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
 
@@ -185,6 +190,8 @@ func (p *ProductionHandlerHTML) handleGetUpdateForm(w http.ResponseWriter, r *ht
 		false,
 		designNameList,
 		colorList,
+		nil,
+		nil,
 	)
 
 	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
@@ -306,7 +313,7 @@ func (p *ProductionHandlerHTML) ensureProductionExists(r *http.Request, paramId 
 }
 
 func (p *ProductionHandlerHTML) AddProductionForm(w http.ResponseWriter, r *http.Request) {
-	performerData, err := p.authenticatePerformer(r)
+	performerData, err := p.authPerformerData.AuthenticatePerformer(r)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
 
@@ -362,6 +369,8 @@ func (p *ProductionHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http
 			false,
 			designNameList,
 			colorList,
+			nil,
+			nil,
 		)
 
 		page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
@@ -380,6 +389,8 @@ func (p *ProductionHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http
 		false,
 		designNameList,
 		colorList,
+		nil,
+		nil,
 	)
 
 	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
@@ -449,9 +460,4 @@ func (p *ProductionHandlerHTML) handlerPostAddForm(w http.ResponseWriter, r *htt
 	http.Redirect(w, r, urlProductions, http.StatusSeeOther)
 
 	return
-}
-
-// authenticatePerformer - авторизованные данные сотрудника.
-func (p *ProductionHandlerHTML) authenticatePerformer(r *http.Request) (*handler.PerformerData, error) {
-	return p.authMiddleware.GetUserData(r, p.performerService, p.roleService)
 }

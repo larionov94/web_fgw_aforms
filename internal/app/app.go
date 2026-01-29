@@ -60,13 +60,18 @@ func StartApp() {
 	repoAFormsCatalog := repository.NewCatalogRepo(mssqlDB, logger)
 	serviceAFormsCatalog := service.NewCatalogService(repoAFormsCatalog, logger)
 
+	repoAFormsPlan := repository.NewPlanRepo(mssqlDB, logger)
+	serviceAFormsPlan := service.NewPlanService(repoAFormsPlan, logger)
+
 	handlerAuthHTML := http_web.NewAuthHandlerHTML(servicePerformer, serviceRole, logger, authMiddleware)
-	handlerAFormsProductionHTML := aforms.NewProductionHandlerHTML(serviceAFormsProduction, servicePerformer, serviceRole, serviceAFormsCatalog, logger, authMiddleware)
+	handlerAFormsProductionHTML := aforms.NewProductionHandlerHTML(serviceAFormsProduction, servicePerformer, serviceRole, serviceAFormsCatalog, logger, authMiddleware, handlerAuthHTML)
+	handlerAFormsPlanHTML := aforms.NewPlanHandlerHTML(serviceAFormsPlan, logger, authMiddleware, handlerAuthHTML)
 
 	mux := http.NewServeMux()
 
 	handlerAuthHTML.ServerHTTPRouter(mux)
 	handlerAFormsProductionHTML.ServeHTTPHTMLRouter(mux)
+	handlerAFormsPlanHTML.ServeHTTPHTMLRouter(mux)
 
 	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web/"))))
 
