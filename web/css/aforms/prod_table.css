@@ -9,3 +9,36 @@
     margin-left: 5px;
     font-size: 12px;
 }
+
+/* Предотвращение дергания при обновлении */
+#productionsTable tbody {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+#productionsTable tbody.updating {
+    opacity: 0.7;
+}
+
+.sortable-header {
+    position: relative;
+}
+
+/* Индикатор загрузки для заголовка */
+.sortable-header.loading::after {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
+}

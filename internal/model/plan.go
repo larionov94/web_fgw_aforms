@@ -7,7 +7,7 @@ type Plan struct {
 	ExtSector       int        `json:"extSector"`     // ExtSector - внешний ключ с таблицей svTB_Sector.idSector
 	PlanCount       int        `json:"planCount"`     // PlanCount - плановое кол-во продукции
 	PlanDate        string     `json:"planDate"`      // PlanDate - дата плана создания
-	PlanInfo        *string    `json:"planInfo"`      // PlanInfo - комментарий к плану
+	PlanInfo        string     `json:"planInfo"`      // PlanInfo - комментарий к плану
 	PlEditDate      string     `json:"plEditDate"`    // PlEditDate - дата редактирования плана
 	SectorModel     Sector     `json:"sector"`
 	ProductionModel Production `json:"production"`

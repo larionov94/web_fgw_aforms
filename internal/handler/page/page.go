@@ -119,6 +119,7 @@ func RenderPage(w http.ResponseWriter, tmpl string, data interface{}, r *http.Re
 	parseTmpl, err := template.New(tmpl).Funcs(
 		template.FuncMap{
 			"formatDateTime": convert.FormatDateTime,
+			"formatDate":     convert.FormatDate,
 		}).ParseFiles(templatePath)
 
 	if err != nil {
@@ -146,6 +147,7 @@ func RenderPages(w http.ResponseWriter, tmpl string, data interface{}, r *http.R
 			"formatDateTime":      convert.FormatDateTime,
 			"splitDimensions":     convert.SplitDimensions,
 			"formatDateTimeLocal": convert.FormatDateTimeLocal,
+			"formatDate":          convert.FormatDate,
 		}).ParseFiles(templatePaths...)
 
 	if err != nil {
@@ -169,6 +171,7 @@ func RenderErrorPage(w http.ResponseWriter, statusCode int, msgCode string, r *h
 	parseTmpl, err := template.New(tmplErrorHTML).Funcs(
 		template.FuncMap{
 			"formatDateTime": convert.FormatDateTime,
+			"formatDate":     convert.FormatDate,
 		}).ParseFiles(templatePath)
 
 	if err != nil {

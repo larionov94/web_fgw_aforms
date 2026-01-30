@@ -10,4 +10,313 @@
     </button>
 </div>
 
+<!--В ДАЛЬНЕЙШЕМ БУДЕТ ПОИСК-->
+
+
+<!-- Карточка с таблицей - всегда отображаем -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+
+        <div class="table-responsive" style="min-width: 1200px;">
+
+            <!-- Добавляем контейнер для скролла -->
+            <div style="height: calc(100vh - 400px); overflow-y: auto; position:relative;">
+                <table class="table table-hover mb-0" style="min-width: 1200px;" id="productionsTable">
+
+                    <colgroup>
+                        <col style="width: 70px"> <!-- АРТИКУЛ-->
+                        <col style="width: 500px"> <!-- ПРОДУКЦИЯ-->
+                        <col style="width: 60px"> <!-- КОД ПЛАНА-->
+                        <col style="width: 60px"> <!-- СМЕНА-->
+                        <col style="width: 90px"> <!-- КОД ПРОДУКЦИИ-->
+                        <col style="width: 240px"> <!-- УЧАСТОК-->
+                        <col style="width: 60px"> <!-- КОД УЧАСТКА-->
+                        <col style="width: 80px"> <!-- ПЛАНОВОЕ КОЛ-ВО-->
+                        <col style="width: 100px"> <!-- ДАТА ПЛАНА-->
+                        <col style="width: 110px"> <!-- КОММЕНТАРИИ-->
+                        <col style="width: 150px"> <!-- ДАТА И ВРЕМЯ ИЗМЕНЕНИЯ ЗАПИСИ-->
+                        <col style="width: 140px"> <!-- ТИП ПРОДУКЦИИ-->
+                        <col style="width: 110px"> <!-- ЦВЕТ-->
+                        <col style="width: 110px"> <!-- КОЛ-ВО В РЯДУ-->
+                        <col style="width: 110px"> <!-- КОЛ-ВО РЯДОВ-->
+                        <col style="width: 110px"> <!-- ВЕС УПАКОВКИ-->
+                        <col style="width: 110px"> <!-- ГАБАРИТЫ УПАКОВКИ-->
+                        <col style="width: 110px">
+                    </colgroup>
+
+                    <thead class="table-light"
+                           style="position: sticky; top: 0; z-index: 10; background-color: #f8f9fa;">
+                    <tr>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrArticle&order={{ if eq $sortField `PrArticle` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Артикул
+                                {{ if eq $sortField "PrArticle" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header " style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrName&order={{ if eq $sortField `PrName` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Наименование продукция
+                                {{ if eq $sortField "PrName" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=IdPlan&order={{ if eq $sortField `IdPlan` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-flex align-items-center justify-content-center w-100 h-100">
+                                <div class="d-flex flex-column align-items-center me-1">
+                                    <span>Код</span>
+                                    <span>плана</span>
+                                </div>
+                                {{ if eq $sortField "IdPlan" }}
+                                <span class="sort-indicator ms-1">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PlanShift&order={{ if eq $sortField `PlanShift` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Смена
+                                {{ if eq $sortField "PlanShift" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header" style="position: relative;">
+                            <a href="?sort=ExtProduction&order={{ if eq $sortField `ExtProduction` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-flex align-items-center justify-content-center w-100 h-100">
+                                <div class="d-flex flex-column align-items-center me-2">
+                                    <span>Код</span>
+                                    <span>продукции</span>
+                                </div>
+                                {{ if eq $sortField "ExtProduction" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=SectorName&order={{ if eq $sortField `SectorName` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Участок
+                                {{ if eq $sortField "SectorName" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=ExtSector&order={{ if eq $sortField `ExtSector` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-flex align-items-center justify-content-center w-100 h-100">
+                                <div class="d-flex flex-column align-items-center me-1">
+                                    <span>Код</span>
+                                    <span>участка</span>
+                                </div>
+                                {{ if eq $sortField "ExtSector" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=PlanCount&order={{ if eq $sortField `PlanCount` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-flex align-items-center justify-content-center w-100 h-100">
+                                <div class="d-flex flex-column align-items-center me-2">
+                                    <span>Плановое</span>
+                                    <span>кол-во</span>
+                                </div>
+                                {{ if eq $sortField "PlanCount" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PlanDate&order={{ if eq $sortField `PlanDate` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Дата плана
+                                {{ if eq $sortField "PlanDate" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PlanInfo&order={{ if eq $sortField `PlanInfo` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Заметки
+                                {{ if eq $sortField "PlanInfo" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=PlEditDate&order={{ if eq $sortField `PlEditDate` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Дата и время <br> изменение записи
+                                {{ if eq $sortField "PlEditDate" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrType&order={{ if eq $sortField `PrType` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Тип продукции
+                                {{ if eq $sortField "PrType" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrColor&order={{ if eq $sortField `PrColor` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Цвет
+                                {{ if eq $sortField "PrColor" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=PrCount&order={{ if eq $sortField `PrCount` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Кол-во <br> в ряду
+                                {{ if eq $sortField "PrCount" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=PrRows&order={{ if eq $sortField `PrRows` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Кол-во <br> рядов
+                                {{ if eq $sortField "PrRows" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative;">
+                            <a href="?sort=PrWeight&order={{ if eq $sortField `PrWeight` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Вес упаковки <br> (кг)
+                                {{ if eq $sortField "PrWeight" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
+                            <a href="?sort=PrHWD&order={{ if eq $sortField `PrHWD` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                               class="text-decoration-none text-dark d-block w-100 h-100">
+                                Габариты упаковки
+                                {{ if eq $sortField "PrHWD" }}
+                                <span class="sort-indicator">
+                                    {{ if eq $sortOrder "ASC" }}↑{{ else }}↓{{ end }}
+                                </span>
+                                {{ end }}
+                            </a>
+                        </th>
+
+                        <th class="text-nowrap text-center" style="padding-bottom: 13px;">Операции</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {{ range .Plans }}
+                    <tr>
+                        <td class="text-center">{{ .ProductionModel.PrArticle }}</td>
+                        <td>{{ .ProductionModel.PrName }}</td>
+                        <td class="text-center">{{ .IdPlan }}</td>
+                        <td class="text-center">{{ .PlanShift }}</td>
+                        <td class="text-center">{{ .ExtProduction }}</td>
+                        <td>{{ .SectorModel.SectorName }}</td>
+                        <td class="text-center">{{ .ExtSector }}</td>
+                        <td class="text-center">{{ .PlanCount }}</td>
+                        <td class="text-center">{{ formatDate .PlanDate }}</td>
+                        <td>{{ .PlanInfo }}</td>
+                        <td class="text-center">{{ formatDateTime .PlEditDate }}</td>
+                        <td class="text-center">{{ .ProductionModel.PrType }}</td>
+                        <td class="text-center">{{ .ProductionModel.PrColor }}</td>
+                        <td class="text-center">{{ .ProductionModel.PrCount }}</td>
+                        <td class="text-center">{{ .ProductionModel.PrRows }}</td>
+                        <td class="text-center">{{ .ProductionModel.PrWeight }}</td>
+                        <td class="text-center">{{ .ProductionModel.PrHWD }}</td>
+
+                        <!-- Кнопки операций -->
+                        <td>
+                            <div class="d-flex justify-content-center gap-1">
+                                <!-- Кнопка редактирования -->
+                                <button class="btn btn-sm btn-outline-primary edit-btn px-1 py-1"
+                                        title="Редактировать"
+                                        onclick="window.open('/aforms/plans/upd?idPlan={{ .IdPlan }}', '_self')">
+                                    <span>✏️</span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success copy-btn px-2 py-1"
+                                        title="Создать на основе этой записи"
+                                        onclick="window.open('/aforms/plans/add?basedOn={{ .IdPlan }}', '_self')">
+                                    <span>📋</span>
+                                </button>
+                            </div>
+                        </td>
+
+                    </tr>
+                    {{ end }}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {{ end }}

@@ -21,6 +21,16 @@ func FormatDateTime(dateTime string) string {
 	return t.Format("02.01.2006 15:04:05")
 }
 
+// FormatDate - функция форматирования даты в формате ДД.ММ.ГГГГ
+func FormatDate(dateTime string) string {
+	t, err := time.Parse(time.RFC3339, dateTime)
+	if err != nil {
+		return dateTime
+	}
+
+	return t.Format("02.01.2006")
+}
+
 // FormatDateTimeLocal преобразует дату в формат для datetime-local
 func FormatDateTimeLocal(dateStr string) string {
 	if dateStr == "" {

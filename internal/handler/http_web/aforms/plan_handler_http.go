@@ -14,6 +14,9 @@ import (
 
 const (
 	tmplPlanHTML = "plans.html"
+
+	renderPagePlanTitle = "Планы сменно-суточных заданий"
+	renderPagePlanKey   = "plans"
 )
 
 type PlanHandlerHTML struct {
@@ -56,8 +59,8 @@ func (p *PlanHandlerHTML) RenderPlanPage(w http.ResponseWriter, r *http.Request)
 	}
 
 	data := page.NewDataPage(
-		"Планы сменно-суточных заданий",
-		"plans",
+		renderPagePlanTitle,
+		renderPagePlanKey,
 		performerData,
 		nil,
 		nil,
