@@ -20,9 +20,11 @@ CREATE INDEX IX_svTB_Plan_extProduction ON dbo.svTB_Plan(extProduction);
 CREATE INDEX IX_svTB_Plan_extSector ON dbo.svTB_Plan(extSector);
 CREATE INDEX IX_svTB_Plan_PlanDate ON dbo.svTB_Plan(PlanDate);
 
-CREATE PROCEDURE dbo.svAFormsPlanAll -- ХП возвращает список планов с сортировкой
-    @SortField NVARCHAR(50) = 'idPlan',
-    @SortOrder NVARCHAR(4) = 'DESC'
+CREATE PROCEDURE dbo.svAFormsPlansWithSortingAndFiltering -- ХП возвращает список планов с сортировкой и фильтрацией
+    @SortField NVARCHAR(50) = 'idPlan', -- поле для сортировки
+    @SortOrder NVARCHAR(4) = 'DESC', -- порядок сортировки
+    @StartDate DATE = NULL, -- дата начала периода
+    @EndDate DATE = NULL -- дата конца периода
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -35,8 +37,6 @@ BEGIN
     IF @SortOrder NOT IN ('ASC', 'DESC')
         SET @SortOrder = 'DESC';
 
-    DECLARE @SQL NVARCHAR(MAX);
-
     -- Полный список полей для сортировки из всех таблиц
     IF @SortField NOT IN (
         -- Поля из svTB_Plan
@@ -44,17 +44,16 @@ BEGIN
                           'PlanCount', 'PlanDate', 'PlEditDate',
         -- Поля из svTB_Production
                           'PrShortName', 'PrArticle', 'PrPackName', 'PrColor',
-                          'PrCount', 'PrRows', 'PrHWD',
+                          'PrCount', 'PrRows', 'PrHWD', 'PrType', 'PrWeight',
         -- Поля из svTB_Sector
-                          'SecName', 'SecCode', 'SecOrder'
+                          'SectorName'
         )
         SET @SortField = 'idPlan';
 
-    -- Безопасное формирование запроса
-    DECLARE @OrderBy NVARCHAR(100);
-
     -- Формируем ORDER BY в зависимости от выбранного поля
-    SET @OrderBy = QUOTENAME(@SortField) + ' ' + @SortOrder;
+    DECLARE @OrderBy NVARCHAR(100) = QUOTENAME(@SortField) + ' ' + @SortOrder;
+
+    DECLARE @SQL NVARCHAR(MAX);
 
     SET @SQL = N'
         SELECT
@@ -63,15 +62,15 @@ BEGIN
 
             -- Информация о продукции
             p.extProduction,
-            pr.PrName,
-            pr.PrShortName,
-            pr.PrType,
-            pr.PrArticle,
-            pr.PrColor,
-            pr.PrCount,
-            pr.PrRows,
-            pr.PrHWD,
-            pr.PrWeight,
+            ISNULL(pr.PrName, '''') AS KDName,
+            ISNULL(pr.PrShortName, '''') AS KDNameShort,
+            ISNULL(pr.PrType, '''') AS KDNameType,
+            ISNULL(pr.PrArticle, '''') AS KDNameArticle,
+            ISNULL(pr.PrColor, '''') AS KDNameColor,
+            ISNULL(pr.PrCount, 0) AS KDNameCount,
+            ISNULL(pr.PrRows, 0) AS KDNameRows,
+            ISNULL(pr.PrHWD, '''') AS KDNameHWD,
+            ISNULL(pr.PrWeight, 0) AS KDNameWeight,
 
             -- Информация о секторе
             p.extSector,
@@ -79,13 +78,21 @@ BEGIN
 
             -- Основная информация плана
             p.PlanCount,
-            p.PlanDate
+            p.PlanDate,
+            ISNULL(p.PlanInfo, '''') AS PlanInfo,
+            p.PlEditDate
 
         FROM dbo.svTB_Plan p
         LEFT JOIN dbo.svTB_Production pr ON p.extProduction = pr.idProduction
         LEFT JOIN dbo.svTB_Sector s ON p.extSector = s.idSector
+        WHERE p.PlanDate >= @StartDateParam AND p.PlanDate <= @EndDateParam
         ORDER BY ' + @OrderBy;
 
-EXEC sp_executesql @SQL;
+    -- Используем другие имена параметров в динамическом SQL, чтобы избежать конфликта
+EXEC sp_executesql @SQL,
+         N'@StartDateParam DATE, @EndDateParam DATE',
+         @StartDateParam = @StartDate,
+         @EndDateParam = @EndDate;
 END
-GO;
+go
+

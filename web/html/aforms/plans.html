@@ -1,6 +1,8 @@
 {{ define "plans_content" }}
 {{ $sortField := .SortPlans.SortField }}
 {{ $sortOrder := .SortPlans.SortOrder }}
+{{ $startDate := .SortPlans.StartDate }}
+{{ $endDate := .SortPlans.EndDate }}
 
 <div class="d-flex justify-content-between align-items-center mt-2">
     <h1 class="h2 mb-3">{{ .Title }}</h1>
@@ -11,7 +13,55 @@
 </div>
 
 <!--В ДАЛЬНЕЙШЕМ БУДЕТ ПОИСК-->
+<!-- Форма фильтрации по датам -->
+<div class="card mb-1">
+    <div class="card-body">
+        <form method="GET" action="/aforms/plans" id="dateFilterForm" class="row g-3 align-items-end">
+            <!-- Скрытые поля для сохранения сортировки -->
+            <input type="hidden" name="sort" value="{{ $sortField }}">
+            <input type="hidden" name="order" value="{{ $sortOrder }}">
 
+            <div class="col-md-1">
+                <label for="startDate" class="form-label">Дата с:</label>
+                <input type="date"
+                       class="form-control"
+                       id="startDate"
+                       name="startDate"
+                       value="{{ if $startDate }}{{ $startDate }}{{ end }}">
+            </div>
+
+            <div class="col-md-1">
+                <label for="endDate" class="form-label">Дата по:</label>
+                <input type="date"
+                       class="form-control"
+                       id="endDate"
+                       name="endDate"
+                       value="{{ if $endDate }}{{ $endDate }}{{ end }}">
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-70">
+                    <i class="bi bi-funnel"></i> Применить
+                </button>
+            </div>
+        </form>
+
+        <!-- Отображение активного фильтра -->
+        {{ if or $startDate $endDate }}
+        <div class="mt-2">
+            <small class="text-muted">
+                <i class="bi bi-filter"></i> Активный фильтр:
+                {{ if $startDate }}с {{ $startDate }}{{ end }}
+                {{ if $endDate }}по {{ $endDate }}{{ end }}
+                <a href="/aforms/plans?sort={{ $sortField }}&order={{ $sortOrder }}"
+                   class="text-danger ms-2 text-decoration-none">
+                    <i class="bi bi-x"></i> Сбросить (по умолчанию 180 дней)
+                </a>
+            </small>
+        </div>
+        {{ end }}
+    </div>
+</div>
 
 <!-- Карточка с таблицей - всегда отображаем -->
 <div class="card shadow-sm">
@@ -49,7 +99,7 @@
                     <tr>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=PrArticle&order={{ if eq $sortField `PrArticle` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PrArticle` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Артикул
                                 {{ if eq $sortField "PrArticle" }}
@@ -61,7 +111,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header " style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=PrName&order={{ if eq $sortField `PrName` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PrName` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Наименование продукция
                                 {{ if eq $sortField "PrName" }}
@@ -73,7 +123,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative;">
-                            <a href="?sort=IdPlan&order={{ if eq $sortField `IdPlan` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `IdPlan` }}"
                                class="text-decoration-none text-dark d-flex align-items-center justify-content-center w-100 h-100">
                                 <div class="d-flex flex-column align-items-center me-1">
                                     <span>Код</span>
@@ -88,7 +138,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header" style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=PlanShift&order={{ if eq $sortField `PlanShift` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PlanShift` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Смена
                                 {{ if eq $sortField "PlanShift" }}
@@ -100,7 +150,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header" style="position: relative;">
-                            <a href="?sort=ExtProduction&order={{ if eq $sortField `ExtProduction` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `ExtProduction` }}"
                                class="text-decoration-none text-dark d-flex align-items-center justify-content-center w-100 h-100">
                                 <div class="d-flex flex-column align-items-center me-2">
                                     <span>Код</span>
@@ -115,7 +165,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=SectorName&order={{ if eq $sortField `SectorName` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `SectorName` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Участок
                                 {{ if eq $sortField "SectorName" }}
@@ -127,7 +177,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative;">
-                            <a href="?sort=ExtSector&order={{ if eq $sortField `ExtSector` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `ExtSector` }}"
                                class="text-decoration-none text-dark d-flex align-items-center justify-content-center w-100 h-100">
                                 <div class="d-flex flex-column align-items-center me-1">
                                     <span>Код</span>
@@ -142,7 +192,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative;">
-                            <a href="?sort=PlanCount&order={{ if eq $sortField `PlanCount` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PlanCount` }}"
                                class="text-decoration-none text-dark d-flex align-items-center justify-content-center w-100 h-100">
                                 <div class="d-flex flex-column align-items-center me-2">
                                     <span>Плановое</span>
@@ -157,7 +207,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=PlanDate&order={{ if eq $sortField `PlanDate` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PlanDate` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Дата плана
                                 {{ if eq $sortField "PlanDate" }}
@@ -169,7 +219,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=PlanInfo&order={{ if eq $sortField `PlanInfo` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PlanInfo` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Заметки
                                 {{ if eq $sortField "PlanInfo" }}
@@ -181,7 +231,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative;">
-                            <a href="?sort=PlEditDate&order={{ if eq $sortField `PlEditDate` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PlEditDate` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Дата и время <br> изменение записи
                                 {{ if eq $sortField "PlEditDate" }}
@@ -193,7 +243,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=PrType&order={{ if eq $sortField `PrType` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PrType` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Тип продукции
                                 {{ if eq $sortField "PrType" }}
@@ -206,7 +256,7 @@
 
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=PrColor&order={{ if eq $sortField `PrColor` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PrColor` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Цвет
                                 {{ if eq $sortField "PrColor" }}
@@ -218,7 +268,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative;">
-                            <a href="?sort=PrCount&order={{ if eq $sortField `PrCount` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PrCount` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Кол-во <br> в ряду
                                 {{ if eq $sortField "PrCount" }}
@@ -230,7 +280,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative;">
-                            <a href="?sort=PrRows&order={{ if eq $sortField `PrRows` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PrRows` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Кол-во <br> рядов
                                 {{ if eq $sortField "PrRows" }}
@@ -242,7 +292,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative;">
-                            <a href="?sort=PrWeight&order={{ if eq $sortField `PrWeight` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PrWeight` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Вес упаковки <br> (кг)
                                 {{ if eq $sortField "PrWeight" }}
@@ -254,7 +304,7 @@
                         </th>
 
                         <th class="text-nowrap sortable-header text-center" style="position: relative; padding-bottom: 13px;">
-                            <a href="?sort=PrHWD&order={{ if eq $sortField `PrHWD` }}{{ if eq $sortOrder `ASC` }}DESC{{ else }}ASC{{ end }}{{ else }}ASC{{ end }}"
+                            <a href="{{ buildSortURL $sortField $sortOrder $startDate $endDate `PrHWD` }}"
                                class="text-decoration-none text-dark d-block w-100 h-100">
                                 Габариты упаковки
                                 {{ if eq $sortField "PrHWD" }}
@@ -318,5 +368,42 @@
     </div>
 </div>
 
+<div class="alert {{ if eq (len .Plans) 0 }}alert-warning{{ else }}alert-info{{ end }} mt-2 py-1 px-3">
+    <i class="bi bi-{{ if eq (len .Plans) 0 }}exclamation-triangle{{ else }}info-circle{{ end }}"></i>
+    Всего: {{ len .Plans }}
+    <!--    Всего найдено: {{ len .Productions }} вариантов упаковки-->
+</div>
+
+
+<script>
+    // Функция для установки диапазона дат
+    function setDateRange(days) {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - days);
+
+        // Форматируем даты в формат YYYY-MM-DD
+        document.getElementById('startDate').value = formatDate(startDate);
+        document.getElementById('endDate').value = formatDate(endDate);
+    }
+
+    // Функция форматирования даты
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Установка дат по умолчанию при загрузке, если не заданы
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+
+        if (!startDateInput.value && !endDateInput.value) {
+            setDateRange(180);
+        }
+    });
+</script>
 
 {{ end }}

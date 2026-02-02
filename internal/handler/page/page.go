@@ -24,6 +24,8 @@ type SortProductionsPage struct {
 type SortPlanPage struct {
 	SortField string
 	SortOrder string
+	StartDate string
+	EndDate   string
 }
 
 type SearchProductionsPage struct {
@@ -120,6 +122,7 @@ func RenderPage(w http.ResponseWriter, tmpl string, data interface{}, r *http.Re
 		template.FuncMap{
 			"formatDateTime": convert.FormatDateTime,
 			"formatDate":     convert.FormatDate,
+			"buildSortURL":   convert.BuildSortURL,
 		}).ParseFiles(templatePath)
 
 	if err != nil {
@@ -148,6 +151,7 @@ func RenderPages(w http.ResponseWriter, tmpl string, data interface{}, r *http.R
 			"splitDimensions":     convert.SplitDimensions,
 			"formatDateTimeLocal": convert.FormatDateTimeLocal,
 			"formatDate":          convert.FormatDate,
+			"buildSortURL":        convert.BuildSortURL,
 		}).ParseFiles(templatePaths...)
 
 	if err != nil {
@@ -172,6 +176,7 @@ func RenderErrorPage(w http.ResponseWriter, statusCode int, msgCode string, r *h
 		template.FuncMap{
 			"formatDateTime": convert.FormatDateTime,
 			"formatDate":     convert.FormatDate,
+			"buildSortURL":   convert.BuildSortURL,
 		}).ParseFiles(templatePath)
 
 	if err != nil {

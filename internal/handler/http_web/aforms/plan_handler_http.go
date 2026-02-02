@@ -10,6 +10,7 @@ import (
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
 	"net/http"
+	"time"
 )
 
 const (
@@ -85,10 +86,20 @@ func (p *PlanHandlerHTML) fetchPlansWithParams(w http.ResponseWriter, r *http.Re
 	sortField := r.URL.Query().Get("sort")
 	sortOrder := r.URL.Query().Get("order")
 
-	plans, err = p.planService.AllPlans(r.Context(), sortField, sortOrder)
+	startDate := r.URL.Query().Get("startDate")
+	endDate := r.URL.Query().Get("endDate")
+
+	if startDate == "" {
+		startDate = time.Now().AddDate(0, 0, -180).Format("2006-01-02")
+	}
+
+	if endDate == "" {
+		endDate = time.Now().Format("2006-01-02")
+	}
+
+	plans, err = p.planService.AllPlans(r.Context(), sortField, sortOrder, startDate, endDate)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7000+err.Error(), p.logg, r)
-
 		return nil, nil, err
 	}
 
@@ -96,5 +107,7 @@ func (p *PlanHandlerHTML) fetchPlansWithParams(w http.ResponseWriter, r *http.Re
 		&page.SortPlanPage{
 			SortField: sortField,
 			SortOrder: sortOrder,
+			StartDate: startDate,
+			EndDate:   endDate,
 		}, nil
 }
