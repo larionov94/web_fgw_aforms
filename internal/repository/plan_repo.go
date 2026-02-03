@@ -19,11 +19,11 @@ func NewPlanRepo(mssql *sql.DB, logger *common.Logger) *PlanRepo {
 }
 
 type PlanRepository interface {
-	All(ctx context.Context, sortField, sortOrder string, startDate string, endDate string) ([]*model.Plan, error)
+	All(ctx context.Context, sortField, sortOrder, startDate, endDate string, idProduction, idSector *int) ([]*model.Plan, error)
 }
 
-func (p *PlanRepo) All(ctx context.Context, sortField, sortOrder string, startDate string, endDate string) ([]*model.Plan, error) {
-	rows, err := p.mssql.QueryContext(ctx, FGWsvAFormsPlansWithSortingAndFilteringQuery, sortField, sortOrder, startDate, endDate)
+func (p *PlanRepo) All(ctx context.Context, sortField, sortOrder, startDate, endDate string, idProduction, idSector *int) ([]*model.Plan, error) {
+	rows, err := p.mssql.QueryContext(ctx, FGWsvAFormsPlansWithSortingAndFilteringQuery, sortField, sortOrder, startDate, endDate, idProduction, idSector)
 	if err != nil {
 		p.logg.LogE(msg.E3203, err)
 

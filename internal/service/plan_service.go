@@ -18,11 +18,11 @@ func NewPlanService(planRepo repository.PlanRepository, logger *common.Logger) *
 }
 
 type PlanUseCase interface {
-	AllPlans(ctx context.Context, sortField, sortOrder string, startDate string, endDate string) ([]*model.Plan, error)
+	AllPlans(ctx context.Context, sortField, sortOrder, startDate, endDate string, idProduction, idSector *int) ([]*model.Plan, error)
 }
 
-func (p *PlanService) AllPlans(ctx context.Context, sortField, sortOrder string, startDate string, endDate string) ([]*model.Plan, error) {
-	plans, err := p.planRepo.All(ctx, sortField, sortOrder, startDate, endDate)
+func (p *PlanService) AllPlans(ctx context.Context, sortField, sortOrder, startDate, endDate string, idProduction, idSector *int) ([]*model.Plan, error) {
+	plans, err := p.planRepo.All(ctx, sortField, sortOrder, startDate, endDate, idProduction, idSector)
 	if err != nil {
 		p.logg.LogE(msg.E3209, err)
 

@@ -65,7 +65,7 @@ func StartApp() {
 
 	handlerAuthHTML := http_web.NewAuthHandlerHTML(servicePerformer, serviceRole, logger, authMiddleware)
 	handlerAFormsProductionHTML := aforms.NewProductionHandlerHTML(serviceAFormsProduction, servicePerformer, serviceRole, serviceAFormsCatalog, logger, authMiddleware, handlerAuthHTML)
-	handlerAFormsPlanHTML := aforms.NewPlanHandlerHTML(serviceAFormsPlan, logger, authMiddleware, handlerAuthHTML)
+	handlerAFormsPlanHTML := aforms.NewPlanHandlerHTML(serviceAFormsPlan, logger, authMiddleware, handlerAuthHTML, serviceAFormsProduction)
 
 	mux := http.NewServeMux()
 

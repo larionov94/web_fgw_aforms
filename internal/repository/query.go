@@ -27,5 +27,5 @@ const (
 )
 
 const (
-	FGWsvAFormsPlansWithSortingAndFilteringQuery = "exec dbo.svAFormsPlansWithSortingAndFiltering ?, ?, ?, ?;" //ХП возвращает список планов с сортировкой и с параметрами фильтрации.
+	FGWsvAFormsPlansWithSortingAndFilteringQuery = "exec dbo.svAFormsPlansWithSortingAndFiltering ?, ?, ?, ?, ?, ?;" //ХП возвращает список планов с сортировкой и с параметрами фильтрации.
 )

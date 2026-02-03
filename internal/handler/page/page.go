@@ -22,10 +22,13 @@ type SortProductionsPage struct {
 }
 
 type SortPlanPage struct {
-	SortField string
-	SortOrder string
-	StartDate string
-	EndDate   string
+	SortField    string
+	SortOrder    string
+	StartDate    string
+	EndDate      string
+	IdProduction *int
+	IdSector     *int
+	PrName       string
 }
 
 type SearchProductionsPage struct {

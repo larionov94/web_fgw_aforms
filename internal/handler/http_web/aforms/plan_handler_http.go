@@ -9,7 +9,9 @@ import (
 	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -25,11 +27,12 @@ type PlanHandlerHTML struct {
 	logg              *common.Logger
 	authMiddleware    *handler.AuthMiddleware
 	authPerformerData *http_web.AuthHandlerHTML
+	productionService service.ProductionUseCase
 }
 
 func NewPlanHandlerHTML(planService service.PlanUseCase, logg *common.Logger, authMiddleware *handler.AuthMiddleware,
-	authPerformerData *http_web.AuthHandlerHTML) *PlanHandlerHTML {
-	return &PlanHandlerHTML{planService: planService, logg: logg, authMiddleware: authMiddleware, authPerformerData: authPerformerData}
+	authPerformerData *http_web.AuthHandlerHTML, productionService service.ProductionUseCase) *PlanHandlerHTML {
+	return &PlanHandlerHTML{planService: planService, logg: logg, authMiddleware: authMiddleware, authPerformerData: authPerformerData, productionService: productionService}
 }
 
 func (p *PlanHandlerHTML) ServeHTTPHTMLRouter(mux *http.ServeMux) {
@@ -59,11 +62,18 @@ func (p *PlanHandlerHTML) RenderPlanPage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	productions, err := p.productionService.AllProductions(r.Context(), "", "")
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+
 	data := page.NewDataPage(
 		renderPagePlanTitle,
 		renderPagePlanKey,
 		performerData,
-		nil,
+		productions,
 		nil,
 		nil,
 		false,
@@ -82,6 +92,8 @@ func (p *PlanHandlerHTML) fetchPlansWithParams(w http.ResponseWriter, r *http.Re
 
 	var plans []*model.Plan
 	var err error
+	var idProduction *int
+	var idSector *int
 
 	sortField := r.URL.Query().Get("sort")
 	sortOrder := r.URL.Query().Get("order")
@@ -97,7 +109,31 @@ func (p *PlanHandlerHTML) fetchPlansWithParams(w http.ResponseWriter, r *http.Re
 		endDate = time.Now().Format("2006-01-02")
 	}
 
-	plans, err = p.planService.AllPlans(r.Context(), sortField, sortOrder, startDate, endDate)
+	idProductionStr := r.URL.Query().Get("idProduction")
+	if idProductionStr != "" {
+		idProd, err := strconv.Atoi(idProductionStr)
+		if err != nil {
+			p.logg.LogW(fmt.Sprintf("Некорректный idProduction: %s", idProductionStr))
+			idProduction = nil
+		} else {
+			idProduction = &idProd
+		}
+	}
+
+	idSectorStr := r.URL.Query().Get("idSector")
+	if idSectorStr != "" {
+		idSec, err := strconv.Atoi(idSectorStr)
+		if err != nil {
+			p.logg.LogW(fmt.Sprintf("Некорректный idSector: %s", idSectorStr))
+			idSector = nil
+		} else {
+			idSector = &idSec
+		}
+	}
+
+	prName := r.URL.Query().Get("PrName")
+
+	plans, err = p.planService.AllPlans(r.Context(), sortField, sortOrder, startDate, endDate, idProduction, idSector)
 	if err != nil {
 		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7000+err.Error(), p.logg, r)
 		return nil, nil, err
@@ -105,9 +141,12 @@ func (p *PlanHandlerHTML) fetchPlansWithParams(w http.ResponseWriter, r *http.Re
 
 	return plans,
 		&page.SortPlanPage{
-			SortField: sortField,
-			SortOrder: sortOrder,
-			StartDate: startDate,
-			EndDate:   endDate,
+			SortField:    sortField,
+			SortOrder:    sortOrder,
+			StartDate:    startDate,
+			EndDate:      endDate,
+			IdProduction: idProduction,
+			IdSector:     idSector,
+			PrName:       prName,
 		}, nil
 }

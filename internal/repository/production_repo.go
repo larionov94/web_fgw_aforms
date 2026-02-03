@@ -42,6 +42,7 @@ func (p *ProductionRepo) All(ctx context.Context, sortField, sortOrder string) (
 		var production model.Production
 		if err = rows.Scan(
 			&production.IdProduction,
+			&production.PrName,
 			&production.PrShortName,
 			&production.PrPackName,
 			&production.PrArticle,
