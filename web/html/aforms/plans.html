@@ -35,7 +35,7 @@
             <div class="col-md-1">
                 <label for="startDate" class="form-label">Дата с:</label>
                 <input type="date"
-                       class="form-control"
+                       class="form-control form-control-sm"
                        id="startDate"
                        name="startDate"
                        value="{{ if $startDate }}{{ $startDate }}{{ end }}">
@@ -44,31 +44,31 @@
             <div class="col-md-1">
                 <label for="endDate" class="form-label">Дата по:</label>
                 <input type="date"
-                       class="form-control"
+                       class="form-control form-control-sm"
                        id="endDate"
                        name="endDate"
                        value="{{ if $endDate }}{{ $endDate }}{{ end }}">
             </div>
 
-            <div class="col-md-1">
+            <div class="col-md-3">
                 <label for="PrName" class="form-label">
                     Варианты упаковки продукции
                 </label>
-                <div class="input-group input-group-sm">
+                <div class="input-group input-group-sm ">
                     <input type="hidden"
                            id="idProduction"
                            name="idProduction"
                            value="{{ if $idProd }}{{ $idProd }}{{ end }}">
 
                     <input type="text"
-                           class="form-control form-control-sm py-1"
+                           class="form-control form-control-sm px-3 rounded-start"
                            id="PrName"
                            name="PrName"
                            value="{{ if $prName }}{{ $prName }}{{ end }}"
                            readonly>
 
                     <!-- Кнопка выбора из модального окна -->
-                    <button class="btn btn-outline-secondary"
+                    <button class="btn btn-outline-secondary rounded-end"
                             type="button"
                             data-bs-toggle="modal"
                             data-bs-target="#productionModal">
