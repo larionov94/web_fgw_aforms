@@ -29,3 +29,7 @@ const (
 const (
 	FGWsvAFormsPlansWithSortingAndFilteringQuery = "exec dbo.svAFormsPlansWithSortingAndFiltering ?, ?, ?, ?, ?, ?;" //ХП возвращает список планов с сортировкой и с параметрами фильтрации.
 )
+
+const (
+	FGWsvAFormsSectorAllQuery = "exec dbo.svAFormsSectorAll;" // ХП возвращает список печек
+)
