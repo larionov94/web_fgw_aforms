@@ -28,11 +28,12 @@ type PlanHandlerHTML struct {
 	authMiddleware    *handler.AuthMiddleware
 	authPerformerData *http_web.AuthHandlerHTML
 	productionService service.ProductionUseCase
+	sectorService     service.SectorUseCase
 }
 
 func NewPlanHandlerHTML(planService service.PlanUseCase, logg *common.Logger, authMiddleware *handler.AuthMiddleware,
-	authPerformerData *http_web.AuthHandlerHTML, productionService service.ProductionUseCase) *PlanHandlerHTML {
-	return &PlanHandlerHTML{planService: planService, logg: logg, authMiddleware: authMiddleware, authPerformerData: authPerformerData, productionService: productionService}
+	authPerformerData *http_web.AuthHandlerHTML, productionService service.ProductionUseCase, sectorService service.SectorUseCase) *PlanHandlerHTML {
+	return &PlanHandlerHTML{planService: planService, logg: logg, authMiddleware: authMiddleware, authPerformerData: authPerformerData, productionService: productionService, sectorService: sectorService}
 }
 
 func (p *PlanHandlerHTML) ServeHTTPHTMLRouter(mux *http.ServeMux) {
@@ -69,6 +70,13 @@ func (p *PlanHandlerHTML) RenderPlanPage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	sectors, err := p.sectorService.AllSector(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+
 	data := page.NewDataPage(
 		renderPagePlanTitle,
 		renderPagePlanKey,
@@ -81,6 +89,7 @@ func (p *PlanHandlerHTML) RenderPlanPage(w http.ResponseWriter, r *http.Request)
 		nil,
 		sortField,
 		plans,
+		sectors,
 	)
 
 	page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
@@ -132,6 +141,7 @@ func (p *PlanHandlerHTML) fetchPlansWithParams(w http.ResponseWriter, r *http.Re
 	}
 
 	prName := r.URL.Query().Get("PrName")
+	secName := r.URL.Query().Get("SectorName")
 
 	plans, err = p.planService.AllPlans(r.Context(), sortField, sortOrder, startDate, endDate, idProduction, idSector)
 	if err != nil {
@@ -148,5 +158,6 @@ func (p *PlanHandlerHTML) fetchPlansWithParams(w http.ResponseWriter, r *http.Re
 			IdProduction: idProduction,
 			IdSector:     idSector,
 			PrName:       prName,
+			SectorName:   secName,
 		}, nil
 }

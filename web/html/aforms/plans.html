@@ -5,6 +5,8 @@
 {{ $endDate := .SortPlans.EndDate }}
 {{ $idProd := .SortPlans.IdProduction }}
 {{ $prName := .SortPlans.PrName }}
+{{ $idSector := .SortPlans.IdSector }}
+{{ $secName := .SortPlans.SectorName }}
 
 
 {{ $production := "" }}
@@ -73,6 +75,36 @@
                             type="button"
                             data-bs-toggle="modal"
                             data-bs-target="#productionModal"
+                            tabindex="-1">
+                        ...
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-2">
+                <label for="SectorName" class="form-label">
+                    Участки
+                </label>
+                <div class="input-group input-group-sm ">
+                    <input type="hidden"
+                           id="idSector"
+                           name="idSector"
+                           value="{{ if $idSector }}{{ $idSector }}{{ end }}">
+
+                    <input type="text"
+                           class="form-control form-control-sm px-3 rounded-start"
+                           id="SectorName"
+                           name="SectorName"
+                           value="{{ if $secName }}{{ $secName }}{{ end }}"
+                           readonly>
+
+                    <!-- Кнопка выбора из модального окна-->
+                    <button class="btn btn-outline-secondary rounded-end shadow-none"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#sectorModal"
                             tabindex="-1">
                         ...
                     </button>
@@ -513,6 +545,60 @@
                 <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="sectorModal" tabindex="-1" aria-labelledby="sectorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header py-1">
+                <h5 class="modal-title fs-6" id="sectorModalLabel">Выбор участка</h5>
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-2">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-sm table-hover mb-0" style="line-height: 1.2;">
+                        <thead>
+                        <tr>
+                            <th class="py-0 align-middle" style="height: 24px;">Код</th>
+                            <th class="py-0 align-middle" style="height: 24px;">Участок</th>
+                            <th class="py-0 align-middle" style="width: 90px; height: 24px;">Действие</th>
+                        </tr>
+                        </thead>
+                        <tbody id="colorTableBody">
+                        {{ range .Sectors }}
+                        <tr style="height: 28px;">
+                            <td class="py-0 align-middle">{{ .IdSector }}</td>
+                            <td class="py-0 align-middle">{{ .SectorName }}</td>
+                            <td class="py-0 align-middle">
+                                <button type="button" class="btn btn-sm btn-outline-primary select-sector py-1 px-1"
+                                        data-name="{{ .SectorName }}"
+                                        data-id="{{ .IdSector }}"
+                                        style="font-size: 0.75rem; line-height: 1;">
+                                    Выбрать
+                                </button>
+                            </td>
+                        </tr>
+                        {{ else }}
+                        <tr style="height: 28px;">
+                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных участков</td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer py-1">
+                <!-- Счетчик строк слева -->
+                <div class="me-auto d-flex align-items-center small text-muted">
+                    <span>Всего: <span id="colorRowCount">{{ len .Sectors }}</span></span>
+                </div>
+
+                <!-- Кнопка закрытия справа -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
         </div>
     </div>
 </div>

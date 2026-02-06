@@ -63,9 +63,12 @@ func StartApp() {
 	repoAFormsPlan := repository.NewPlanRepo(mssqlDB, logger)
 	serviceAFormsPlan := service.NewPlanService(repoAFormsPlan, logger)
 
+	repoAFormsSector := repository.NewSectorRepo(mssqlDB, logger)
+	serviceAFormsSector := service.NewSectorService(repoAFormsSector, logger)
+
 	handlerAuthHTML := http_web.NewAuthHandlerHTML(servicePerformer, serviceRole, logger, authMiddleware)
 	handlerAFormsProductionHTML := aforms.NewProductionHandlerHTML(serviceAFormsProduction, servicePerformer, serviceRole, serviceAFormsCatalog, logger, authMiddleware, handlerAuthHTML)
-	handlerAFormsPlanHTML := aforms.NewPlanHandlerHTML(serviceAFormsPlan, logger, authMiddleware, handlerAuthHTML, serviceAFormsProduction)
+	handlerAFormsPlanHTML := aforms.NewPlanHandlerHTML(serviceAFormsPlan, logger, authMiddleware, handlerAuthHTML, serviceAFormsProduction, serviceAFormsSector)
 
 	mux := http.NewServeMux()
 

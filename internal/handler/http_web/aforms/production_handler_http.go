@@ -90,6 +90,7 @@ func (p *ProductionHandlerHTML) RenderProductionsPage(w http.ResponseWriter, r *
 		nil,
 		nil,
 		nil,
+		nil,
 	)
 
 	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML, tmplPlanHTML)
@@ -190,6 +191,7 @@ func (p *ProductionHandlerHTML) handleGetUpdateForm(w http.ResponseWriter, r *ht
 		false,
 		designNameList,
 		colorList,
+		nil,
 		nil,
 		nil,
 	)
@@ -371,6 +373,7 @@ func (p *ProductionHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http
 			colorList,
 			nil,
 			nil,
+			nil,
 		)
 
 		page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
@@ -389,6 +392,7 @@ func (p *ProductionHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http
 		false,
 		designNameList,
 		colorList,
+		nil,
 		nil,
 		nil,
 	)

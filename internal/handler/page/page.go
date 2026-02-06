@@ -29,6 +29,7 @@ type SortPlanPage struct {
 	IdProduction *int
 	IdSector     *int
 	PrName       string
+	SectorName   string
 }
 
 type SearchProductionsPage struct {
@@ -49,6 +50,7 @@ type DataPage struct {
 	ColorList      []*model.Catalog       // ColorList - список цветов продукции
 	SortPlans      *SortPlanPage          // SortPlans - сортировка плана
 	Plans          []*model.Plan          // Plans - список планов
+	Sectors        []*model.Sector        // Sectors - список участков
 }
 
 func NewDataPage(
@@ -61,7 +63,8 @@ func NewDataPage(
 	isSearch bool,
 	designNameList, colorList []*model.Catalog,
 	sortPlan *SortPlanPage,
-	plans []*model.Plan) *DataPage {
+	plans []*model.Plan,
+	sectors []*model.Sector) *DataPage {
 
 	return &DataPage{
 		title,
@@ -74,7 +77,8 @@ func NewDataPage(
 		designNameList,
 		colorList,
 		sortPlan,
-		plans}
+		plans,
+		sectors}
 }
 func SetSecureHTMLHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

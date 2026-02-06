@@ -45,6 +45,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    document.querySelectorAll('.select-sector').forEach(button => {
+        button.addEventListener('click', function () {
+            const SectorName = this.getAttribute('data-name');
+            const idSec = this.getAttribute('data-id');
+
+            document.getElementById('SectorName').value = SectorName
+            document.getElementById('idSector').value = idSec
+
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('sectorModal'));
+            if (modal) modal.hide();
+        });
+    });
+
     //--------------------------------------------------------//
     //     ОБРАБОТКА ПОИСКА ВАРИАНТА УПАКОВКИ ПРОДУКЦИИ       //
     //                  МОДАЛЬНОЕ ОКНО                        //
