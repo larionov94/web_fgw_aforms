@@ -17,7 +17,6 @@
 {{ end }}
 
 
-
 <div class="d-flex justify-content-between align-items-center mt-2">
     <h1 class="h2 mb-3">{{ .Title }}</h1>
     <button class="btn btn-primary btn-lg" id="addProductionBtn"
@@ -115,7 +114,7 @@
 
 
             <div class="col-md-1">
-                <button type="submit" class="btn btn-primary btn-sm-plus " >
+                <button type="submit" class="btn btn-primary btn-sm-plus ">
                     <i class="bi bi-funnel"></i> Применить
                 </button>
             </div>
@@ -483,7 +482,8 @@
                         <thead>
                         <tr>
                             <th class="py-0 align-middle" style="width: 100px; height: 24px;">Артикул</th>
-                            <th class="py-0 align-middle" style="height: 24px; min-width: 200px;">Наименование продукции <br>
+                            <th class="py-0 align-middle" style="height: 24px; min-width: 200px;">Наименование продукции
+                                <br>
                                 для упаковщика
                             </th>
                             <th class="py-0 align-middle" style="height: 24px; min-width: 150px;">Наименование продукции
@@ -526,7 +526,8 @@
                         </tr>
                         {{ else }}
                         <tr style="height: 28px;">
-                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных вариантов упаковки продукции
+                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных вариантов упаковки
+                                продукции
                             </td>
                         </tr>
                         {{ end }}
@@ -538,7 +539,9 @@
             <div class="modal-footer py-1">
                 <!-- Счетчик строк слева -->
                 <div class="me-auto d-flex align-items-center small text-muted">
-                    <span>Показано: <span id="visibleRowCount" class="fw-bold ms-1">{{ len .Productions }}</span> из <span id="totalRowCount" class="fw-bold">{{ len .Productions }}</span></span>
+                    <span>Показано: <span id="visibleRowCount"
+                                          class="fw-bold ms-1">{{ len .Productions }}</span> из <span id="totalRowCount"
+                                                                                                      class="fw-bold">{{ len .Productions }}</span></span>
                 </div>
 
                 <!-- Кнопка закрытия справа -->
