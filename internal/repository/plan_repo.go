@@ -76,10 +76,10 @@ func (p *PlanRepo) All(ctx context.Context, sortField, sortOrder, startDate, end
 func (p *PlanRepo) Add(ctx context.Context, plan *model.Plan) error {
 	if _, err := p.mssql.ExecContext(ctx, FGWsvAFormsPlanAddQuery,
 		&plan.PlanShift,
-		&plan.ExtProduction,
+		&plan.PlanDate,
 		&plan.ExtSector,
 		&plan.PlanCount,
-		&plan.PlanDate,
+		&plan.ExtProduction,
 		&plan.PlanInfo,
 	); err != nil {
 		p.logg.LogE(msg.E3204, err)

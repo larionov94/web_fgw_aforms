@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -198,12 +199,21 @@ func (p *PlanHandlerHTML) handlerPostAddForm(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	planDate := strings.TrimSpace(r.FormValue("PlanDate"))
+
+	formatPlanDate, err := convert.ParseToMSSQLDateTime(planDate)
+	if err != nil {
+		page.RenderErrorPage(w, 400, msg.H7101, r)
+
+		return
+	}
+
 	plan := &model.Plan{
 		PlanShift:     convert.ParseFormFieldInt(r, "PlanShift"),
 		ExtProduction: convert.ParseFormFieldInt(r, "extProduction"),
 		ExtSector:     convert.ParseFormFieldInt(r, "extSector"),
-		PlanCount:     convert.ParseFormFieldInt(r, "planCount"),
-		PlanDate:      r.FormValue("PlanDate"),
+		PlanCount:     convert.ParseFormFieldInt(r, "PlanCount"),
+		PlanDate:      formatPlanDate,
 		PlanInfo:      r.FormValue("PlanInfo"),
 		AuditRec: model.Audit{
 			CreatedBy: performerData.PerformerId,

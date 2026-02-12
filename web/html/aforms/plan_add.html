@@ -89,7 +89,7 @@
                                    id="PlanDate"
                                    name="PlanDate"
 
-                                   {{ if $plan }} value="{{ formatDate $plan.PlanDate }}" {{ end }}
+                                   {{ if $plan }} value="{{ $plan.PlanDate }}" {{ end }}
 
                                    required>
                         </div>
@@ -104,8 +104,7 @@
                             <div class="input-group input-group-sm ">
                                 <input type="hidden"
                                        id="extSector"
-                                       name="extSector"
-                                       value="">
+                                       name="extSector">
 
                                 <input type="text"
                                        class="form-control form-control-sm px-2 rounded-start"
@@ -258,16 +257,25 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Навигация по вкладкам -->
-                <div class="d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
-                        ← Назад к списку
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="comments-tab">
+                        ← Назад: Комментарии
                     </button>
-                    <button type="button" class="btn btn-primary next-tab" data-next-tab="fact-tab">
-                        Далее: Факт выполнения →
+                    <!-- Проблема с проверкой кнопки, на данный момент id кнопки не работает (saveProductionBtn)-->
+                    <button type="submit" class="btn btn-success" id="savePlanBtn1">
+                        <i class="bi bi-check-circle"></i>Создать
                     </button>
                 </div>
+
+                <!-- Навигация по вкладкам -->
+<!--                <div class="d-flex justify-content-between">-->
+<!--                    <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">-->
+<!--                        ← Назад к списку-->
+<!--                    </button>-->
+<!--                    <button type="button" class="btn btn-primary next-tab" data-next-tab="fact-tab">-->
+<!--                        Далее: Факт выполнения →-->
+<!--                    </button>-->
+<!--                </div>-->
 
             </div>
         </form>
