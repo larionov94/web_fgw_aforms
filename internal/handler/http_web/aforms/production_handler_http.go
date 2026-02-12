@@ -93,7 +93,8 @@ func (p *ProductionHandlerHTML) RenderProductionsPage(w http.ResponseWriter, r *
 		nil,
 	)
 
-	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML, tmplPlanHTML)
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplProductionHTML, tmplProductionAddHTML,
+		tmplProductionUpdHTML, tmplPlanHTML, tmplPlanAddHTML)
 }
 
 // fetchProductionsWithParams - получить продукцию с учетом параметров запроса.
@@ -196,7 +197,7 @@ func (p *ProductionHandlerHTML) handleGetUpdateForm(w http.ResponseWriter, r *ht
 		nil,
 	)
 
-	page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplPlanAddHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
 
 	return
 }
@@ -376,7 +377,7 @@ func (p *ProductionHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http
 			nil,
 		)
 
-		page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+		page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplPlanAddHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
 
 		return
 
@@ -397,7 +398,7 @@ func (p *ProductionHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http
 		nil,
 	)
 
-	page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplPlanAddHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
 
 	return
 }

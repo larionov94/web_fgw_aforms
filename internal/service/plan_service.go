@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fgw_web_aforms/internal/model"
 	"fgw_web_aforms/internal/repository"
 	"fgw_web_aforms/pkg/common"
@@ -19,6 +20,7 @@ func NewPlanService(planRepo repository.PlanRepository, logger *common.Logger) *
 
 type PlanUseCase interface {
 	AllPlans(ctx context.Context, sortField, sortOrder, startDate, endDate string, idProduction, idSector *int) ([]*model.Plan, error)
+	AddPlan(ctx context.Context, p *model.Plan) error
 }
 
 func (p *PlanService) AllPlans(ctx context.Context, sortField, sortOrder, startDate, endDate string, idProduction, idSector *int) ([]*model.Plan, error) {
@@ -30,4 +32,12 @@ func (p *PlanService) AllPlans(ctx context.Context, sortField, sortOrder, startD
 	}
 
 	return plans, nil
+}
+
+func (p *PlanService) AddPlan(ctx context.Context, plan *model.Plan) error {
+	if plan == nil {
+		return errors.New("сменно-суточное задание не должно быть nil")
+	}
+
+	return p.planRepo.Add(ctx, plan)
 }

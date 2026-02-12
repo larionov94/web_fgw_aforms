@@ -20,6 +20,7 @@ func NewPlanRepo(mssql *sql.DB, logger *common.Logger) *PlanRepo {
 
 type PlanRepository interface {
 	All(ctx context.Context, sortField, sortOrder, startDate, endDate string, idProduction, idSector *int) ([]*model.Plan, error)
+	Add(ctx context.Context, p *model.Plan) error
 }
 
 func (p *PlanRepo) All(ctx context.Context, sortField, sortOrder, startDate, endDate string, idProduction, idSector *int) ([]*model.Plan, error) {
@@ -70,4 +71,21 @@ func (p *PlanRepo) All(ctx context.Context, sortField, sortOrder, startDate, end
 	}
 
 	return plans, nil
+}
+
+func (p *PlanRepo) Add(ctx context.Context, plan *model.Plan) error {
+	if _, err := p.mssql.ExecContext(ctx, FGWsvAFormsPlanAddQuery,
+		&plan.PlanShift,
+		&plan.ExtProduction,
+		&plan.ExtSector,
+		&plan.PlanCount,
+		&plan.PlanDate,
+		&plan.PlanInfo,
+	); err != nil {
+		p.logg.LogE(msg.E3204, err)
+
+		return err
+	}
+
+	return nil
 }

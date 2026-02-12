@@ -156,6 +156,9 @@
     {{ else if eq .CurrentPage `plans` }}
     {{ template "plans_content" . }}
 
+    {{ else if eq .CurrentPage `planAdd` }}
+    {{ template "plan_add" . }}
+
     {{ else }}
     <!-- Страница по умолчанию или 404 -->
     <div class="alert alert-warning mt-5">

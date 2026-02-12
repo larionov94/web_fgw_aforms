@@ -1,0 +1,553 @@
+{{ define "plan_add" }}
+
+{{ $plan := "" }}
+{{ if .Plans }}
+{{ if gt (len .Plans) 0 }}
+{{ $plan = index .Plans 0 }}
+{{ end }}
+{{ end }}
+
+
+<div class="main-container" xmlns="http://www.w3.org/1999/html">
+    <div class="card">
+
+        <!-- Навигационные вкладки -->
+        <ul class="nav nav-tabs px-3" id="planTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="plan-tab" data-bs-toggle="tab"
+                        data-bs-target="#plan" type="button" role="tab"
+                        aria-controls="plan" aria-selected="true" disabled>
+                    Параметры
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="fact-tab" data-bs-toggle="tab"
+                        data-bs-target="#fact" type="button" role="tab"
+                        aria-controls="fact" aria-selected="false" disabled>
+                    Факт выполнения
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="info-tab" data-bs-toggle="tab"
+                        data-bs-target="#info" type="button" role="tab"
+                        aria-controls="info" aria-selected="false" disabled>
+                    Комментарий
+                </button>
+            </li>
+        </ul>
+
+        <!-- Форма -->
+        <form action="/aforms/plans/add" method="POST" id="planForm">
+
+            <!-- Вкладка 1: Параметры -->
+            <div class="tab-pane fade show active p-3" id="plan" role="tabpanel" aria-labelledby="plan-tab" tabindex="0">
+
+                <!-- Основная информация -->
+                <div class="form-section mb-2">
+                    <h3 class="mb-1 fs-6 fw-bold">Основная информация</h3>
+
+
+                    <div class="row g-4 mb-1">
+                        <div class="col-md-4 mb-1">
+
+                            <label for="PlanShift" class="form-label mb-1 fs-6">
+                                Смена
+                            </label>
+                            <select name="PlanShift"
+                                    class="form-control form-control-sm py-1"
+                                    id="PlanShift">
+                                <option value="0"
+                                        {{ if $plan }}{{ if eq $plan.PlanShift 0 }}selected{{ end }}{{ else }}selected{{
+                                        end }}>
+
+                                </option>
+                                <option value="1"
+                                        {{ if $plan }}{{ if eq $plan.PlanShift 1 }}selected{{ end }}{{ end }}>
+                                    1-я смена
+                                </option>
+                                <option value="2"
+                                        {{ if $plan }}{{ if eq $plan.PlanShift 2 }}selected{{ end }}{{ end }}>
+                                    2-я смена
+                                </option>
+                                <option value="3"
+                                        {{ if $plan }}{{ if eq $plan.PlanShift 3 }}selected{{ end }}{{ end }}>
+                                    3-я смена
+                                </option>
+                                <option value="4"
+                                        {{ if $plan }}{{ if eq $plan.PlanShift 4 }}selected{{ end }}{{ end }}>
+                                    4-я смена
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-1">
+                            <label for="PlanDate" class="form-label required-field mb-1 fs-6">
+                                Дата
+                            </label>
+                            <input type="date"
+                                   class="form-control form-control-sm "
+                                   id="PlanDate"
+                                   name="PlanDate"
+
+                                   {{ if $plan }} value="{{ formatDate $plan.PlanDate }}" {{ end }}
+
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-4">
+                            <label for="SectorName" class="form-label required-field mb-1">
+                                Участки
+                            </label>
+                            <div class="input-group input-group-sm ">
+                                <input type="hidden"
+                                       id="extSector"
+                                       name="extSector"
+                                       value="">
+
+                                <input type="text"
+                                       class="form-control form-control-sm px-2 rounded-start"
+                                       id="SectorName"
+                                       name="SectorName"
+                                       value=""
+                                       readonly>
+
+                                <!-- Кнопка выбора из модального окна-->
+                                <button class="btn btn-outline-secondary rounded-end shadow-none"
+                                        type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#sectorAddModal"
+                                        tabindex="-1">
+                                    ...
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-1">
+                            <label for="PlanCount" class="form-label required-field mb-1 fs-6">
+                                Плановое количество упаковок
+                            </label>
+                            <input type="number"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="PlanCount"
+                                   name="PlanCount"
+
+                                   {{ if $plan }}value="{{ $plan.PlanCount }}" {{ end }}
+
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label for="PrName" class="form-label required-field mb-1">
+                            Варианты упаковки продукции
+                        </label>
+                        <div class="input-group input-group-sm ">
+                            <input type="hidden"
+                                   id="extProduction"
+                                   name="extProduction"
+                                   value="">
+
+                            <input type="text"
+                                   class="form-control form-control-sm px-2 rounded-start"
+                                   id="PrName"
+                                   name="PrName"
+                                   value=""
+                                   readonly>
+
+                            <!-- Кнопка выбора из модального окна-->
+                            <button class="btn btn-outline-secondary rounded-end shadow-none"
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#productionAddModal"
+                                    tabindex="-1">
+                                ...
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-section mb-2">
+                    <h3 class="mb-1 fs-6 fw-bold">Параметры</h3>
+
+                    <div class="row g-4 mb-2">
+
+                        <!--                        1-Й СТОЛБЕЦ -->
+                        <div class="col-md-4 mb-1">
+                            <label for="PrType" class="form-label  mb-1 fs-6">
+                                Тип продукции
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="PrType"
+                                   name="PrType"
+                                   readonly>
+
+                            <label for="PrArticle" class="form-label  mb-1 fs-6">
+                                Артикул
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="PrArticle"
+                                   name="PrArticle"
+                                   readonly>
+
+                            <label for="PrCount" class="form-label  mb-0 fs-6">
+                                Количество продукции в ряду (шт)
+                            </label>
+                            <input type="number"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="PrCount"
+                                   name="PrCount"
+                                   readonly>
+
+                            <label for="PrWeight" class="form-label mb-0 fs-6">
+                                Вес (кг)
+                            </label>
+                            <input type="number"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="PrWeight"
+                                   name="PrWeight"
+                                   min="0"
+                                   readonly>
+                        </div>
+
+                        <!--                        2-Й СТОЛБЕЦ-->
+                        <div class="col-md-4 mb-1">
+                            <label for="PrColor" class="form-label  mb-1 fs-6">
+                                Цвет
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="PrColor"
+                                   name="PrColor"
+                                   readonly>
+
+                            <label for="barCode" class="form-label  mb-1 fs-6">
+                                Штрихкод EAN13
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="barCode"
+                                   name="barCode"
+                                   readonly>
+
+                            <label for="PrRows" class="form-label mb-0 fs-6">
+                                Количество рядов (шт)
+                            </label>
+                            <input type="number"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="PrRows"
+                                   name="PrRows"
+                                   readonly>
+
+                            <label for="PrHWD" class="form-label mb-0 fs-6">
+                                Габариты (В×Ш×Г, мм)
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-sm py-1 mb-1"
+                                   id="PrHWD"
+                                   name="PrHWD"
+                                   readonly>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div class="modal fade" id="productionAddModal" tabindex="-1" aria-labelledby="productionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="min-width: 1200px;">
+
+            <div class="modal-header py-1">
+                <h5 class="modal-title fs-6" id="productionModalLabel">Выбор варианта упаковки продукции</h5>
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body py-2">
+
+                <div class="mb-2">
+                    <label for="productionSearch">
+                        Поле поиска
+                    </label>
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           id="productionSearch"
+                           placeholder="Поиск по артикулу, наименованию...">
+                </div>
+
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-sm table-hover mb-0" style="line-height: 1.2; min-width: 850px;">
+                        <thead>
+                        <tr>
+                            <th class="py-0 align-middle" style="width: 100px; height: 24px;">Артикул</th>
+                            <th class="py-0 align-middle" style="height: 24px; min-width: 200px;">Наименование продукции
+                                <br>
+                                для упаковщика
+                            </th>
+                            <th class="py-0 align-middle" style="height: 24px; min-width: 150px;">Наименование продукции
+                                для этикетки
+                            </th>
+                            <th class="py-0 align-middle text-center" style="width: 70px; height: 24px;">Цвет</th>
+                            <th class="py-0 align-middle text-center" style="width: 70px; height: 24px;">Кол-во рядов
+                            </th>
+                            <th class="py-0 align-middle text-center" style="width: 70px; height: 24px;">Кол-во в ряду
+                            </th>
+                            <th class="py-0 align-middle text-center" style="width: 70px; height: 24px;">Код продукции
+                            </th>
+                            <th class="py-0 align-middle text-center" style="width: 90px; height: 24px;">Дата и время
+                                изменения записи
+                            </th>
+                            <th class="py-0 align-middle text-center" style="width: 100px; height: 24px;">Действие</th>
+                        </tr>
+                        </thead>
+                        <tbody id="productionTableBody">
+                        {{ range .Productions }}
+                        <tr style="height: 28px;">
+                            <td class="text-center py-0 align-middle">{{ .PrArticle }}</td>
+                            <td class="py-0 align-middle text-truncate" style="max-width: 200px;">{{ .PrName }}</td>
+                            <td class="py-0 align-middle text-truncate" style="max-width: 150px;">{{ .PrPackName }}</td>
+                            <td class="text-center py-0 align-middle">{{ .PrColor }}</td>
+                            <td class="text-center py-0 align-middle">{{ .PrRows }}</td>
+                            <td class="text-center py-0 align-middle">{{ .PrCount }}</td>
+                            <td class="text-center py-0 align-middle">{{ .IdProduction }}</td>
+                            <td class="py-0 align-middle">{{ formatDateTime .PrEditDate }}</td>
+
+                            <td class="text-center py-0 align-middle">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary select-production-name-add py-1 px-2"
+                                        data-prname="{{ .PrName }}"
+                                        data-id="{{ .IdProduction }}"
+                                        style="font-size: 0.75rem; line-height: 1;">
+                                    Выбрать
+                                </button>
+                            </td>
+                        </tr>
+                        {{ else }}
+                        <tr style="height: 28px;">
+                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных вариантов упаковки
+                                продукции
+                            </td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer py-1">
+                <!-- Счетчик строк слева -->
+                <div class="me-auto d-flex align-items-center small text-muted">
+                    <span>Показано: <span id="visibleRowCount"
+                                          class="fw-bold ms-1">{{ len .Productions }}</span> из <span id="totalRowCount"
+                                                                                                      class="fw-bold">{{ len .Productions }}</span></span>
+                </div>
+
+                <!-- Кнопка закрытия справа -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="sectorAddModal" tabindex="-1" aria-labelledby="sectorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header py-1">
+                <h5 class="modal-title fs-6" id="sectorModalLabel">Выбор участка</h5>
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-2">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-sm table-hover mb-0" style="line-height: 1.2;">
+                        <thead>
+                        <tr>
+                            <th class="py-0 align-middle" style="height: 24px;">Код</th>
+                            <th class="py-0 align-middle" style="height: 24px;">Участок</th>
+                            <th class="py-0 align-middle" style="width: 90px; height: 24px;">Действие</th>
+                        </tr>
+                        </thead>
+                        <tbody id="sectorTableBody">
+                        {{ range .Sectors }}
+                        <tr style="height: 28px;">
+                            <td class="py-0 align-middle">{{ .IdSector }}</td>
+                            <td class="py-0 align-middle">{{ .SectorName }}</td>
+                            <td class="py-0 align-middle">
+                                <button type="button" class="btn btn-sm btn-outline-primary select-sector-add py-1 px-1"
+                                        data-name="{{ .SectorName }}"
+                                        data-id="{{ .IdSector }}"
+                                        style="font-size: 0.75rem; line-height: 1;">
+                                    Выбрать
+                                </button>
+                            </td>
+                        </tr>
+                        {{ else }}
+                        <tr style="height: 28px;">
+                            <td colspan="3" class="text-center py-0 align-middle">Нет доступных участков</td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer py-1">
+                <!-- Счетчик строк слева -->
+                <div class="me-auto d-flex align-items-center small text-muted">
+                    <span>Всего: <span id="sectorRowCount">{{ len .Sectors }}</span></span>
+                </div>
+
+                <!-- Кнопка закрытия справа -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Простой скрипт с делегированием событий
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('select-sector-add')) {
+            e.preventDefault();
+
+            const sectorName = e.target.getAttribute('data-name');
+            const sectorId = e.target.getAttribute('data-id');
+
+            document.getElementById('SectorName').value = sectorName;
+            document.getElementById('extSector').value = sectorId;
+
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('sectorAddModal'));
+            if (modal) modal.hide();
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('select-production-name-add')) {
+            e.preventDefault();
+
+            const prName = e.target.getAttribute('data-prname');
+            const idProd = e.target.getAttribute('data-id');
+
+            document.getElementById('PrName').value = prName
+            document.getElementById('extProduction').value = idProd
+
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('productionAddModal'));
+            if (modal) modal.hide();
+        }
+    });
+
+    // Обработка поиска конструкторского наименования
+    const productionSearch = document.getElementById('productionSearch');
+    if (productionSearch) {
+        productionSearch.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#productionTableBody tr');
+
+            rows.forEach(row => {
+                // Пропускаем строку "нет данных"
+                if (row.querySelector('td.text-center[colspan]')) {
+                    // Показываем только если поиск пустой И нет других строк
+                    const hasOtherVisibleRows = Array.from(rows).some(r => {
+                        if (r === row) return false;
+                        const noDataCell = r.querySelector('td.text-center[colspan]');
+                        return !noDataCell &&
+                            (!r.style.display || r.style.display === '');
+                    });
+                    row.style.display = (searchTerm === '' && !hasOtherVisibleRows) ? '' : 'none';
+                    return;
+                }
+
+                const articleCell = row.querySelector('td:nth-child(1)'); // Артикул
+                const nameCell1 = row.querySelector('td:nth-child(2)'); // Наименование для упаковщика
+                const nameCell2 = row.querySelector('td:nth-child(3)'); // Наименование для этикетки
+                const colorCell = row.querySelector('td:nth-child(4)'); // Цвет
+                const codeCell = row.querySelector('td:nth-child(7)'); // Код продукции
+
+                let matches = false;
+
+                // Проверяем все поля
+                if (articleCell && articleCell.textContent.toLowerCase().includes(searchTerm)) matches = true;
+                if (nameCell1 && nameCell1.textContent.toLowerCase().includes(searchTerm)) matches = true;
+                if (nameCell2 && nameCell2.textContent.toLowerCase().includes(searchTerm)) matches = true;
+                if (colorCell && colorCell.textContent.toLowerCase().includes(searchTerm)) matches = true;
+                if (codeCell && codeCell.textContent.toLowerCase().includes(searchTerm)) matches = true;
+
+                row.style.display = matches ? '' : 'none';
+            });
+            updateRowCounter();
+        });
+    }
+
+    // Сброс поиска при открытии/закрытии модальных окон
+    const productionModal = document.getElementById('productionAddModal');
+    if (productionModal) {
+        productionModal.addEventListener('shown.bs.modal', function () {
+            if (productionSearch) {
+                productionSearch.value = '';
+                productionSearch.placeholder = "Поиск по артикулу, наименованию...";
+                productionSearch.dispatchEvent(new Event('input'));
+                productionSearch.focus();
+            }
+            updateRowCounter();
+        });
+
+        productionModal.addEventListener('hidden.bs.modal', function () {
+            if (productionSearch) {
+                productionSearch.value = '';
+                productionSearch.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+    updateRowCounter();
+
+    //--------------------------------------------------------//
+    //              ОБНОВЛЕНИЕ СЧЕТЧИКА СТРОК В               //
+    //                    МОДАЛЬНОМ ОКНЕ                      //
+    //--------------------------------------------------------//
+
+    // Функция для обновления счетчика строк
+    function updateRowCounter() {
+        const visibleRows = document.querySelectorAll('#productionTableBody tr:not([style*="display: none"])').length;
+        const totalRows = document.querySelectorAll('#productionTableBody tr').length;
+        const noDataRow = document.querySelector('#productionTableBody tr td.text-center[colspan]');
+
+        // Если есть строка "нет данных", не считаем ее
+        let actualVisibleRows = visibleRows;
+        let actualTotalRows = totalRows;
+
+        if (noDataRow) {
+            const isNoDataVisible = !noDataRow.closest('tr').style.display ||
+                noDataRow.closest('tr').style.display === '';
+            actualTotalRows = totalRows - 1; // Исключаем строку "нет данных" из общего числа
+            if (isNoDataVisible) {
+                actualVisibleRows = 0; // Если видна строка "нет данных", значит обычных строк 0
+            }
+        }
+
+        // Обновляем счетчики
+        const visibleCounter = document.getElementById('visibleRowCount');
+        const totalCounter = document.getElementById('totalRowCount');
+
+        if (visibleCounter) {
+            visibleCounter.textContent = actualVisibleRows;
+        }
+        if (totalCounter) {
+            totalCounter.textContent = actualTotalRows;
+        }
+    }
+</script>
+
+{{ end }}

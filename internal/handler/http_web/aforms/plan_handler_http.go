@@ -9,6 +9,7 @@ import (
 	"fgw_web_aforms/internal/service"
 	"fgw_web_aforms/pkg/common"
 	"fgw_web_aforms/pkg/common/msg"
+	"fgw_web_aforms/pkg/convert"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -16,10 +17,16 @@ import (
 )
 
 const (
-	tmplPlanHTML = "plans.html"
+	tmplPlanHTML    = "plans.html"
+	tmplPlanAddHTML = "plan_add.html"
+
+	urlPlan = "/aforms/plans"
 
 	renderPagePlanTitle = "Планы сменно-суточных заданий"
 	renderPagePlanKey   = "plans"
+
+	addPlanPageTitle  = "Добавить сменно-суточный план"
+	addPlanPageAddKey = "planAdd"
 )
 
 type PlanHandlerHTML struct {
@@ -38,6 +45,7 @@ func NewPlanHandlerHTML(planService service.PlanUseCase, logg *common.Logger, au
 
 func (p *PlanHandlerHTML) ServeHTTPHTMLRouter(mux *http.ServeMux) {
 	mux.HandleFunc("/aforms/plans", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.RenderPlanPage)))
+	mux.HandleFunc("/aforms/plans/add", p.authMiddleware.RequireAuth(p.authMiddleware.RequireRole([]int{0, 4, 5}, p.AddPlanForm)))
 }
 
 func (p *PlanHandlerHTML) RenderPlanPage(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +100,7 @@ func (p *PlanHandlerHTML) RenderPlanPage(w http.ResponseWriter, r *http.Request)
 		sectors,
 	)
 
-	page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML)
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplProductionHTML, tmplProductionAddHTML, tmplProductionUpdHTML, tmplPlanAddHTML)
 }
 
 // fetchPlansWithParams - получить план с учетом параметров запроса.
@@ -160,4 +168,90 @@ func (p *PlanHandlerHTML) fetchPlansWithParams(w http.ResponseWriter, r *http.Re
 			PrName:       prName,
 			SectorName:   secName,
 		}, nil
+}
+
+func (p *PlanHandlerHTML) AddPlanForm(w http.ResponseWriter, r *http.Request) {
+	performerData, err := p.authPerformerData.AuthenticatePerformer(r)
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusUnauthorized, msg.H7005, p.logg, r)
+
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		p.handlerGetAddForm(w, r, performerData)
+	case http.MethodPost:
+		p.handlerPostAddForm(w, r, performerData)
+	default:
+		http.Error(w, msg.H7000, http.StatusMethodNotAllowed)
+
+		return
+	}
+}
+
+func (p *PlanHandlerHTML) handlerPostAddForm(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := r.ParseForm(); err != nil {
+		http_err.SendErrorHTTP(w, http.StatusBadRequest, msg.H7018+err.Error(), p.logg, r)
+
+		return
+	}
+
+	plan := &model.Plan{
+		PlanShift:     convert.ParseFormFieldInt(r, "PlanShift"),
+		ExtProduction: convert.ParseFormFieldInt(r, "extProduction"),
+		ExtSector:     convert.ParseFormFieldInt(r, "extSector"),
+		PlanCount:     convert.ParseFormFieldInt(r, "planCount"),
+		PlanDate:      r.FormValue("PlanDate"),
+		PlanInfo:      r.FormValue("PlanInfo"),
+		AuditRec: model.Audit{
+			CreatedBy: performerData.PerformerId,
+			UpdatedBy: performerData.PerformerId,
+		},
+	}
+
+	if err := p.planService.AddPlan(r.Context(), plan); err != nil {
+		http_err.SendErrorHTTP(w, http.StatusInternalServerError, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+	http.Redirect(w, r, urlPlan, http.StatusSeeOther)
+
+	return
+}
+
+func (p *PlanHandlerHTML) handlerGetAddForm(w http.ResponseWriter, r *http.Request, performerData *handler.PerformerData) {
+	productions, err := p.productionService.AllProductions(r.Context(), "", "")
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+
+	sectors, err := p.sectorService.AllSector(r.Context())
+	if err != nil {
+		http_err.SendErrorHTTP(w, http.StatusNotFound, msg.H7000+err.Error(), p.logg, r)
+
+		return
+	}
+
+	data := page.NewDataPage(
+		addPlanPageTitle,
+		addPlanPageAddKey,
+		performerData,
+		productions,
+		nil,
+		nil,
+		false,
+		nil,
+		nil,
+		nil,
+		nil,
+		sectors,
+	)
+
+	page.RenderPages(w, tmplIndexHTML, data, r, tmplPlanHTML, tmplProductionAddHTML, tmplProductionUpdHTML, tmplPlanAddHTML, tmplProductionHTML)
+
+	return
 }

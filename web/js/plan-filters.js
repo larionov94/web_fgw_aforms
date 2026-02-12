@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
 
+    const planDateInput = document.getElementById('PlanDate');
+
+    planDateInput.value = formatDate(new Date());
+
     if (!startDateInput.value && !endDateInput.value) {
         setDateRange(180);
     }

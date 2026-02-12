@@ -96,3 +96,31 @@ EXEC sp_executesql @SQL,
 END
 go
 
+CREATE PROCEDURE dbo.svAFormsPlanAdd -- ХП добавляет сменно-суточный план. Старое название "svSP_PlanSave"
+    @PlanShift INT = 0, -- номер смены
+    @CurDate DATETIME, -- текущая дата
+    @SectorId INT, -- номер печки
+    @PlanCount INT = 0, -- плановое количество упаковок
+    @ProdId INT, -- код продукции
+    @Info VARCHAR(1000) = '' -- комментарий
+AS
+BEGIN
+
+    SET NOCOUNT ON;
+
+INSERT INTO dbo.svTB_Plan
+(PlanShift,
+ extProduction,
+ extSector,
+ PlanCount,
+ PlanDate,
+ PlanInfo)
+VALUES (@PlanShift,
+        @ProdId,
+        @SectorId,
+        @PlanCount,
+        @CurDate,
+        @Info);
+END
+GO;
+

@@ -11,6 +11,11 @@ func GetCurrentDateTime() string {
 	return time.Now().Format(time.DateTime)
 }
 
+// GetCurrentDate получить текущую дату и время в формате "2006-01-02".
+func GetCurrentDate() string {
+	return time.Now().Format(time.DateOnly)
+}
+
 // FormatDateTime - функция форматирования даты в формате ДД.ММ.ГГГГ ЧЧ:ММ
 func FormatDateTime(dateTime string) string {
 	t, err := time.Parse(time.RFC3339, dateTime)

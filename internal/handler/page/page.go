@@ -159,6 +159,7 @@ func RenderPages(w http.ResponseWriter, tmpl string, data interface{}, r *http.R
 			"formatDateTimeLocal": convert.FormatDateTimeLocal,
 			"formatDate":          convert.FormatDate,
 			"buildSortURL":        convert.BuildSortURL,
+			"currentDate":         convert.GetCurrentDate,
 		}).ParseFiles(templatePaths...)
 
 	if err != nil {

@@ -26,8 +26,10 @@ const (
 	FGWsvAFormsColorAllQuery      = "exec dbo.svAFormsColorAll;"      // ХП возвращает цвета.
 )
 
+// ПЛАН
 const (
 	FGWsvAFormsPlansWithSortingAndFilteringQuery = "exec dbo.svAFormsPlansWithSortingAndFiltering ?, ?, ?, ?, ?, ?;" //ХП возвращает список планов с сортировкой и с параметрами фильтрации.
+	FGWsvAFormsPlanAddQuery                      = "exec dbo.svAFormsPlanAdd ?, ?, ?, ?, ?, ?;"                      // ХП добавляет сменно-суточный план. Старое название "svSP_PlanSave"                       //
 )
 
 const (
