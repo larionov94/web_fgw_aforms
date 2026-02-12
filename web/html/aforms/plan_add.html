@@ -111,6 +111,7 @@
                                        id="SectorName"
                                        name="SectorName"
                                        value=""
+                                       required
                                        readonly>
 
                                 <!-- Кнопка выбора из модального окна-->
@@ -154,6 +155,7 @@
                                    id="PrName"
                                    name="PrName"
                                    value=""
+                                   required
                                    readonly>
 
                             <!-- Кнопка выбора из модального окна-->
@@ -257,27 +259,72 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary prev-tab" onclick="window.history.back()">
+                        ← Назад к списку
+                    </button>
+                    <button type="button" class="btn btn-primary next-tab" data-next-tab="fact-tab">
+                        Далее: Факт выполнения →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Вкладка 2: Факт выполнения -->
+            <div class="tab-pane fade" id="fact" role="tabpanel" aria-labelledby="fact-tab" tabindex="0">
+
+                <div class="form-section">
+                    <h3 class="mb-2 fs-6 fw-bold">Факт выполнения</h3>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="plan-tab">
+                        ← Назад: Параметры
+                    </button>
+                    <button type="button" class="btn btn-primary next-tab" data-next-tab="info-tab">
+                        Далее: Комментарий →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Вкладка 3: Комментарии -->
+            <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+
+                <div class="form-section">
+                    <h3 class="mb-2 fs-6 fw-bold">Комментарии и примечания</h3>
+
+                    <div class="row g-0">
+                        <div class="col-12 mb-1">
+                            <label for="PlanInfo" class="form-label mb-0 fs-6">
+                                Комментарий
+                            </label>
+                            <textarea type="text"
+                                      class="form-control form-control-sm py-1"
+                                      id="PlanInfo"
+                                      name="PlanInfo"
+                                      rows="6"
+                                      placeholder="Напишите ваш комментарий здесь..."
+                                      maxlength="2000">{{ if $plan }}{{ $plan.PlanInfo }}{{ end }}
+                                </textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-actions">
-                    <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="comments-tab">
-                        ← Назад: Комментарии
+                    <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="fact-tab">
+                        ← Назад: Факт выполнения
                     </button>
                     <!-- Проблема с проверкой кнопки, на данный момент id кнопки не работает (saveProductionBtn)-->
                     <button type="submit" class="btn btn-success" id="savePlanBtn1">
-                        <i class="bi bi-check-circle"></i>Создать
+                        <i class="bi bi-check-circle"></i>Сохранить сменно-суточный план
                     </button>
                 </div>
-
-                <!-- Навигация по вкладкам -->
-<!--                <div class="d-flex justify-content-between">-->
-<!--                    <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">-->
-<!--                        ← Назад к списку-->
-<!--                    </button>-->
-<!--                    <button type="button" class="btn btn-primary next-tab" data-next-tab="fact-tab">-->
-<!--                        Далее: Факт выполнения →-->
-<!--                    </button>-->
-<!--                </div>-->
-
             </div>
+
+
+
+
+
         </form>
 
     </div>

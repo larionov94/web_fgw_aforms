@@ -1,0 +1,31 @@
+    // ========== ДОПОЛНИТЕЛЬНАЯ ВАЛИДАЦИЯ ДЛЯ ПОЛЕЙ ==========
+
+    // Проверка выбора участка автоматически открывает модальное окно, если поле не заполнено
+    const sectorField = document.getElementById('SectorName');
+    const extSector = document.getElementById('extSector');
+
+    if (sectorField && extSector) {
+        sectorField.addEventListener('focus', function() {
+            if (!extSector.value) {
+                showPlanAlert('Пожалуйста, выберите участок из справочника', 'info');
+                // Открываем модальное окно выбора участка
+                const sectorModal = new bootstrap.Modal(document.getElementById('sectorAddModal'));
+                sectorModal.show();
+            }
+        });
+    }
+
+    // Проверка выбора продукции
+    const prNameField = document.getElementById('PrName');
+    const extProduction = document.getElementById('extProduction');
+
+    if (prNameField && extProduction) {
+        prNameField.addEventListener('focus', function() {
+            if (!extProduction.value) {
+                showPlanAlert('Пожалуйста, выберите продукцию из справочника', 'info');
+                // Открываем модальное окно выбора продукции
+                const productionModal = new bootstrap.Modal(document.getElementById('productionAddModal'));
+                productionModal.show();
+            }
+        });
+    }

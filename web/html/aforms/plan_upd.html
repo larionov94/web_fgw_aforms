@@ -1,0 +1,14 @@
+{{ define "plan_add" }}
+
+{{ $plan := "" }}
+{{ if .Plans }}
+{{ if gt (len .Plans) 0 }}
+{{ $plan = index .Plans 0 }}
+{{ end }}
+{{ end }}
+
+
+
+
+
+{{ end }}

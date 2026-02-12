@@ -81,6 +81,8 @@ func (p *PlanRepo) Add(ctx context.Context, plan *model.Plan) error {
 		&plan.PlanCount,
 		&plan.ExtProduction,
 		&plan.PlanInfo,
+		&plan.AuditRec.CreatedBy,
+		&plan.AuditRec.UpdatedBy,
 	); err != nil {
 		p.logg.LogE(msg.E3204, err)
 
