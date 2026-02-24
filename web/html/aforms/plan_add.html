@@ -11,6 +11,17 @@
 <div class="main-container" xmlns="http://www.w3.org/1999/html">
     <div class="card">
 
+        <div class="card-header p-2">
+            {{ if $plan }}
+            <h1 class="h3 mb-0">Добавить продукцию (на основе существующей)</h1>
+            <p class="text-muted mb-0">Создание новой записи на основе: {{ $plan.ProductionModel.PrArticle }} {{
+                $plan.ProductionModel.PrPackName }}</p>
+            {{ else }}
+            <h1 class="h3 mb-0">{{ .Title }}</h1>
+            <p class="text-muted mb-0">Заполните информацию о сменно-суточном задании во всех вкладках</p>
+            {{ end }}
+        </div>
+
         <!-- Навигационные вкладки -->
         <ul class="nav nav-tabs px-3" id="planTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -38,78 +49,124 @@
 
         <!-- Форма -->
         <form action="/aforms/plans/add" method="POST" id="planForm">
+            <div class="tab-content">
+                <!-- Вкладка 1: Параметры -->
+                <div class="tab-pane fade show active p-3" id="plan" role="tabpanel" aria-labelledby="plan-tab"
+                     tabindex="0">
 
-            <!-- Вкладка 1: Параметры -->
-            <div class="tab-pane fade show active p-3" id="plan" role="tabpanel" aria-labelledby="plan-tab" tabindex="0">
-
-                <!-- Основная информация -->
-                <div class="form-section mb-2">
-                    <h3 class="mb-1 fs-6 fw-bold">Основная информация</h3>
+                    <!-- Основная информация -->
+                    <div class="form-section mb-2">
+                        <h3 class="mb-1 fs-6 fw-bold">Основная информация</h3>
 
 
-                    <div class="row g-4 mb-1">
-                        <div class="col-md-4 mb-1">
+                        <div class="row g-4 mb-1">
+                            <div class="col-md-4 mb-1">
 
-                            <label for="PlanShift" class="form-label mb-1 fs-6">
-                                Смена
-                            </label>
-                            <select name="PlanShift"
-                                    class="form-control form-control-sm py-1"
-                                    id="PlanShift">
-                                <option value="0"
-                                        {{ if $plan }}{{ if eq $plan.PlanShift 0 }}selected{{ end }}{{ else }}selected{{
-                                        end }}>
+                                <label for="PlanShift" class="form-label mb-1 fs-6">
+                                    Смена
+                                </label>
+                                <select name="PlanShift"
+                                        class="form-control form-control-sm py-1"
+                                        id="PlanShift">
+                                    <option value="0"
+                                            {{ if $plan }}{{ if eq $plan.PlanShift 0 }}selected{{ end }}{{ else
+                                            }}selected{{
+                                            end }}>
 
-                                </option>
-                                <option value="1"
-                                        {{ if $plan }}{{ if eq $plan.PlanShift 1 }}selected{{ end }}{{ end }}>
-                                    1-я смена
-                                </option>
-                                <option value="2"
-                                        {{ if $plan }}{{ if eq $plan.PlanShift 2 }}selected{{ end }}{{ end }}>
-                                    2-я смена
-                                </option>
-                                <option value="3"
-                                        {{ if $plan }}{{ if eq $plan.PlanShift 3 }}selected{{ end }}{{ end }}>
-                                    3-я смена
-                                </option>
-                                <option value="4"
-                                        {{ if $plan }}{{ if eq $plan.PlanShift 4 }}selected{{ end }}{{ end }}>
-                                    4-я смена
-                                </option>
-                            </select>
+                                    </option>
+                                    <option value="1"
+                                            {{ if $plan }}{{ if eq $plan.PlanShift 1 }}selected{{ end }}{{ end }}>
+                                        1-я смена
+                                    </option>
+                                    <option value="2"
+                                            {{ if $plan }}{{ if eq $plan.PlanShift 2 }}selected{{ end }}{{ end }}>
+                                        2-я смена
+                                    </option>
+                                    <option value="3"
+                                            {{ if $plan }}{{ if eq $plan.PlanShift 3 }}selected{{ end }}{{ end }}>
+                                        3-я смена
+                                    </option>
+                                    <option value="4"
+                                            {{ if $plan }}{{ if eq $plan.PlanShift 4 }}selected{{ end }}{{ end }}>
+                                        4-я смена
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-1">
+                                <label for="PlanDate" class="form-label required-field mb-1 fs-6">
+                                    Дата
+                                </label>
+                                <input type="date"
+                                       class="form-control form-control-sm "
+                                       id="PlanDate"
+                                       name="PlanDate"
+
+                                       {{ if $plan }} value="{{ $plan.PlanDate }}" {{ end }}
+
+                                       required>
+                            </div>
                         </div>
 
-                        <div class="col-md-4 mb-1">
-                            <label for="PlanDate" class="form-label required-field mb-1 fs-6">
-                                Дата
-                            </label>
-                            <input type="date"
-                                   class="form-control form-control-sm "
-                                   id="PlanDate"
-                                   name="PlanDate"
+                        <div class="row g-4">
 
-                                   {{ if $plan }} value="{{ $plan.PlanDate }}" {{ end }}
+                            <div class="col-md-4">
+                                <label for="SectorName" class="form-label required-field mb-1">
+                                    Участки
+                                </label>
+                                <div class="input-group input-group-sm ">
+                                    <input type="hidden"
+                                           id="extSector"
+                                           name="extSector">
 
-                                   required>
+                                    <input type="text"
+                                           class="form-control form-control-sm px-2 rounded-start"
+                                           id="SectorName"
+                                           name="SectorName"
+                                           value=""
+                                           required
+                                           readonly>
+
+                                    <!-- Кнопка выбора из модального окна-->
+                                    <button class="btn btn-outline-secondary rounded-end shadow-none"
+                                            type="button"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#sectorAddModal"
+                                            tabindex="-1">
+                                        ...
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-1">
+                                <label for="PlanCount" class="form-label required-field mb-1 fs-6">
+                                    Плановое количество упаковок
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="PlanCount"
+                                       name="PlanCount"
+
+                                       {{ if $plan }}value="{{ $plan.PlanCount }}" {{ end }}
+
+                                       required>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row g-4">
-
-                        <div class="col-md-4">
-                            <label for="SectorName" class="form-label required-field mb-1">
-                                Участки
+                        <div class="col-md-8">
+                            <label for="PrName" class="form-label required-field mb-1">
+                                Варианты упаковки продукции
                             </label>
                             <div class="input-group input-group-sm ">
                                 <input type="hidden"
-                                       id="extSector"
-                                       name="extSector">
+                                       id="extProduction"
+                                       name="extProduction"
+                                       value="">
 
                                 <input type="text"
                                        class="form-control form-control-sm px-2 rounded-start"
-                                       id="SectorName"
-                                       name="SectorName"
+                                       id="PrName"
+                                       name="PrName"
                                        value=""
                                        required
                                        readonly>
@@ -118,213 +175,167 @@
                                 <button class="btn btn-outline-secondary rounded-end shadow-none"
                                         type="button"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#sectorAddModal"
+                                        data-bs-target="#productionAddModal"
                                         tabindex="-1">
                                     ...
                                 </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-section mb-2">
+                        <h3 class="mb-1 fs-6 fw-bold">Параметры</h3>
+
+                        <div class="row g-4 mb-2">
+
+                            <!--                        1-Й СТОЛБЕЦ -->
+                            <div class="col-md-4 mb-1">
+                                <label for="PrType" class="form-label  mb-1 fs-6">
+                                    Тип продукции
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="PrType"
+                                       name="PrType"
+                                       readonly>
+
+                                <label for="PrArticle" class="form-label  mb-1 fs-6">
+                                    Артикул
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="PrArticle"
+                                       name="PrArticle"
+                                       readonly>
+
+                                <label for="PrCount" class="form-label  mb-0 fs-6">
+                                    Количество продукции в ряду (шт)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="PrCount"
+                                       name="PrCount"
+                                       readonly>
+
+                                <label for="PrWeight" class="form-label mb-0 fs-6">
+                                    Вес (кг)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="PrWeight"
+                                       name="PrWeight"
+                                       min="0"
+                                       readonly>
+                            </div>
+
+                            <!--                        2-Й СТОЛБЕЦ-->
+                            <div class="col-md-4 mb-1">
+                                <label for="PrColor" class="form-label  mb-1 fs-6">
+                                    Цвет
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="PrColor"
+                                       name="PrColor"
+                                       readonly>
+
+                                <label for="barCode" class="form-label  mb-1 fs-6">
+                                    Штрихкод EAN13
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="barCode"
+                                       name="barCode"
+                                       readonly>
+
+                                <label for="PrRows" class="form-label mb-0 fs-6">
+                                    Количество рядов (шт)
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="PrRows"
+                                       name="PrRows"
+                                       readonly>
+
+                                <label for="PrHWD" class="form-label mb-0 fs-6">
+                                    Габариты (В×Ш×Г, мм)
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-sm py-1 mb-1"
+                                       id="PrHWD"
+                                       name="PrHWD"
+                                       readonly>
+
                             </div>
                         </div>
-
-                        <div class="col-md-4 mb-1">
-                            <label for="PlanCount" class="form-label required-field mb-1 fs-6">
-                                Плановое количество упаковок
-                            </label>
-                            <input type="number"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="PlanCount"
-                                   name="PlanCount"
-
-                                   {{ if $plan }}value="{{ $plan.PlanCount }}" {{ end }}
-
-                                   required>
-                        </div>
                     </div>
 
-                    <div class="col-md-8">
-                        <label for="PrName" class="form-label required-field mb-1">
-                            Варианты упаковки продукции
-                        </label>
-                        <div class="input-group input-group-sm ">
-                            <input type="hidden"
-                                   id="extProduction"
-                                   name="extProduction"
-                                   value="">
-
-                            <input type="text"
-                                   class="form-control form-control-sm px-2 rounded-start"
-                                   id="PrName"
-                                   name="PrName"
-                                   value=""
-                                   required
-                                   readonly>
-
-                            <!-- Кнопка выбора из модального окна-->
-                            <button class="btn btn-outline-secondary rounded-end shadow-none"
-                                    type="button"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#productionAddModal"
-                                    tabindex="-1">
-                                ...
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="form-section mb-2">
-                    <h3 class="mb-1 fs-6 fw-bold">Параметры</h3>
-
-                    <div class="row g-4 mb-2">
-
-                        <!--                        1-Й СТОЛБЕЦ -->
-                        <div class="col-md-4 mb-1">
-                            <label for="PrType" class="form-label  mb-1 fs-6">
-                                Тип продукции
-                            </label>
-                            <input type="text"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="PrType"
-                                   name="PrType"
-                                   readonly>
-
-                            <label for="PrArticle" class="form-label  mb-1 fs-6">
-                                Артикул
-                            </label>
-                            <input type="text"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="PrArticle"
-                                   name="PrArticle"
-                                   readonly>
-
-                            <label for="PrCount" class="form-label  mb-0 fs-6">
-                                Количество продукции в ряду (шт)
-                            </label>
-                            <input type="number"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="PrCount"
-                                   name="PrCount"
-                                   readonly>
-
-                            <label for="PrWeight" class="form-label mb-0 fs-6">
-                                Вес (кг)
-                            </label>
-                            <input type="number"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="PrWeight"
-                                   name="PrWeight"
-                                   min="0"
-                                   readonly>
-                        </div>
-
-                        <!--                        2-Й СТОЛБЕЦ-->
-                        <div class="col-md-4 mb-1">
-                            <label for="PrColor" class="form-label  mb-1 fs-6">
-                                Цвет
-                            </label>
-                            <input type="text"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="PrColor"
-                                   name="PrColor"
-                                   readonly>
-
-                            <label for="barCode" class="form-label  mb-1 fs-6">
-                                Штрихкод EAN13
-                            </label>
-                            <input type="text"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="barCode"
-                                   name="barCode"
-                                   readonly>
-
-                            <label for="PrRows" class="form-label mb-0 fs-6">
-                                Количество рядов (шт)
-                            </label>
-                            <input type="number"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="PrRows"
-                                   name="PrRows"
-                                   readonly>
-
-                            <label for="PrHWD" class="form-label mb-0 fs-6">
-                                Габариты (В×Ш×Г, мм)
-                            </label>
-                            <input type="text"
-                                   class="form-control form-control-sm py-1 mb-1"
-                                   id="PrHWD"
-                                   name="PrHWD"
-                                   readonly>
-
-                        </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary prev-tab"
+                                onclick="window.history.back()">
+                            ← Назад к списку
+                        </button>
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="fact-tab">
+                            Далее: Факт выполнения →
+                        </button>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary prev-tab" onclick="window.history.back()">
-                        ← Назад к списку
-                    </button>
-                    <button type="button" class="btn btn-primary next-tab" data-next-tab="fact-tab">
-                        Далее: Факт выполнения →
-                    </button>
+                <!-- Вкладка 2: Факт выполнения -->
+                <div class="tab-pane fade" id="fact" role="tabpanel" aria-labelledby="fact-tab" tabindex="0">
+
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Факт выполнения</h3>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="plan-tab">
+                            ← Назад: Параметры
+                        </button>
+                        <button type="button" class="btn btn-primary next-tab" data-next-tab="info-tab">
+                            Далее: Комментарий →
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Вкладка 2: Факт выполнения -->
-            <div class="tab-pane fade" id="fact" role="tabpanel" aria-labelledby="fact-tab" tabindex="0">
+                <!-- Вкладка 3: Комментарии -->
+                <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
 
-                <div class="form-section">
-                    <h3 class="mb-2 fs-6 fw-bold">Факт выполнения</h3>
-                </div>
+                    <div class="form-section">
+                        <h3 class="mb-2 fs-6 fw-bold">Комментарии и примечания</h3>
 
-                <div class="d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="plan-tab">
-                        ← Назад: Параметры
-                    </button>
-                    <button type="button" class="btn btn-primary next-tab" data-next-tab="info-tab">
-                        Далее: Комментарий →
-                    </button>
-                </div>
-            </div>
-
-            <!-- Вкладка 3: Комментарии -->
-            <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
-
-                <div class="form-section">
-                    <h3 class="mb-2 fs-6 fw-bold">Комментарии и примечания</h3>
-
-                    <div class="row g-0">
-                        <div class="col-12 mb-1">
-                            <label for="PlanInfo" class="form-label mb-0 fs-6">
-                                Комментарий
-                            </label>
-                            <textarea type="text"
-                                      class="form-control form-control-sm py-1"
-                                      id="PlanInfo"
-                                      name="PlanInfo"
-                                      rows="6"
-                                      placeholder="Напишите ваш комментарий здесь..."
-                                      maxlength="2000">{{ if $plan }}{{ $plan.PlanInfo }}{{ end }}
+                        <div class="row g-0">
+                            <div class="col-12 mb-1">
+                                <label for="PlanInfo" class="form-label mb-0 fs-6">
+                                    Комментарий
+                                </label>
+                                <textarea type="text"
+                                          class="form-control form-control-sm py-1"
+                                          id="PlanInfo"
+                                          name="PlanInfo"
+                                          rows="6"
+                                          placeholder="Напишите ваш комментарий здесь..."
+                                          maxlength="2000">{{ if $plan }}{{ $plan.PlanInfo }}{{ end }}
                                 </textarea>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="fact-tab">
+                            ← Назад: Факт выполнения
+                        </button>
+                        <!-- Проблема с проверкой кнопки, на данный момент id кнопки не работает (saveProductionBtn)-->
+                        <button type="submit" class="btn btn-success" id="savePlanBtn1">
+                            <i class="bi bi-check-circle"></i>Сохранить сменно-суточный план
+                        </button>
                     </div>
                 </div>
 
-                <div class="form-actions">
-                    <button type="button" class="btn btn-outline-secondary prev-tab" data-prev-tab="fact-tab">
-                        ← Назад: Факт выполнения
-                    </button>
-                    <!-- Проблема с проверкой кнопки, на данный момент id кнопки не работает (saveProductionBtn)-->
-                    <button type="submit" class="btn btn-success" id="savePlanBtn1">
-                        <i class="bi bi-check-circle"></i>Сохранить сменно-суточный план
-                    </button>
-                </div>
             </div>
-
-
-
-
-
         </form>
 
     </div>
